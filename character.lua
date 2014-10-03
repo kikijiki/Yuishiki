@@ -24,6 +24,13 @@ function Character:initialize(data)
   self.items = {}
 end
 
+function Character:setGm(gm)
+  self.gm = gm
+  self.agent.actuator.data.character = self
+  self.agent.actuator.data.gm = gm
+  self.agent.actuator.prepare = function(a, ...) return a.data.gm, a.data.character, ... end
+end
+
 function Character.static.load(path)
   local data = summon.AssetLoader.loadRaw(path)
   return Character(data)
@@ -92,6 +99,15 @@ function Character:addCStat(name, ...)
   local stat = Stat.Composite(...) 
   self.status[name] = stat
   return stat
+end
+
+function Character:addAction(name, action)
+  self.actions[name] = action
+  self.agent.actuator:addAction(name, action)
+  self.agent.actuator.actions[name].condition = function(gm, c, ...)
+    local cost = action.cost(gm, c, ...)
+    return gm.canPayCost(c, cost)
+  end
 end
 
 function Character:kill()

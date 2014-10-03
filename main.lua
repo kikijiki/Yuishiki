@@ -40,6 +40,11 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   end
+  
+  if key == "f12" then
+    local ss = love.graphics.newScreenshot()
+    ss:encode("ss"..os.date("%Y%m%d%H%M%S")..".bmp", "bmp")
+  end
 end
 
 function love.mousepressed(x, y, button)

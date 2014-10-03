@@ -96,4 +96,42 @@ function GM:update(dt)
   self.world:update(dt)
 end
 
+function GM.canPayCost(c, cost)
+  if not cost then return true end
+  
+  if type(cost) == "number" then
+    return not (c.status.ap:get() < cost)
+  end
+  
+  for k,v in pairs(cost) do
+    local stat = c.status[k]:get()
+    if stat < v then return false end
+  end
+  
+  return true
+end
+
+function GM.payCost(c, cost)
+  if not cost then return true end
+  
+  if type(cost) == "number" then
+    c.status.ap:sub(cost)
+    return
+  end
+  
+  for k,v in pairs(cost) do
+    local stat = c.status[k]
+    stat:sub(v)
+  end
+end
+
+function GM.tryToPayCost(c, cost)
+  if GM.canPayCost(c, cost) then
+    GM.payCost(c, cost)
+    return true
+  else
+    return false
+  end
+end
+
 return GM

@@ -103,14 +103,18 @@ function Stage:mousepressed(x, y, button)
     self.camera:startDrag(vec(x, y))
   end
   
+  if button == "r" then
+    self.camera:follow(vec(0, 0))
+  end
+  
   if button == "wu" then
     local c = self.camera
-    c:zoom(1.2)
+    c:zoomIn()
   end
   
   if button == "wd" then
     local c = self.camera
-    c:zoom(1/1.2)
+    c:zoomOut()
   end
   
   self.dispatcher:dispatch("mousepressed", x, y, button)

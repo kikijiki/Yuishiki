@@ -57,14 +57,14 @@ function Plan:step()
     self,
     self.parameters,
     self.agent.bdi.belief_base.interface,
-    self.agent.devices.interface)}
+    self.agent.actuator.interface)}
 
   local err = table.remove(ret, 1) == false
   table.insert(self.results.history, ret)
   self.results.last = ret
   
-  --[5.2] if err then ys.log.w("Error in plan body.", table.unpack(ret)) end
-  if err then ys.log.w("Error in plan body.", unpack(ret)) end
+  --[[5.2]]-- if err then ys.log.w("Error in plan body.", table.unpack(ret)) end
+  --[[5.1]] if err then ys.log.w("Error in plan body.", unpack(ret)) end
   return err, ret
 end
 

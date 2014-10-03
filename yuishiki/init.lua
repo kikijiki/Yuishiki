@@ -23,7 +23,6 @@ local path = ... .. "."
 --[[]] ys.mas = {}
 --[[]] ys.mas.Sensor          = require (path.."mas.sensor")
 --[[]] ys.mas.Actuator        = require (path.."mas.actuator")
---[[]] ys.mas.DeviceBase      = require (path.."mas.device-base")
 --[[]] ys.mas.EventQueue      = require (path.."mas.event-queue")
 --[[]] ys.mas.Event           = require (path.."mas.event")
 --[[]] ys.mas.Trigger         = require (path.."mas.trigger")

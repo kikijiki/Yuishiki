@@ -15,7 +15,7 @@ function Model:initialize(agent)
   
   self.interface = setmetatable({}, {
     beliefs = self.belief_base.interface,
-    devices = agent.devices.interface,
+    actuator = agent.actuator.interface,
     internal = agent,
     external = setmetatable({},{}),
     __newindex = function(t, k)

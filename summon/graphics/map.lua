@@ -75,6 +75,7 @@ function Map:initialize(name, tileset)
   self.tiles = {}
   self.grid = {}
   self.animations = {}
+  self.aabb = {}
   self.directions = {
     ["NE"] = vec(-1,  0),
     ["NW"] = vec( 0, -1),
@@ -130,6 +131,7 @@ function Map.static.load(path)
   end
   
   map:computeDepth(max)
+  map:computeAABB()
   return map
 end
 
@@ -139,6 +141,28 @@ function Map:assignTileCoordinates(t)
   local dx, dy = self.tileset.tileOffset:unpack()
 
   t.position = vec((ir - il) * dx, (ir + il) * dy)
+end
+
+function Map:computeAABB()
+  local left, top, right, bottom = 0, 0, 0, 0
+  
+  for _,tile in pairs(self.tiles) do
+    local i = self:getTilePixelCoordinates(tile.coordinates)
+    local dx, dy = self.tileset.tileOffset:unpack()
+    
+    left = math.min(i.base.x - dx, left)
+    right = math.max(i.base.x + dx, right)
+    top = math.min(i.top.y - dy, top)
+    bottom = math.max(i.base.y + dy, bottom)
+  end
+  
+  self.aabb = {
+    left = left, 
+    top = top, 
+    right = right, 
+    bottom = bottom, 
+    width = right - left,
+    height = bottom - top }
 end
 
 function Map:computeDepth(max)

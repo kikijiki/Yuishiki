@@ -7,9 +7,9 @@ function Agent:initialize()
   self.id = generateId()
   self.step_count = 0
 
-  self.devices = ys.mas.DeviceBase(self)
-  --self.event_queue = ys.mas.EventQueue()
   self.dispatcher  = ys.mas.EventDispatcher()
+  self.actuator = ys.mas.Actuator()
+  self.sensors = {}
   
   self.modules = {}
   self.custom = {}
@@ -50,7 +50,10 @@ function Agent:step()
 end
 
 function Agent:onEvent(event)
-  self.device_base:onEvent(event)
+  for _,sensor in pairs(self.sensors) do
+    local sensor_event = sensor:onEvent(event)
+    if sensor_event then self:dispatchEvent(sensor_event) end
+  end
 end
 
 function Agent:plugComponent(module, source, loader)

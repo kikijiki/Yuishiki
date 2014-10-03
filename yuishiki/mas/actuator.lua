@@ -1,107 +1,64 @@
-local Actuator = ys.class("Actuator")
-local actuator_class_prefix = "actuator_"
-Actuator.static._ys_component_type = "actuator"
+local Actuator = ys.common.class("Actuator")
 
-local generateId =  ys.common.uti.makeIdGenerator("actuator")
-local generateEventId = ys.common.uti.makeIdGenerator("actuator_action", true)
+--[[
+  Actuator data
+   - actions
+   - prepare (optional)
+   - data (optional)
+  Action data
+   - body
+   - condition (optional)
+]]
 
-function Actuator.static.define(name, actions)
-  local A = ys.class(actuator_class_prefix..name, ys.mas.Actuator)
-  A.static.name = name
-  A.actions = actions or {}
-  
-  A.initialize = function(self, agent)
-    Actuator.initialize(self, agent)
-    for _,action in pairs(A.actions) do self:add(action) end
-  end
-  
-  A.register = function(action) assert(action and action.name and action.execute)
-    A.actions[action.name] = action
-  end
-  
-  return A
-end
-
-function Actuator:initialize(agent, actions) assert(agent)
-  self.agent = agent
-  self.id = generateId()
-  self.actions = {}
-  self.pending = {}
-  
-  if actions then
-    for _,action in pairs(actions) do self:add(action) end
-  end
-  
-  self.interface = setmetatable({}, {
-    __index = function(t, k)
-      return function(...) return self:execute(k, ...) end
-    end,
-    __newindex = function(t, k)
-      ys.log.w("Trying to modify an interface.")
-      return ys.common.uti.null_interface
-    end
+local function setInterface(metamethod, i)
+  return setmetatable({}, {
+      ["__"..metamethod] = i,
+      __newindex = function()
+        ys.log.w("Trying to modify an interface.")
+        return ys.common.uti.null_interface
+      end
   })
 end
 
-function Actuator:update()
-  for _,data in pairs(self.pending) do self:updateThread(data) end
+function Actuator:initialize(data, actions)
+  self.data = data or {}
+  self.actions = actions or {}
+  
+  self.interface = setInterface("index", {
+    ["do"] = setInterface("index", setInterface("call", function(t, ...) return self:execute(t, ...) end)),
+    ["can"] = setInterface("index", setInterface("call", function(t, ...) return self:canExecute(t, ...) end))
+  })
 end
 
-function Actuator:updateThread(data) assert(data)
-  local thread = data.thread
-  ----[5.2] local ret = {coroutine.resume(thread, self, table.unpack(data.parameters))}
-  local ret = {coroutine.resume(thread, self, unpack(data.parameters))}
-  local err = ret[1] == false
-  table.remove(ret, 1)
-  ----[5.2] if err == false then ys.log.w("Actuator <"..self.class.name.."> raised an error:", table.unpack(ret)) end
-  local finished = (coroutine.status(thread) == "dead")
-  if not finished and err == false then
-    ys.log.w("Actuator <"..self.class.name.."> raised an error:", unpack(ret))
-  end
-  local event = ys.mas.Event.Actuator(data.id, finished, ret)
-  self.agent:sendInternalEvent(event)
-  if finished then self.pending[data.id] = nil end
+function Actuator:addAction(name, action)
+  self.actions[name] = action
 end
 
 function Actuator:execute(action, ...)
-  if not self:isActive() then return end
   local a = self.actions[action]
-
   if a then
-    if a.canExecute and not a.canExecute(self, ...) then
-      ys.log.w("Actuator <"..self.class.name.."> raised an error: execution condition of action <"..action.."> is not satisfied.")
-      return
+    local param = {...}
+    if self.prepare then
+      return a.body(self:prepare(...))
+    else
+      return a.body(...)
+    end
+  end
+end
+
+function Actuator:canExecute(action, ...)
+  local a = self.actions[action]
+  if a then
+    if not a.condition then return true end
+    local param = {...}
+    if self.prepare then
+      return a.condition(self:prepare(...))
+    else
+      return a.condition(...)
     end
   else
-    ys.log.w("Actuator <"..self.class.name.."> raised an error: action <"..action.."> does not exist.")
-    return
+    return false
   end
-  
-  local id = generateEventId()
-  local thread = coroutine.create(a.execute)
-  local thread_data = {id = id, thread = thread, parameters = {...}}
-  
-  self.pending[id] = thread_data
-  self:updateThread(thread_data)
-  
-  return id
 end
-
-function Actuator:abort(id)
-  self.pending[id] = nil
-end
-
-function Actuator:add(action) assert(action and action.name and action.execute)
-  self.actions[action.name] = action
-end
-
-function Actuator:getYsType()
-  return "actuator"
-end
-
---[[Methods to override]]--
-
-function Actuator:isActive() return true end
-function Actuator:isBusy(action, parameters) return false end
 
 return Actuator

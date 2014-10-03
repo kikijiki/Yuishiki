@@ -48,6 +48,14 @@ function Camera:zoom(factor)
   self.scale = self.scale * factor
 end
 
+function Camera:zoomIn()
+  self:zoom(1.2)
+end
+
+function Camera:zoomOut()
+  self:zoom(1/1.2)
+end
+
 function Camera:follow(target)
   self.target = target
 end
