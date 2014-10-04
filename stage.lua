@@ -83,8 +83,8 @@ function Stage:keypressed(key)
   end
   
   if key == " " and self.gm.activeCharacter then
-    --self.gm.activeCharacter:moveTo(self.world.map, vec(1, 1))
-    self.gm:applyRule("moveCharacter", self.gm.activeCharacter, vec(5, 5))
+    --self.gm:executeAction(self.gm.activeCharacter, "move", vec(5, 5))
+    self.gm.activeCharacter.agent.actuator.interface.exec.move(vec(5, 5))
   end
   
   

@@ -1,8 +1,11 @@
 local GM = summon.class("GM")
 
+local Action = require "action"
+
 function GM:initialize(world)
   self.world = world
-  self.ruleset = {}
+  self.rules = {}
+  self.actions = {}
   
   self.turnCount = 0
   self.initiative = {results = {}, list = {}, current = 0}
@@ -10,15 +13,19 @@ function GM:initialize(world)
 end
 
 function GM:loadRules(ruleset)
-  for k,v in pairs(ruleset) do
-    if self.ruleset[k] then summon.log.i("Overriding rule '"..k.."'.") end
-    self.ruleset[k] = v
+  for k,v in pairs(ruleset.rules) do
+    if self.rules[k] then summon.log.i("Overriding rule '"..k.."'.") end
+    self.rules[k] = v
+  end
+  for k,v in pairs(ruleset.actions) do
+    if self.actions[k] then summon.log.i("Overriding action '"..k.."'.") end
+    self.actions[k] = Action(v)
   end
 end
 
 function GM:applyRule(rule, ...)
-  if self.ruleset[rule] then
-    return self.ruleset[rule](self, ...)
+  if self.rules[rule] then
+    return self.rules[rule](self, ...)
   else
     summon.log.w("Could not apply rule '"..rule.."'.")
   end
@@ -71,6 +78,7 @@ function GM:addCharacter(character, id) assert(character)
       for i = 1, times do self:applyRule(v[1], character, character.status) end
     end
   end
+  character:setGm(self)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
 end
@@ -96,7 +104,10 @@ function GM:update(dt)
   self.world:update(dt)
 end
 
-function GM.canPayCost(c, cost)
+function GM:canPayCost(c, cost, ...)
+  if type(cost) == "function" then
+    cost = cost(self, c, ...)
+  end
   if not cost then return true end
   
   if type(cost) == "number" then
@@ -111,7 +122,10 @@ function GM.canPayCost(c, cost)
   return true
 end
 
-function GM.payCost(c, cost)
+function GM:payCost(c, cost, ...)
+  if type(cost) == "function" then
+    cost = cost(self, c, ...)
+  end
   if not cost then return true end
   
   if type(cost) == "number" then
@@ -125,13 +139,25 @@ function GM.payCost(c, cost)
   end
 end
 
-function GM.tryToPayCost(c, cost)
-  if GM.canPayCost(c, cost) then
-    GM.payCost(c, cost)
+function GM:tryToPayCost(c, cost, ...)
+  if self:canPayCost(c, cost, ...) then
+    self:payCost(c, cost, ...)
     return true
   else
     return false
   end
+end
+
+function GM:executeAction(c, a, ...)
+  if not c or not c.actions[a] or not self.actions[a] then return false end
+  local action = self.actions[a]
+  return action:execute(self, c, ...)
+end
+
+function GM:canExecuteAction(c, a, ...)
+  if not c or not c.actions[a] or not self.actions[a] then return false end
+  local action = self.actions[a]
+  return action:canExecute(self, c, ...)
 end
 
 return GM

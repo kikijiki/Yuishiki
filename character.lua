@@ -26,9 +26,14 @@ end
 
 function Character:setGm(gm)
   self.gm = gm
-  self.agent.actuator.data.character = self
-  self.agent.actuator.data.gm = gm
-  self.agent.actuator.prepare = function(a, ...) return a.data.gm, a.data.character, ... end
+  self.agent.actuator:setCaller({
+    execute = function(a, ...)
+      self.gm:executeAction(self, a, ...)
+    end,
+    canExecute = function(a, ...)
+      self.gm:canExecuteAction(self, a, ...)
+    end
+  })
 end
 
 function Character.static.load(path)
@@ -101,13 +106,9 @@ function Character:addCStat(name, ...)
   return stat
 end
 
-function Character:addAction(name, action)
-  self.actions[name] = action
-  self.agent.actuator:addAction(name, action)
-  self.agent.actuator.actions[name].condition = function(gm, c, ...)
-    local cost = action.cost(gm, c, ...)
-    return gm.canPayCost(c, cost)
-  end
+function Character:addAction(name)
+  self.actions[name] = true
+  self.agent.actuator:addAction(name)
 end
 
 function Character:kill()

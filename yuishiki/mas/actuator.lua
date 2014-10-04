@@ -1,63 +1,47 @@
 local Actuator = ys.common.class("Actuator")
 
---[[
-  Actuator data
-   - actions
-   - prepare (optional)
-   - data (optional)
-  Action data
-   - body
-   - condition (optional)
-]]
-
-local function setInterface(metamethod, i)
-  return setmetatable({}, {
-      ["__"..metamethod] = i,
-      __newindex = function()
-        ys.log.w("Trying to modify an interface.")
-        return ys.common.uti.null_interface
-      end
-  })
-end
-
-function Actuator:initialize(data, actions)
-  self.data = data or {}
-  self.actions = actions or {}
+function Actuator:initialize()
+  self.actions = {}
   
-  self.interface = setInterface("index", {
-    ["do"] = setInterface("index", setInterface("call", function(t, ...) return self:execute(t, ...) end)),
-    ["can"] = setInterface("index", setInterface("call", function(t, ...) return self:canExecute(t, ...) end))
-  })
+  self.interface = {
+    exec = setmetatable({}, {
+      __index = function(_, k)
+        return setmetatable({}, {
+          __call = function(_, ...)
+            return self:execute(k, ...)
+          end
+        })
+      end
+    }),
+    can = setmetatable({}, {
+      __index = function(_, k)
+        return setmetatable({}, {
+          __call = function(_, ...)
+            return self:execute(k, ...)
+          end
+        })
+      end
+    })
+  }
 end
 
-function Actuator:addAction(name, action)
-  self.actions[name] = action
+function Actuator:setCaller(caller)
+  self.caller = caller
+end
+
+function Actuator:addAction(action)
+  self.actions[action] = action
 end
 
 function Actuator:execute(action, ...)
-  local a = self.actions[action]
-  if a then
-    local param = {...}
-    if self.prepare then
-      return a.body(self:prepare(...))
-    else
-      return a.body(...)
-    end
+  if self.caller and self.caller.execute then
+    return self.caller.execute(action, ...)
   end
 end
 
 function Actuator:canExecute(action, ...)
-  local a = self.actions[action]
-  if a then
-    if not a.condition then return true end
-    local param = {...}
-    if self.prepare then
-      return a.condition(self:prepare(...))
-    else
-      return a.condition(...)
-    end
-  else
-    return false
+  if caller and caller.canExecute then
+    return caller.canExecute(action, ...)
   end
 end
 
