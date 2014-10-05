@@ -25,6 +25,16 @@ function love.load()
 
   table.sort(scenarios, function(a, b) return a.name < b.title end)
   gamestate.switch(require "states.menu", scenarios)
+  
+  --console.load(nil, nil, nil, function(t)
+  --  local f = loadstring(t)
+  --  print(pcall(f))
+  --end)
+  print = function(...)
+    local out = ""
+    for _,v in pairs({...}) do out = out.."  "..tostring(v) end
+    console.i(out)
+  end
 end
 
 function love.update(dt)
@@ -33,9 +43,7 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-  if console.keypressed(key) then
-    return false
-  end
+  if key == '`' then console.visible = not console.visible end
 
   if key == "escape" then
     love.event.quit()
@@ -45,6 +53,10 @@ function love.keypressed(key)
     local ss = love.graphics.newScreenshot()
     ss:encode("ss"..os.date("%Y%m%d%H%M%S")..".bmp", "bmp")
   end
+end
+
+function love.textinput(t)
+    --if t ~= '`' then console.input = console.input .. t end
 end
 
 function love.mousepressed(x, y, button)

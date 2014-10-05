@@ -63,7 +63,7 @@ function console.load( keyCode, fontSize, keyRepeat, inputCallback )
 end
 
 function console.resize( w, h )
-	console.w, console.h = w, h / 5
+	console.w, console.h = w, h / 3
 	console.linesPerConsole = math.floor((console.h - console.margin * 2) / console.lineHeight)
 end
 
@@ -76,8 +76,8 @@ function console.keypressed(key)
 			console.input = ""
 		elseif key == "backspace" then
 			console.input = string.sub(console.input, 0, #console.input - 1)
-		else
-			console.input = console.input .. key
+		--else
+		--	console.input = console.input .. key
 		end
 		return true
 	end

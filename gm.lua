@@ -1,25 +1,46 @@
 local GM = summon.class("GM")
 
 local Action = require "action"
+local Item = require "item"
+local Weapon = require "weapon"
+local console = require "lib.console"
 
 function GM:initialize(world)
   self.world = world
   self.rules = {}
   self.actions = {}
+  self.items = {}
   
   self.turnCount = 0
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
+  self.logger = console.i
 end
 
-function GM:loadRules(ruleset)
-  for k,v in pairs(ruleset.rules) do
+function GM:loadRuleset(ruleset)
+  if ruleset.rules then self:loadRules(ruleset.rules) end
+  if ruleset.actions then self:loadActions(ruleset.actions) end
+  if ruleset.items then self:loadItems(ruleset.items) end
+end
+
+function GM:loadRules(rules)
+  for k,v in pairs(rules) do
     if self.rules[k] then summon.log.i("Overriding rule '"..k.."'.") end
     self.rules[k] = v
   end
-  for k,v in pairs(ruleset.actions) do
+end
+
+function GM:loadActions(actions)
+  for k,v in pairs(actions) do
     if self.actions[k] then summon.log.i("Overriding action '"..k.."'.") end
     self.actions[k] = Action(v)
+  end
+end
+
+function GM:loadItems(items)
+  for k,v in pairs(items) do
+    if self.items[k] then summon.log.i("Overriding weapon '"..k.."'.") end
+    self.items[k] = v
   end
 end
 
@@ -72,15 +93,30 @@ end
 
 function GM:addCharacter(character, id) assert(character)
   self:applyRule("initializeCharacter", character)
+  
   if character.modules then 
     for _,v in pairs(character.modules) do 
       local times = v[2] or 1
       for i = 1, times do self:applyRule(v[1], character, character.status) end
     end
   end
+  
+  if character.items then
+    for slot, name in pairs(character.data.items) do
+      local item = self:instanceItem(name)
+      if item then character:equip(item, slot) end
+    end
+  end
+  
   character:setGm(self)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
+end
+
+function GM:instanceItem(name)
+  local item_data = self.items[name]
+  if not item_data then return end
+  if item_data.item_type == "weapon" then return Weapon(item_data) end
 end
 
 function GM:nextCharacter()
@@ -158,6 +194,39 @@ function GM:canExecuteAction(c, a, ...)
   if not c or not c.actions[a] or not self.actions[a] then return false end
   local action = self.actions[a]
   return action:canExecute(self, c, ...)
+end
+
+function GM:getCharacterDistance(c1, c2)
+  local co1 = c1.status.position:get()
+  local co2 = c2.status.position:get()
+  return math.abs(co1.x - co2.x) + math.abs(co1.y - co2.y)
+end
+
+function GM:kill(character)
+  character:kill()
+end
+
+function GM:log(msg)
+  self.logger(msg)
+end
+
+function GM:logc(c, msg)
+  self.logger("["..c.name.."] "..msg)
+end
+
+function GM:logcc(c, target, msg)
+  self.logger("["..c.name.."]->["..target.name.."] "..msg)
+end
+
+function GM:roll(v1, v2)
+  if not v2 then
+    ret = math.random(v1)
+    self:log("Roll [1, "..v1.."] -> "..ret)
+  else
+    ret = math.random(v1, v2)
+    self:log("Roll ["..v1..", "..v2.."] -> "..ret)
+  end
+  return ret
 end
 
 return GM

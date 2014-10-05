@@ -41,6 +41,7 @@ function BattleInterface:initialize(stage)
   self.stage = stage
   self.cursor = Cursor()
   self.mouse = {}
+  self.console = {}
 end
 
 function BattleInterface:setCursor(position)
@@ -76,6 +77,7 @@ end
 
 function drawBar(x, y, w, h, v, max, color)
   local barw = w * v / max
+  barw = math.max(0, barw)
   
   sg.setColor(30, 30, 30)
   sg.rectangle("fill", x, y, w, h)

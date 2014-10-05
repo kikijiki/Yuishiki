@@ -216,12 +216,12 @@ function WalkCommand:execute()
   self:push(TranslateCommand(data.top, data.spriteZ, sprite.speed.movement))
   
   sprite:setAnimation("walk", false)
-  sprite:setDirection(self.map:getFacingDirection(self.character.status.position, self.destination))
+  sprite:setDirection(self.map:getFacingDirection(self.character.status.position:get(), self.destination))
   self:finish()
 end
 
 function WalkCommand:onPop()
-  self.character.status.position = self.destination
+  self.character.status.position:set(self.destination)
   --self.sprite:setAnimation("idle", false)
 end
 
@@ -252,7 +252,7 @@ function JumpCommand:execute()
     return
   end
 
-  local from = self.map:getTilePixelCoordinates(self.character.status.position)
+  local from = self.map:getTilePixelCoordinates(self.character.status.position:get())
   local to = self.map:getTilePixelCoordinates(self.destination)
   local h = to.height - from.height
   
@@ -273,7 +273,7 @@ function JumpCommand:execute()
   self.speed = self.distance / self.duration
 
   self.sprite:setAnimation("jump")
-  self.sprite:setDirection(self.map:getFacingDirection(self.character.status.position, self.destination))
+  self.sprite:setDirection(self.map:getFacingDirection(self.character.status.position:get(), self.destination))
 end
 
 function JumpCommand:update(dt)
@@ -301,7 +301,7 @@ end
 
 function JumpCommand:onPop()
   self.sprite:setPosition(self.to.top, self.to.spriteZ)
-  self.character.status.position = self.destination
+  self.character.status.position:set(self.destination)
 end
 
 export.JumpCommand = JumpCommand
@@ -322,14 +322,14 @@ function StepCommand:execute()
   Command.execute(self)
   
   if type(self.destination) == "string" then
-    self.destination = self.map.directions[self.destination] + self.character.status.position
+    self.destination = self.map.directions[self.destination] + self.character.status.position:get()
   end
   if not self.map:containsTile(self.destination) then
     self:finish()
     return
   end
   
-  local from = self.map:getTilePixelCoordinates(self.character.status.position)
+  local from = self.map:getTilePixelCoordinates(self.character.status.position:get())
   local to = self.map:getTilePixelCoordinates(self.destination)
   
   if from.heightM == to.heightM then

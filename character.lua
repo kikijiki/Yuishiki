@@ -6,6 +6,7 @@ local Command = summon.game.Command
 local Stat = require "stat"
 
 function Character:initialize(data)
+  self.data = data
   self.name = data.name
   self.modules= data.modules
   
@@ -14,14 +15,12 @@ function Character:initialize(data)
   self.autoIdle = false
   
   self.agent = ys.mas.Agent()
-   
-  self.status = {
-    name = self.name,
-    position = vec(1, 1)
-  }
-  
+
+  self.status = {}
   self.actions = {}
   self.items = {}
+  
+  self:addStat("position", vec(1, 1))
 end
 
 function Character:setGm(gm)
@@ -116,10 +115,17 @@ function Character:kill()
   self.sprite:setAnimation("dead")
 end
 
-function Character:moveTo(map, dest)
-  local path = map:pathTo(self.status.position, dest)
+function Character:move(map, path)
   for _,v in pairs(path) do
-    self:appendCommand(Command.StepCommand(v.coordinates, map))
+    self:appendCommand(Command.StepCommand(v, map))
+  end
+end
+
+function Character:equip(item, slot)
+  if slot then
+    self.items[slot] = item
+  else
+    table.insert(self.items, item)
   end
 end
 

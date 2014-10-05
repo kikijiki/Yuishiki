@@ -258,7 +258,7 @@ function Map:pathTo(from, to)
       return ret
     end,
     function(a, b, n)
-      return a.coordinates:dist2(b.coordinates)
+      return 1 + math.abs(a.height - b.height) * 10 --a.coordinates:dist2(b.coordinates)
     end,
     function(a, b)
       return a.coordinates:dist2(b.coordinates) + math.abs(a.height - b.height) * 10

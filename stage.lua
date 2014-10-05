@@ -21,7 +21,7 @@ function Stage:initialize(data, characters)
   local path = summon.AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
   summon.fs.getDirectoryItems(path, function(file)
     local ruleset = summon.fs.load(path..file)()
-    self.gm:loadRules(ruleset)
+    self.gm:loadRuleset(ruleset)
   end)
 
   for _,char in pairs(data.characters) do
@@ -84,7 +84,7 @@ function Stage:keypressed(key)
   
   if key == " " and self.gm.activeCharacter then
     --self.gm:executeAction(self.gm.activeCharacter, "move", vec(5, 5))
-    self.gm.activeCharacter.agent.actuator.interface.exec.move(vec(5, 5))
+    self.gm.activeCharacter.agent.actuator.interface.exec.attack(self.gm.world.characters["char2"])
   end
   
   

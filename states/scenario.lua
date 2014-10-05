@@ -31,7 +31,7 @@ end
 function Scenario:play()
   local characters = {}
   for id,char in pairs(self.data.characters) do
-    characters[id] = summon.AssetLoader.load("character", char)
+    characters[id] = summon.AssetLoader.load("character", char, false, id)
   end
 
   local phases = self.data.phases

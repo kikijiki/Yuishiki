@@ -22,12 +22,12 @@ function World:placeCharacter(char, x, y)
   if type(char) == "string" then char = self.characters[char] end
   
   if not x then
-    pos = char.status.position
+    pos = char.status.position:get()
   else
     if y then pos = vec(x, y)
     else pos = x end
   end
-  char.status.position = pos
+  char.status.position:set(pos)
   char.sprite:setPosition(self.map:getTilePixelCoordinates(pos).top)
 end
 

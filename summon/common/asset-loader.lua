@@ -33,7 +33,7 @@ end
 -- @param caching Set to false to disable caching for this asset (optional, default = true).
 -- @usage Assets.load("texture", "tex0.png")
 -- @return the asset.
-function AssetLoader.load(asset_type, asset_name, caching)
+function AssetLoader.load(asset_type, asset_name, caching, ...)
   assert(asset_type, "Asset type is nil.")
   assert(asset_name, "Asset name is nil.")
 
@@ -43,12 +43,12 @@ function AssetLoader.load(asset_type, asset_name, caching)
   local path = base_path..asset_name
 
   caching = caching or a.caching
-  if not caching then return AssetLoader.loadDirect(a.loader, path, base_path, asset_name) end
+  if not caching then return AssetLoader.loadDirect(a.loader, path, base_path, asset_name, ...) end
   
   if cache[asset_type][asset_name] then
     return cache[asset_type][asset_name].asset
   else
-    local data = AssetLoader.loadDirect(a.loader, path, base_path, asset_name)
+    local data = AssetLoader.loadDirect(a.loader, path, base_path, asset_name, ...)
     if data then 
       cache[asset_type][asset_name] = {asset = data, path = path}
       return data
@@ -56,8 +56,8 @@ function AssetLoader.load(asset_type, asset_name, caching)
   end
 end
 
-function AssetLoader.loadDirect(loader, path, base_path, asset_name)
-  local ret, buf = pcall(loader, path, base_path, asset_name)
+function AssetLoader.loadDirect(loader, path, base_path, asset_name, ...)
+  local ret, buf = pcall(loader, path, base_path, asset_name, ...)
   if ret then 
     return buf
   else
