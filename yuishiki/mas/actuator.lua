@@ -3,26 +3,23 @@ local Actuator = ys.common.class("Actuator")
 function Actuator:initialize()
   self.actions = {}
   
-  self.interface = {
-    exec = setmetatable({}, {
-      __index = function(_, k)
+  self.interface = setmetatable({}, {
+    __index = function(_, k)
+      if k == "can" then
+        return setmetatable({}, {
+        __call = function(_, ...)
+          return self:execute(k, ...)
+        end
+      })
+      else
         return setmetatable({}, {
           __call = function(_, ...)
             return self:execute(k, ...)
           end
         })
       end
-    }),
-    can = setmetatable({}, {
-      __index = function(_, k)
-        return setmetatable({}, {
-          __call = function(_, ...)
-            return self:execute(k, ...)
-          end
-        })
-      end
-    })
-  }
+    end
+  })
 end
 
 function Actuator:setCaller(caller)

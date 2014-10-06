@@ -57,14 +57,15 @@ local GoalTrigger = ys.class("GoalTrigger", Trigger)
 Trigger.Goal = GoalTrigger
 
 function GoalTrigger:initialize(goal_name)
-  Trigger.initialize(self, Trigger.TriggerMode.Goal)
-  self.goal_name = goal_name
+  Trigger.initialize(self, Trigger.TriggerMode.Goal, {goal_name = goal_name})
 end
 
-function GoalTrigger:check(goal)
-  if not goal then return false end
-  if self.goal_name then return goal.name == self.goal_name
-  else return true end
+function Trigger.static.fromData(data)
+  if not data then return end
+  local trigger_type = data[1]
+  if trigger_type == "goal" then return Trigger.Goal(select(2, unpack(data))) end
+  if trigger_type == "event" then return Trigger.Event(select(2, unpack(data))) end
+  if trigger_type == "custom" then return Trigger.Custom(select(2, unpack(data))) end
 end
 
 return Trigger

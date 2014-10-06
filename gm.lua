@@ -65,7 +65,6 @@ end
 
 function GM:updateInitiative(character)
   local init = self.initiative
-  local cur = init.current
   
   if character then
     local i = self:applyRule("initiative", character)
@@ -77,7 +76,7 @@ function GM:updateInitiative(character)
         flag = true
         table.insert(init.results, j, {i, character})
         table.insert(init.list, j, character)
-        if cur > 0 and j < cur then cur = cur + 1 end
+        if init.current > 0 and j < init.current then init.current = init.current + 1 end
       end 
     end
     
@@ -87,24 +86,26 @@ function GM:updateInitiative(character)
     end
   end
 
-  self.initiative.current = 0
+  --self.initiative.current = 0
   self.activeCharacter = nil
 end
 
 function GM:addCharacter(character, id) assert(character)
-  self:applyRule("initializeCharacter", character)
-  
-  if character.modules then 
-    for _,v in pairs(character.modules) do 
-      local times = v[2] or 1
-      for i = 1, times do self:applyRule(v[1], character, character.status) end
+  if not character.gm then -- if not already initialized
+    self:applyRule("initializeCharacter", character)
+    
+    if character.modules then 
+      for _,v in pairs(character.modules) do 
+        local times = v[2] or 1
+        for i = 1, times do self:applyRule(v[1], character, character.status) end
+      end
     end
-  end
-  
-  if character.items then
-    for slot, name in pairs(character.data.items) do
-      local item = self:instanceItem(name)
-      if item then character:equip(item, slot) end
+    
+    if character.items then
+      for slot, name in pairs(character.data.items) do
+        local item = self:instanceItem(name)
+        if item then character:equip(item, slot) end
+      end
     end
   end
   
@@ -121,7 +122,6 @@ end
 
 function GM:nextCharacter()
   local init = self.initiative
-  
   init.current = init.current + 1
   if init.current > #init.list then return false end
   
@@ -204,6 +204,19 @@ end
 
 function GM:kill(character)
   character:kill()
+  
+  local init = self.initiative
+  print(#init.list, #init.results)
+  
+  for i = 1, #init.list do
+    local entry = init.list[i]
+    print("Entry "..i.." "..entry.name)
+    if entry == character then print("removing "..entry.name)
+      table.remove(init.list, i)
+      table.remove(init.results, i)
+      if init.current > i then init.current = init.current - 1 end
+    end
+  end
 end
 
 function GM:log(msg)

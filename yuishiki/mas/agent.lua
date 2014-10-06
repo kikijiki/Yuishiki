@@ -56,29 +56,43 @@ function Agent:onEvent(event)
   end
 end
 
-function Agent:plugComponent(module, source, loader)
-  module.before[source]()
-  if module.components[source] then
-    for _,v in pairs(module.components[source]) do
-      loader(v)
+function Agent:plug(mod)
+  if type(mod) ~= "table" then return end
+  
+  if mod.g then
+    for k,v in pairs(mod.g) do
+      local goal_schema = ys.bdi.Goal.define(k, v)
+      self.bdi.goal_base:register(goal_schema)
     end
   end
-  module.after[source]()
+  
+  if mod.p then
+    for k,v in pairs(mod.p) do
+      local plan_schema = ys.bdi.Plan.define(k, v)
+      self.bdi.plan_base:register(plan_schema)
+    end
+  end
+  
+  if mod.b then
+    for k,v in pairs(mod.b) do
+      local belief = ys.bdi.Belief.fromData(k, v)
+      self.bdi.belief_base:set(belief)
+    end
+  end
+
+  if mod.f then
+    for k,f in pairs(mod.f) do
+      self.bdi.functions[k] = f
+    end
+  end
+  
+  return true
 end
 
-function Agent:plug(module)
-  module.before["plugging"]()
-
-  self:plugComponent(module, "goal", function(x) self.bdi.goal_base:register(x) end)
-  self:plugComponent(module, "plan", function(x) self.bdi.plan_base:register(x) end)
-  self:plugComponent(module, "belief", function(x) self.bdi.belief_base:set(x) end)
-  
-  module.before["bdi_functions"]()
-  for k,f in pairs(module.functions) do self.bdi.functions[k] = f end
-  module.after["bdi_functions"]()
-
-  module.after["plugging"]()
-  return true
+function Agent:bindBelief(name, ...)
+  local belief = ys.bdi.Belief.External(name, ...)
+  self.bdi.belief_base:set(belief)
+  return belief
 end
 
 return Agent

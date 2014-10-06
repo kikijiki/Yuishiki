@@ -15,7 +15,8 @@ local scenarios_path = "assets/scenarios/"
 local scenarios = {}
 
 function love.load()
-  summon.AssetLoader.register("character", "characters", require("character").load, true)
+  summon.AssetLoader.register("character", "characters", require("character").load, false)
+  summon.AssetLoader.register("aimod", "aimods", require("character").loadAiMod, false)
   gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })
   
   summon.fs.getDirectoryItems(scenarios_path, function(file)
@@ -30,10 +31,12 @@ function love.load()
   --  local f = loadstring(t)
   --  print(pcall(f))
   --end)
+  local luaprint = print
   print = function(...)
     local out = ""
     for _,v in pairs({...}) do out = out.."  "..tostring(v) end
     console.i(out)
+    luaprint(...)
   end
 end
 

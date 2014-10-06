@@ -27,7 +27,6 @@ local path = ... .. "."
 --[[]] ys.mas.Event           = require (path.."mas.event")
 --[[]] ys.mas.Trigger         = require (path.."mas.trigger")
 --[[]] ys.mas.EventDispatcher = require (path.."mas.event-dispatcher")
---[[]] ys.mas.Module          = require (path.."mas.module")
 --[[]] ys.mas.Agent           = require (path.."mas.agent")
 
 --[[BDI]]

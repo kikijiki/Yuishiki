@@ -76,6 +76,11 @@ function Sprite:setPosition(v, z)
   if z then self.z = z end
 end
 
+function Sprite:setPositionFromTile(map, v)
+  local tilec = map:getTilePixelCoordinates(v)
+  self:setPosition(tilec.top, tilec.spriteZ)
+end
+
 function Sprite:move(v, z)
   self.position = self.position + v
   if z then self.z = self.z + z end

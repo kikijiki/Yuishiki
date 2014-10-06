@@ -9,15 +9,15 @@ Plan.static.Status = ys.common.uti.makeEnum("New", "Active", "WaitEvent", "WaitS
 Plan.static.FailReason = ys.common.uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
 Plan.static.Condition = ys.common.uti.makeEnum("Success", "Failure", "Context", "Completion")
 
-function Plan.static.define(name, body, data)
+function Plan.static.define(name, data)
   local P = ys.class(plan_class_prefix..name, ys.bdi.Plan)
 
   P.static.default = data
   P.static.members = {"name", "body", "trigger", "condition", "on", "manage_subgoal_failure", "priority"}
   
   P.static.name = name
-  P.static.body = body
-  P.static.trigger = data.trigger
+  P.static.body = data.body
+  P.static.trigger = Trigger.fromData(data.trigger)
   P.static.condition = ys.common.ManualTrigger(data.condition)
   P.static.on = ys.common.ManualTrigger(data.on)
   P.static.manage_subgoal_failure = data.manage_subgoal_failure or false

@@ -2,6 +2,7 @@ assert(ys, "Yuishiki is not loaded.")
 
 local Goal = ys.common.class("BDI_Goal")
 local goal_class_prefix = "goal_"
+local Trigger = ys.mas.Trigger
 
 Goal.static.Status = ys.common.uti.makeEnum("New", "Active", "Succeeded", "Failed")
 Goal.static.FailReason = ys.common.uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
@@ -12,7 +13,7 @@ function Goal.static.define(name, data)
   G.static.default = data
   G.static.members = {"name", "trigger", "condition", "limit", "on", "retry"}
   G.static.name = name
-  G.static.trigger = data.trigger
+  G.static.trigger = Trigger.fromData(data.trigger)
   G.static.condition = ys.common.ManualTrigger(data.condition)
   G.static.limit = data.limit
   G.static.on = ys.common.ManualTrigger(data.on)

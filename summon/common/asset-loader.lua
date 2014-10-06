@@ -69,12 +69,12 @@ end
 function AssetLoader.loadRaw(path, name, env)
   assert(path, "Path is nil.")
   
-  local err, data
+  local ret, data
   if name then
     local a = assets[path]
-    err, data = assert(summon.common.uti.runSandboxed(assets_path..a.path.."/"..name, env))
+    ret, data = assert(summon.common.uti.runSandboxed(assets_path..a.path.."/"..name, env))
   else
-    err, data = assert(summon.common.uti.runSandboxed(path, env))
+    ret, data = assert(summon.common.uti.runSandboxed(path, env))
   end
   return data
 end

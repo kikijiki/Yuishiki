@@ -28,7 +28,7 @@ function World:placeCharacter(char, x, y)
     else pos = x end
   end
   char.status.position:set(pos)
-  char.sprite:setPosition(self.map:getTilePixelCoordinates(pos).top)
+  char.sprite:setPositionFromTile(self.map, pos)
 end
 
 function World:draw()

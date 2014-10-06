@@ -7,26 +7,9 @@ Belief.static.Source = ys.common.uti.makeEnum("Internal", "External", "Dynamic")
 
 local Event = ys.mas.Event
 
-function Belief.static.define(name, source, initialValue)
-  return {
-    name = name,
-    source = source,
-    value = initialValue,
-    getYsType = function() return "belief" end
-  }
-end
-
-function Belief.static.define(name, source, initialValue)
-  return {
-    name = name,
-    source = source,
-    value = initialValue,
-    getYsType = function() return "belief" end
-  }
-end
-
-function Belief:initialize(name) assert(name)
+function Belief:initialize(name, value) assert(name)
   self.name = name
+  self.value = value
 end
 
 function Belief:get()
@@ -69,23 +52,19 @@ end
 local ExternalBelief = ys.common.class("ExternalBelief", Belief)
 Belief.External = ExternalBelief
 
-function ExternalBelief:initialize(name, data)
-  Belief.initialize(self, name)
+function ExternalBelief:initialize(name, getter)
+  Belief.initialize(self, name, getter)
   self.source = Belief.Source.External
-  if data then self:bind(data) end
 end
 
 function ExternalBelief:get()
-  local v = self.value
-  if v.source and v.key then
-    return v.source[v.key]
-  else
-    return nil
+  if self.value then
+    return self.value()
   end
 end
 
-function ExternalBelief:bind(data)
-  self.value = {source = data[1], key = data[2]}
+function ExternalBelief:bind(getter)
+  self.value = getter
 end
 
 function ExternalBelief:update(old)
@@ -93,7 +72,7 @@ function ExternalBelief:update(old)
 end
 
 function ExternalBelief:clone()
-  local copy = ExternalBelief(self.name, nil, self.value)
+  local copy = ExternalBelief(self.name, self.value)
   return copy
 end
 
@@ -191,6 +170,11 @@ function BeliefSet:onChildChange(child_event)
       self.parent:onChildChange(event)
     end
   end
+end
+
+function Belief.fromData(name, data)
+  if data[1] == "internal" then return Belief.Internal(name, select(2, unpack(data))) end
+  if data[1] == "external" then return Belief.External(name, select(2, unpack(data))) end
 end
 
 return Belief

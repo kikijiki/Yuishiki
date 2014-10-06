@@ -8,13 +8,19 @@ local Stat = require "stat"
 function Character:initialize(data)
   self.data = data
   self.name = data.name
-  self.modules= data.modules
+  self.modules = data.modules
+  self.aimod = data.aimod
   
   self.sprite = summon.AssetLoader.load("sprite", data.sprite)
   self.commands = summon.common.Stack()
   self.autoIdle = false
   
   self.agent = ys.mas.Agent()
+  
+  for _,v in pairs(self.aimod) do
+    local aimod = summon.AssetLoader.load("aimod", v)
+    self.agent:plug(aimod)
+  end
 
   self.status = {}
   self.actions = {}
@@ -38,6 +44,10 @@ end
 function Character.static.load(path)
   local data = summon.AssetLoader.loadRaw(path)
   return Character(data)
+end
+
+function Character.static.loadAiMod(path)
+  return summon.AssetLoader.loadRaw(path)
 end
 
 function Character:setEnvironment(env)
@@ -93,15 +103,24 @@ function Character:speak(message, duration)
   summon.speechrenderer.add(self, message, duration, function() return self:getTag("head") + vec(10, -10) * self.scale end)
 end
 
+function Character:bindStat(name, stat)
+  local belief = self.agent:bindBelief(name, function() return stat:get() end)
+  stat:listen(belief, function(stat, new, old)
+    belief:onChange(old) 
+  end)
+end
+
 function Character:addStat(name, ...)
   local stat = Stat(...) 
   self.status[name] = stat
+  self:bindStat(name, stat)
   return stat
 end
 
 function Character:addCStat(name, ...)
   local stat = Stat.Composite(...) 
   self.status[name] = stat
+  self:bindStat(name, stat)
   return stat
 end
 

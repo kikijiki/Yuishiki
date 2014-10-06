@@ -28,8 +28,8 @@ end
 -- Private
 
 function Model:selectIntention()
-  if self.functions.selectIntentionFunction then 
-    return self.custom.selectIntentionFunction(self, self.intention_base)
+  if self.functions.selectIntention then 
+    return self.functions.selectIntention(self, self.intention_base)
   else
     for _,v in pairs(self.intention_base.intentions) do
       if not v:empty() then return v end
@@ -38,8 +38,8 @@ function Model:selectIntention()
 end
 
 function Model:selectOption(options)
-  if self.functions.selectOptionFunction then
-    return self.functions.selectOptionFunction(self, options)
+  if self.functions.selectOption then
+    return self.functions.selectOption(self, options)
   else
     return options[1]
   end
