@@ -96,6 +96,15 @@ function Plan:waitForEvent(name, parameters)
   end
 end
 
+function Plan:waitForBelief(name, condition, ...)
+  if not name then
+    return self:yield()
+  else
+    local trigger = Trigger.Belief(name, condition, ...)
+    return self:waitForTrigger(trigger)
+  end
+end
+
 function Plan:waitForActuator(id)
   if not id then
     return self:yield()
