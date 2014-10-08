@@ -2,23 +2,24 @@ assert(ys, "Yuishiki is not loaded.")
 
 local GoalBase = ys.common.class("BDI_GoalBase")
 local Goal, Plan, Trigger = ys.bdi.Goal, ys.bdi.Plan, ys.mas.Trigger
+local Event = ys.mas.Event
 
 function GoalBase:initialize(agent) assert(agent)
   self.agent = agent
   self.goal_schemas = {}
   self.inhibited = {}
   self.lookup = {trigger = {}}
-  
+
   self.lookup = {}
-  for _,v in pairs(Trigger.TriggerMode) do
-    self.lookup[v] = {} 
+  for _,v in pairs(Event.EventType) do
+    self.lookup[v] = {}
   end
 end
 
 function GoalBase:register(schema) assert(schema)
   self.goal_schemas[schema.name] = schema
   if schema.trigger then
-    table.insert(self.lookup[schema.trigger.trigger_mode], schema)
+    table.insert(self.lookup[schema.trigger.event_type], schema)
   end
 end
 
@@ -47,7 +48,7 @@ function GoalBase:canInstance(schema) assert(schema)
       return false, "The limit condition ("..schema.limit..") is not satisfied."
     end
   end
-  
+
   return true
 end
 
@@ -57,7 +58,7 @@ function GoalBase:checkDynamicTriggers()
       local goal = self:instance(schema)
       self.agent:addIntention(goal)
     end
-  end  
+  end
 end
 
 function GoalBase:onEvent(event)

@@ -2,7 +2,7 @@ local Trigger = ys.common.class("Trigger")
 local Event = ys.mas.Event
 local EventType = Event.EventType
 
-function Trigger:initialize(event_type, parameters) assert(trigger_mode)
+function Trigger:initialize(event_type, parameters)
   self.event_type = event_type
   self.parameters = parameters
 end
@@ -25,18 +25,18 @@ function EventTrigger:check(event)
   -- TODO: class of events?
   if not self.event_name then return true end
   if event.event_type ~= self.event_name then return false end
-  
+
   local tp = self.parameters
   local ep = event.parameters
-  
+
   if tp == nil then return true end
   if ep == nil then return false end
-  
+
   -- Condition: non-nil trigger parameters must be equal.
   for k,v in pairs(tp) do
     if ep[k] ~= v then return false end
   end
-  
+
   return true
 end
 
@@ -71,7 +71,7 @@ function BeliefTrigger:initialize(name, condition, ...) assert(name) assert(Beli
 end
 
 BeliefTrigger.static.conditions = {
-  equal         = function(old, new, p)      return new == p                end
+  equal         = function(old, new, p)      return new == p                end,
   changed       = function(old, new)         return old ~= new              end,
   at_least      = function(old, new, p)      return new >= p                end,
   at_most       = function(old, new, p)      return new <= p                end,
@@ -80,9 +80,9 @@ BeliefTrigger.static.conditions = {
   increased     = function(old, new)         return new >  old              end,
   decreased     = function(old, new)         return old >  new              end,
   not_increased = function(old, new)         return new <= old              end,
-  not_decreased = function(old, new)         return old >= new              end,  
-  in_range      = function(old, new, p1, p2) return new <= p2 and new >= p1 end
-  in_range_ex   = function(old, new, p1, p2) return new <  p2 and new > p1  end
+  not_decreased = function(old, new)         return old >= new              end,
+  in_range      = function(old, new, p1, p2) return new <= p2 and new >= p1 end,
+  in_range_ex   = function(old, new, p1, p2) return new <  p2 and new > p1  end,
 }
 
 function BeliefTrigger:check(event)

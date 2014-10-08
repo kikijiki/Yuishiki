@@ -18,7 +18,7 @@ function love.load()
   summon.AssetLoader.register("character", "characters", require("character").load, false)
   summon.AssetLoader.register("aimod", "aimods", require("character").loadAiMod, false)
   gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })
-  
+
   summon.fs.getDirectoryItems(scenarios_path, function(file)
     local scenario = summon.fs.load(scenarios_path..file)()
     table.insert(scenarios, scenario)
@@ -26,7 +26,7 @@ function love.load()
 
   table.sort(scenarios, function(a, b) return a.name < b.title end)
   gamestate.switch(require "states.menu", scenarios)
-  
+
   --console.load(nil, nil, nil, function(t)
   --  local f = loadstring(t)
   --  print(pcall(f))
@@ -51,7 +51,7 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   end
-  
+
   if key == "f12" then
     local ss = love.graphics.newScreenshot()
     ss:encode("ss"..os.date("%Y%m%d%H%M%S")..".bmp", "bmp")
