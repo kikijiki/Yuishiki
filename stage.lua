@@ -33,6 +33,7 @@ function Stage:initialize(data, characters)
   if data.init then data.init(self, self.world, self.world.characters) end
   self.gm:start()
   self.gm:nextTurn()
+  self.gm:nextCharacter()
 end
 
 function Stage:resize(w, h)
@@ -74,14 +75,10 @@ end
 
 function Stage:keypressed(key)
   if key == "return" then
-    local char = self.gm:nextCharacter()
-    if not char then
-      self.gm:nextTurn()
-      char = self.gm:nextCharacter()
-    end
-    if char then
-      self.camera:follow(char.sprite)
-    end
+    self.gm:resume()
+    --if char then
+    -- self.camera:follow(char.sprite)
+    -- end
   end
 
   if key == " " and self.gm.activeCharacter then

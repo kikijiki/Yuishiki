@@ -44,10 +44,10 @@ end
 
 function IntentionBase:waiting()
   for _,intention in pairs(self.intentions) do
-    if not intention:waiting() then return false end
+    if intention:waiting() then return true end
   end
-  
-  return true
+
+  return false
 end
 
 return IntentionBase

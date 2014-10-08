@@ -12,6 +12,7 @@ function GM:initialize(world)
   self.items = {}
 
   self.turnCount = 0
+  self.paused = false
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
   self.logger = console.i
@@ -130,15 +131,21 @@ function GM:nextCharacter()
 end
 
 function GM:update(dt)
+  self.world:update(dt)
+
+  if self.paused then return end
+  
   local char = self.activeCharacter
-  if char then
-    while char.commands:empty() and not char.agent:waiting() do
-      print("step")
-      char.agent:step()
+  if not char then return end
+
+  for i = 1, 10 do
+    if not char.commands:empty() then return end
+    if not char.agent:step() or char.agent:waiting() then
+      self:nextCharacter()
+      self:pause()
+      return
     end
   end
-
-  self.world:update(dt)
 end
 
 function GM:canPayCost(c, cost, ...)
@@ -241,6 +248,14 @@ function GM:roll(v1, v2)
     self:log("Roll ["..v1..", "..v2.."] -> "..ret)
   end
   return ret
+end
+
+function GM:pause()
+  self.paused = true
+end
+
+function GM:resume()
+  self.paused = false
 end
 
 return GM
