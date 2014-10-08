@@ -6,15 +6,14 @@ local Plan, Trigger = ys.bdi.Plan, ys.mas.Trigger
 function PlanBase:initialize(agent) assert(agent)
   self.agent = agent
   self.plan_schemas = {}
-  self.triggers = {goals = {}, creation = {}}
+  self.triggers = {goal = {}, creation = {}}
 end
 
-function watchTrigger(triggers, name, schema)
-  if schema[name] then
-    local et = schema[name].event_type
-    if not triggers[name][et] then triggers[name][et] = {} end
-    table.insert(triggers[name][et], schema)
-  end
+function watchTrigger(triggers, schema)
+  if not schema[name] then return end
+  local et = schema[name].event_type
+  if not triggers[et] then triggers[et] = {} end
+  table.insert(triggers[et], schema)
 end
 
 function PlanBase:register(schema)
@@ -24,8 +23,9 @@ function PlanBase:register(schema)
     schema.body)
 
   self.plan_schemas[schema.name] = schema
-  watchTrigger(self.triggers, creation, schema)
-  watchTrigger(self.triggers, goal, schema)
+
+  if schema.goal then table.insert(self.triggers.goal, schema) end
+  if schema.creation then table.insert(self.triggers.creation, schema) end
 end
 
 function PlanBase:instance(schema, parameters) assert(schema)
@@ -50,27 +50,8 @@ function PlanBase:filter(goal)
   return options
 end
 
-function checkCreationTrigger(goal_base, event)
-  local et = event.event_type
-  local triggers = goal_base.triggers
-
-  if not triggers[et] then return end
-
-  for _,schema in pairs(triggers[et]) do
-    if schema.creation:check(event) and goal_base:canInstance(schema) then
-      local goal = goal_base:instance(schema, event.parameters)
-      goal_base.agent.bdi:addIntention(goal)
-    end
-  end
-end
-
 function PlanBase:onEvent(event)
-  local et = event.event_type
-  local triggers = self.triggers
-
-  if not triggers[et] then return end
-
-  for _,schema in pairs(triggers[et]) do
+  for _,schema in pairs(self.triggers.creation) do
     if schema.creation:check(event) and self:canInstance(schema) then
       local plan = self:instance(schema, event.parameters)
       goal_base.agent.bdi:addIntention(plan)

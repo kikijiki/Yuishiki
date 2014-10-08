@@ -8,20 +8,12 @@ function GoalBase:initialize(agent) assert(agent)
   self.agent = agent
   self.goal_schemas = {}
   self.inhibited = {}
-  self.triggers = {goals = {}, creation = {}}
-end
-
-function watchTrigger(triggers, name, schema)
-  if schema[name] then
-    local et = schema[name].event_type
-    if not triggers[name][et] then triggers[name][et] = {} end
-    table.insert(triggers[name][et], schema)
-  end
+  self.triggers = {}
 end
 
 function GoalBase:register(schema) assert(schema and schema.name)
   self.goal_schemas[schema.name] = schema
-  watchTrigger(self.triggers, creation, schema)
+  if schema.creation then table.insert(self.triggers, schema) end
 end
 
 function GoalBase:instance(name, parameters) assert(name)
@@ -55,11 +47,8 @@ end
 
 function GoalBase:onEvent(event)
   local et = event.event_type
-  local triggers = self.triggers
 
-  if not triggers[et] then return end
-
-  for _,schema in pairs(triggers[et]) do
+  for _,schema in pairs(self.triggers) do
     if schema.creation:check(event) and self:canInstance(schema) then
       local goal = self:instance(schema, event.parameters)
       self.agent.bdi:addIntention(goal)

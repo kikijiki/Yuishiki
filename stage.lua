@@ -28,6 +28,8 @@ function Stage:initialize(data, characters)
     self.gm:addCharacter(characters[char], char)
   end
 
+  characters["char1"].agent.bdi:pushGoal("be in location", {x = 2, y = 2})
+
   if data.init then data.init(self, self.world, self.world.characters) end
   self.gm:start()
   self.gm:nextTurn()

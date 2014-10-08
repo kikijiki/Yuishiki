@@ -10,7 +10,7 @@ function GM:initialize(world)
   self.rules = {}
   self.actions = {}
   self.items = {}
-  
+
   self.turnCount = 0
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
@@ -65,11 +65,11 @@ end
 
 function GM:updateInitiative(character)
   local init = self.initiative
-  
+
   if character then
     local i = self:applyRule("initiative", character)
     local flag = false
-    
+
     for j = 1, #init.results do
       local entry = init.results[j]
       if entry[1] < i then
@@ -77,9 +77,9 @@ function GM:updateInitiative(character)
         table.insert(init.results, j, {i, character})
         table.insert(init.list, j, character)
         if init.current > 0 and j < init.current then init.current = init.current + 1 end
-      end 
+      end
     end
-    
+
    if not flag then
       table.insert(init.results, {i, character})
       table.insert(init.list, character)
@@ -93,14 +93,14 @@ end
 function GM:addCharacter(character, id) assert(character)
   if not character.gm then -- if not already initialized
     self:applyRule("initializeCharacter", character)
-    
-    if character.modules then 
-      for _,v in pairs(character.modules) do 
+
+    if character.modules then
+      for _,v in pairs(character.modules) do
         local times = v[2] or 1
         for i = 1, times do self:applyRule(v[1], character, character.status) end
       end
     end
-    
+
     if character.items then
       for slot, name in pairs(character.data.items) do
         local item = self:instanceItem(name)
@@ -108,7 +108,7 @@ function GM:addCharacter(character, id) assert(character)
       end
     end
   end
-  
+
   character:setGm(self)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
@@ -124,7 +124,7 @@ function GM:nextCharacter()
   local init = self.initiative
   init.current = init.current + 1
   if init.current > #init.list then return false end
-  
+
   self.activeCharacter = init.list[init.current]
   return self.activeCharacter
 end
@@ -132,11 +132,12 @@ end
 function GM:update(dt)
   local char = self.activeCharacter
   if char then
-    while char and char.commands:empty() and not char.agent:waiting() do
+    while char.commands:empty() and not char.agent:waiting() do
+      print("step")
       char.agent:step()
     end
   end
-  
+
   self.world:update(dt)
 end
 
@@ -145,16 +146,16 @@ function GM:canPayCost(c, cost, ...)
     cost = cost(self, c, ...)
   end
   if not cost then return true end
-  
+
   if type(cost) == "number" then
     return not (c.status.ap:get() < cost)
   end
-  
+
   for k,v in pairs(cost) do
     local stat = c.status[k]:get()
     if stat < v then return false end
   end
-  
+
   return true
 end
 
@@ -163,12 +164,12 @@ function GM:payCost(c, cost, ...)
     cost = cost(self, c, ...)
   end
   if not cost then return true end
-  
+
   if type(cost) == "number" then
     c.status.ap:sub(cost)
     return
   end
-  
+
   for k,v in pairs(cost) do
     local stat = c.status[k]
     stat:sub(v)
@@ -204,10 +205,10 @@ end
 
 function GM:kill(character)
   character:kill()
-  
+
   local init = self.initiative
   print(#init.list, #init.results)
-  
+
   for i = 1, #init.list do
     local entry = init.list[i]
     print("Entry "..i.." "..entry.name)

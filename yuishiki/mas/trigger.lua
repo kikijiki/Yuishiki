@@ -13,7 +13,7 @@ end
 
 function Trigger:check(event)
   if not event then return false end
-  if self.event_name and not self.event_name == event.event_name then return false end
+  if self.event_name and not self.event_name == event.name then return false end
   return event.event_type == self.event_type
 end
 

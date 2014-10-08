@@ -1,4 +1,5 @@
 local Model = ys.common.class("BDI_Model")
+local Event = ys.mas.Event
 
 function Model:initialize(agent)
   self.agent = agent
@@ -51,7 +52,8 @@ function Model:selectOption(goal, options)
 end
 
 function Model:processGoal(goal)
-  local options = self.plan_base:filter(goal)
+  local event = Event.Goal(goal)
+  local options = self.plan_base:filter(event)
 
   if options == nil or #options == 0 then
     ys.log.i("No plans available for the goal <"..goal.name..">.")
