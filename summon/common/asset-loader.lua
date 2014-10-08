@@ -9,6 +9,9 @@ local assets = {}
 local assets_path = "assets/"
 local cache = {}
 
+AssetLoader.sandboxed = true
+AssetLoader.protected = true
+
 --- Register a type of asset.
 -- @param asset The name of the asset type.
 -- @param path The default subpath where to search for this type of assets.
@@ -44,12 +47,12 @@ function AssetLoader.load(asset_type, asset_name, caching, ...)
 
   caching = caching or a.caching
   if not caching then return AssetLoader.loadDirect(a.loader, path, base_path, asset_name, ...) end
-  
+
   if cache[asset_type][asset_name] then
     return cache[asset_type][asset_name].asset
   else
     local data = AssetLoader.loadDirect(a.loader, path, base_path, asset_name, ...)
-    if data then 
+    if data then
       cache[asset_type][asset_name] = {asset = data, path = path}
       return data
     end
@@ -57,19 +60,34 @@ function AssetLoader.load(asset_type, asset_name, caching, ...)
 end
 
 function AssetLoader.loadDirect(loader, path, base_path, asset_name, ...)
-  local ret, buf = pcall(loader, path, base_path, asset_name, ...)
-  if ret then 
-    return buf
+  if AssetLoader.protected then
+    local ret, buf = pcall(loader, path, base_path, asset_name, ...)
+
+    if ret then
+      return buf
+    else
+      summon.log.w("Could not load \""..path.."\", error: "..tostring(buf))
+      return nil
+    end
   else
-    summon.log.w("Could not load \""..path.."\", error: "..tostring(buf))
-    return nil
+    return loader(path, base_path, asset_name, ...)
   end
 end
 
 function AssetLoader.loadRaw(path, name, env)
   assert(path, "Path is nil.")
-  
-  local ret, data
+  local final_path = path
+  if name then final_path = assets_path..assets[path].path.."/"..name end
+
+  if AssetLoader.sandboxed then
+    local ret, data
+    ret, data = assert(summon.common.uti.runSandboxed(path, env))
+    return data
+  else
+    return love.filesystem.load(path)()
+  end
+
+
   if name then
     local a = assets[path]
     ret, data = assert(summon.common.uti.runSandboxed(assets_path..a.path.."/"..name, env))
@@ -85,7 +103,7 @@ end
 -- @param asset_name The name of the asset to clear, or nil for all.
 function AssetLoader.clear(asset_type, asset_name)
   assert(asset_type, "Asset type is nil.")
-  
+
   if asset_type then
     if asset_name then cache[asset_type][asset_name] = nil
     else cache[asset_type] = {} end
@@ -99,9 +117,9 @@ end
 -- @param asset_name The name of the asset to reload, or nil for all.
 function AssetLoader.reload(asset_type, asset_name)
   assert(asset_type, "Asset type is nil.")
-  
+
   local c = cache[asset_type]
-  
+
   if asset_name and c[asset_name].reload then c[asset_name]:reload(path)
   else
     for k,v in pairs(c) do

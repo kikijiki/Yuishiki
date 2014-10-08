@@ -14,8 +14,8 @@ local GoalEvent = ys.class("GoalEvent", Event)
 Event.Event = GoalEvent
 
 function GoalEvent:initialize(goal) assert(goal)
-  Event.initialize(self, 
-    Event.EventType.Goal, 
+  Event.initialize(self,
+    Event.EventType.Goal,
     Event.Source.Internal,
     { name = goal.name,
       goal = goal
@@ -26,7 +26,7 @@ local MessageEvent = ys.class("MessageEvent", Event)
 Event.Message = MessageEvent
 
 function MessageEvent:initialize(message) assert(message)
-  Event.initialize(self, 
+  Event.initialize(self,
     Event.EventType.Message,
     Event.Source.Internal,
     { message = message })
@@ -37,8 +37,8 @@ Event.Belief = BeliefEvent
 
 function BeliefEvent:initialize(belief, old, ...) assert(belief)
   Event.initialize(self,
-    Event.EventType.Belief, 
-    Event.Source.Internal, 
+    Event.EventType.Belief,
+    Event.Source.Internal,
     { name = belief.name,
       old_value = old,
       belief = belief,
@@ -53,8 +53,8 @@ Event.Belief = BeliefEvent
 
 function BeliefSetEvent:initialize(beliefset, change, key, ...) assert(beliefset) assert(change)
   Event.initialize(self,
-    Event.EventType.Belief, 
-    Event.Source.Internal, 
+    Event.EventType.Belief,
+    Event.Source.Internal,
     { name = beliefset.name,
       change = change,
       key = key,
@@ -84,7 +84,7 @@ function ActuatorEvent:initialize(id, finished, data)
     { id = id,
       finished = finished,
       data = data
-    })  
+    })
 end
 
 function Event:__tostring()

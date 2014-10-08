@@ -8,19 +8,20 @@ function GoalBase:initialize(agent) assert(agent)
   self.agent = agent
   self.goal_schemas = {}
   self.inhibited = {}
-  self.lookup = {trigger = {}}
+  self.triggers = {goals = {}, creation = {}}
+end
 
-  self.lookup = {}
-  for _,v in pairs(Event.EventType) do
-    self.lookup[v] = {}
+function watchTrigger(triggers, name, schema)
+  if schema[name] then
+    local et = schema[name].event_type
+    if not triggers[name][et] then triggers[name][et] = {} end
+    table.insert(triggers[name][et], schema)
   end
 end
 
-function GoalBase:register(schema) assert(schema)
+function GoalBase:register(schema) assert(schema and schema.name)
   self.goal_schemas[schema.name] = schema
-  if schema.trigger then
-    table.insert(self.lookup[schema.trigger.event_type], schema)
-  end
+  watchTrigger(self.triggers, creation, schema)
 end
 
 function GoalBase:instance(name, parameters) assert(name)
@@ -52,20 +53,16 @@ function GoalBase:canInstance(schema) assert(schema)
   return true
 end
 
-function GoalBase:checkDynamicTriggers()
-  for _,schema in pairs(self.lookup.trigger.dynamic) do
-    if schema.trigger:check() and self:canInstance(schema) then
-      local goal = self:instance(schema)
-      self.agent:addIntention(goal)
-    end
-  end
-end
-
 function GoalBase:onEvent(event)
-  for _,schema in pairs(self.lookup.event) do
-    if schema.trigger:check(event) and self:canInstance(schema) then
+  local et = event.event_type
+  local triggers = self.triggers
+
+  if not triggers[et] then return end
+
+  for _,schema in pairs(triggers[et]) do
+    if schema.creation:check(event) and self:canInstance(schema) then
       local goal = self:instance(schema, event.parameters)
-      self.agent.bgi:addIntention(goal)
+      self.agent.bdi:addIntention(goal)
     end
   end
 end

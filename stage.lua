@@ -27,7 +27,7 @@ function Stage:initialize(data, characters)
   for _,char in pairs(data.characters) do
     self.gm:addCharacter(characters[char], char)
   end
-  
+
   if data.init then data.init(self, self.world, self.world.characters) end
   self.gm:start()
   self.gm:nextTurn()
@@ -77,18 +77,18 @@ function Stage:keypressed(key)
       self.gm:nextTurn()
       char = self.gm:nextCharacter()
     end
-    if char then 
+    if char then
       self.camera:follow(char.sprite)
     end
   end
-  
+
   if key == " " and self.gm.activeCharacter then
     self.gm.activeCharacter.agent.actuator.interface.attack(self.gm.world.characters["char2"])
   end
-  
-  
+
+
   self.dispatcher:dispatch("keypressed", key)
-  
+
   if self.gm.activeCharacter then
     if key == "up" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("NE", self.world.map)) end
     if key == "down" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("SW", self.world.map)) end
@@ -101,21 +101,21 @@ function Stage:mousepressed(x, y, button)
   if button == "l" then
     self.camera:startDrag(vec(x, y))
   end
-  
+
   if button == "r" then
     self.camera:follow(vec(0, 0))
   end
-  
+
   if button == "wu" then
     local c = self.camera
     c:zoomIn()
   end
-  
+
   if button == "wd" then
     local c = self.camera
     c:zoomOut()
   end
-  
+
   self.dispatcher:dispatch("mousepressed", x, y, button)
 end
 

@@ -2,24 +2,21 @@ local EventDispatcher = ys.class("EventDispatcher")
 local Event = ys.mas.Event
 
 function EventDispatcher:initialize()
-  self.listeners = {}
+  self.listeners = {all = {}}
 
   for _,v in pairs(Event.EventType) do
     self.listeners[v] = {}
   end
 end
 
- function EventDispatcher:register(l, event_types, priority)
-  assert(
-    l and 
-    l.onEvent and 
-    type(l.onEvent) == "function")
+ function EventDispatcher:register(l, event_types, priority) assert(l)
 
-  event_types = event_types or Event.EventType
-  if type(event_types) ~= "table" then event_type = {event_type} end
+  priority = priority or 0
+  event_types = event_types or "all"
+  if type(event_types) ~= "table" then event_types = {event_type} end
 
   for _,event_type in pairs(event_types) do
-    table.insert(self.listeners[event_type], setmetatable({priority = priority, listener = l}, {__mode = "v"}))
+    table.insert(self.listeners[event_type], setmetatable({priority = priority, listener = l}, {__mode = "k"}))
     table.sort(self.listeners[event_type],
       function(a, b)
         return a.priority < b.priority
@@ -40,6 +37,10 @@ end
 
 function EventDispatcher:send(event)
   for _,listener_entry in pairs(self.listeners[event.event_type]) do
+    listener_entry.listener:onEvent(event)
+  end
+
+  for _,listener_entry in pairs(self.listeners["all"]) do
     listener_entry.listener:onEvent(event)
   end
 end

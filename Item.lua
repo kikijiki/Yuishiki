@@ -1,6 +1,4 @@
-local Class = require "lib.middleclass"
-
-local Item = Class("Item")
+local Item = require "lib.middleclass"("Item")
 
 function Item:initialize(name, item_type, slot)
   self.name = name

@@ -10,12 +10,12 @@ function Agent:initialize()
   self.dispatcher  = ys.mas.EventDispatcher()
   self.actuator = ys.mas.Actuator()
   self.sensors = {}
-  
+
   self.modules = {}
   self.custom = {}
-  
+
   self.bdi = ys.bdi.Model(self)
-  
+
   self.interface = setmetatable({}, {
     bdi = self.bdi,
     internal = self,
@@ -58,21 +58,21 @@ end
 
 function Agent:plug(mod)
   if type(mod) ~= "table" then return end
-  
+
   if mod.g then
     for k,v in pairs(mod.g) do
       local goal_schema = ys.bdi.Goal.define(k, v)
       self.bdi.goal_base:register(goal_schema)
     end
   end
-  
+
   if mod.p then
     for k,v in pairs(mod.p) do
       local plan_schema = ys.bdi.Plan.define(k, v)
       self.bdi.plan_base:register(plan_schema)
     end
   end
-  
+
   if mod.b then
     for k,v in pairs(mod.b) do
       local belief = ys.bdi.Belief.fromData(k, v)
@@ -85,7 +85,7 @@ function Agent:plug(mod)
       self.bdi.functions[k] = f
     end
   end
-  
+
   return true
 end
 

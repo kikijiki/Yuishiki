@@ -13,16 +13,19 @@ function Plan.static.define(name, data)
   local P = ys.class(plan_class_prefix..name, ys.bdi.Plan)
 
   P.static.default = data
-  P.static.members = {"name", "body", "trigger", "condition", "on", "manage_subgoal_failure", "priority"}
-  
+  P.static.members = {
+    "name", "body", "goal", "creation", "condition",
+    "on", "manage_subgoal_failure", "priority" }
+
   P.static.name = name
   P.static.body = data.body
-  P.static.trigger = Trigger.fromData(data.trigger)
+  P.static.goal = Trigger.fromData(data.goal)
+  P.static.creation = Trigger.fromData(data.creation)
   P.static.condition = ys.common.ManualTrigger(data.condition)
   P.static.on = ys.common.ManualTrigger(data.on)
   P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
   P.static.priority = data.priority or 0
-  
+
   P.initialize = function(self, agent, parameters)
     Plan.initialize(self, agent, parameters)
     for _,v in pairs(P.members) do self[v] = P[v] end
@@ -30,7 +33,7 @@ function Plan.static.define(name, data)
     self.on.setDefaultArguments(self, agent)
     self.condition.setDefaultArguments(self, agent)
   end
-  
+
   return P
 end
 
@@ -40,7 +43,7 @@ end
 
 function Plan:initialize(agent, parameters) assert(agent)
   self.parameters = parameters or {}
-  
+
   self.agent = agent
   self.status = Plan.Status.New
   self.results = {history = {}, last = nil}
@@ -49,10 +52,10 @@ end
 -- TODO: parameter passing
 function Plan:step()
   if self.status ~= Plan.Status.Active then return end
-  
+
   self.on.step()
 
-  local ret = {coroutine.resume(self.thread, 
+  local ret = {coroutine.resume(self.thread,
     self.agent.interface,
     self,
     self.parameters,
@@ -62,7 +65,7 @@ function Plan:step()
   local err = table.remove(ret, 1) == false
   table.insert(self.results.history, ret)
   self.results.last = ret
-  
+
   --[[5.2]]-- if err then ys.log.w("Error in plan body.", table.unpack(ret)) end
   --[[5.1]] if err then ys.log.w("Error in plan body.", unpack(ret)) end
   return err, ret
@@ -119,12 +122,12 @@ function Plan:pushSubGoal(goal, parameters)
   local goal_instance = self.agent.bdi:pushGoal(goal, parameters, self.intention)
 
   self:yield()
-  
+
   if goal_instance.status ~= Goal.Status.Succeeded and not self.manage_subgoal_failure then
     self:fail(Plan.FailReason.SubgoalFailed)
     return
   end
-  
+
   self.status = Plan.Status.Active
   return goal_instance
 end

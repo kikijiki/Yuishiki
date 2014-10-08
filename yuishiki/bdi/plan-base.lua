@@ -6,22 +6,26 @@ local Plan, Trigger = ys.bdi.Plan, ys.mas.Trigger
 function PlanBase:initialize(agent) assert(agent)
   self.agent = agent
   self.plan_schemas = {}
-  
-  self.lookup = {}
-  for _,v in pairs(Trigger.TriggerMode) do
-    self.lookup[v] = {} 
+  self.triggers = {goals = {}, creation = {}}
+end
+
+function watchTrigger(triggers, name, schema)
+  if schema[name] then
+    local et = schema[name].event_type
+    if not triggers[name][et] then triggers[name][et] = {} end
+    table.insert(triggers[name][et], schema)
   end
 end
 
 function PlanBase:register(schema)
   assert(
     schema and
-    schema.name and 
-    schema.body and 
-    schema.trigger)
-  
+    schema.name and
+    schema.body)
+
   self.plan_schemas[schema.name] = schema
-  table.insert(self.lookup[schema.trigger.trigger_mode], schema)
+  watchTrigger(self.triggers, creation, schema)
+  watchTrigger(self.triggers, goal, schema)
 end
 
 function PlanBase:instance(schema, parameters) assert(schema)
@@ -38,21 +42,38 @@ end
 
 function PlanBase:filter(goal)
   local options = {}
-  for _,schema in pairs(self.lookup.goal) do
-    if schema.trigger:check(goal) and
-       self:canInstance(schema) and
-       not goal.plans.history[schema.name] then
+  for _,schema in pairs(self.triggers.goal) do
+    if schema.goal:check(goal) and self:canInstance(schema) then
       table.insert(options, schema)
     end
   end
   return options
 end
 
+function checkCreationTrigger(goal_base, event)
+  local et = event.event_type
+  local triggers = goal_base.triggers
+
+  if not triggers[et] then return end
+
+  for _,schema in pairs(triggers[et]) do
+    if schema.creation:check(event) and goal_base:canInstance(schema) then
+      local goal = goal_base:instance(schema, event.parameters)
+      goal_base.agent.bdi:addIntention(goal)
+    end
+  end
+end
+
 function PlanBase:onEvent(event)
-  for _,schema in pairs(self.lookup.event) do
-    if schema.trigger:check(event) and self:canInstance(schema) then
+  local et = event.event_type
+  local triggers = self.triggers
+
+  if not triggers[et] then return end
+
+  for _,schema in pairs(triggers[et]) do
+    if schema.creation:check(event) and self:canInstance(schema) then
       local plan = self:instance(schema, event.parameters)
-      self.agent.bdi:addIntention(plan)
+      goal_base.agent.bdi:addIntention(plan)
     end
   end
 end
