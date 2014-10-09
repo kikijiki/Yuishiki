@@ -96,11 +96,11 @@ function BeliefTrigger:initialize(name, condition, ...)
   assert(BeliefTrigger.conditions[condition])
 
   CustomTrigger.initialize(self, EventType.Belief, name,
-    function(event)
+    function(trigger, event, parameters)
       local old = event.parameters.old_value
       local new = event.parameters.belief:get()
       local f = BeliefTrigger.conditions[condition]
-      return f(old, new, unpack(self.values))
+      return f(old, new, unpack(trigger.parameters))
     end,
     {...})
 end

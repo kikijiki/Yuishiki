@@ -10,6 +10,9 @@ local sg = summon.graphics
 ys.log.showTime = false
 ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
+-- ys.log.addRawOutput(console.i, false)
+
+summon.log = ys.log
 
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
@@ -27,6 +30,7 @@ function love.load()
   table.sort(scenarios, function(a, b) return a.name < b.title end)
   gamestate.switch(require "states.menu", scenarios)
 
+  -- execute lua in the console
   --console.load(nil, nil, nil, function(t)
   --  local f = loadstring(t)
   --  print(pcall(f))

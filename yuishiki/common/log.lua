@@ -24,23 +24,23 @@ Log.verbosity = Log.Verbosity.normal
 
 local tags = {
   INF = {
-    normal = "[INF]", 
-    color = ansicolors("%{bright green}[INF]%{reset}"), 
+    normal = "[INF]",
+    color = ansicolors("%{bright green}[INF]%{reset}"),
     level = 3,
     die = false},
   DBG = {
-    normal = "[DBG]", 
-    color = ansicolors("%{bright black}[DBG]%{reset}"), 
+    normal = "[DBG]",
+    color = ansicolors("%{bright black}[DBG]%{reset}"),
     level = 2,
     die = false},
   WRN = {
-    normal = "[WRN]", 
-    color = ansicolors("%{bright yellow}[WRN]%{reset}"), 
+    normal = "[WRN]",
+    color = ansicolors("%{bright yellow}[WRN]%{reset}"),
     level = 2,
     die = false},
   ERR = {
-    normal = "[ERR]", 
-    color = ansicolors("%{bright red}[ERR]%{reset}"), 
+    normal = "[ERR]",
+    color = ansicolors("%{bright red}[ERR]%{reset}"),
     level = 1,
     die = true}
 }
@@ -68,50 +68,50 @@ local function buildBuffer(buf, ...)
     local s = tostring(select(i, ...))
     table.insert(buf, s)
     if i ~= n then table.insert(buf, "\t") end
-  end  
+  end
 end
 
 local function writeToLog(tag_name, ...)
   local tag = tags[tag_name]
   if tag.level > Log.verbosity then return end
-  
+
   local msg = {}
   local meta = {color = {}, normal = {}}
   local data = {}
-  
-  
+
+
   buildBuffer(msg, ...)
   local t = os.date("*t", os.time())
   local info = debug.getinfo(3)
-  
+
   data.debug_info = info
   data.time = t
   data.msg = msg
-  
+
   if Log.showTime then
-    table.insert(meta, "["..t.hour..":"..t.min..":"..t.sec.."]")  
+    table.insert(meta, "["..t.hour..":"..t.min..":"..t.sec.."]")
   end
 
   if Log.showInfo then
     local loginfoColor = {
       colors.source, (info.source or "[unknown]"), colors.reset,
-      colors.arrow, "->", colors.reset, 
+      colors.arrow, "->", colors.reset,
       colors.name, (info.name or "[unknown]"), colors.reset,
       "(", colors.line, tostring(info.currentline), colors.reset, ") ",
       colors.message}
-      
+
     local loginfo = {
-      (info.source or "[unknown]"), 
-      "->", (info.name or "[unknown]"), 
+      (info.source or "[unknown]"),
+      "->", (info.name or "[unknown]"),
       "(", tostring(info.currentline), ") "}
-      
+
     table.insert(meta.normal, table.concat(loginfo))
     table.insert(meta.color, table.concat(loginfoColor))
   end
-  
-  local buffer = tag.normal..table.concat(meta.normal)..table.concat(msg)
-  local buffer_color = tag.color..table.concat(meta.color)..table.concat(msg)
-  
+
+  local buffer = tag.normal.." "..table.concat(meta.normal)..table.concat(msg)
+  local buffer_color = tag.color.." "..table.concat(meta.color)..table.concat(msg)
+
   sendOutput(data)
   sendRawOutput(buffer, buffer_color)
   if tag.die then error(table.concat(msg), 3) end

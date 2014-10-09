@@ -156,7 +156,7 @@ local TranslateCommand = summon.class("TranslateCommand", Command)
 
 function TranslateCommand:initialize(destination, z, speed)
   Command.initialize(self, "Translate")
-  
+
   self.destination = {pos = destination, z = z}
   self.speed = speed
   self.progress = 0
@@ -164,22 +164,22 @@ end
 
 function TranslateCommand:execute()
   Command.execute(self)
-  
+
   local diff = self.destination.pos - self.sprite.position
-  
+
   self.distance = diff:len()
   self.duration = self.distance / self.speed
   self.versor = diff:normalize_inplace()
-  
+
   if self.destination.z then self.sprite.z = math.min(self.destination.z, self.sprite.z) end
 end
 
 function TranslateCommand:update(dt)
   Command.update(self, dt)
-  
+
   local d = dt * self.speed
   self.progress = self.progress + d
-  
+
   if self.progress > self.distance then
     self.sprite:setPosition(self.destination.pos, self.destination.z)
     self:finish()
@@ -203,18 +203,18 @@ end
 
 function WalkCommand:execute()
   Command.execute(self)
-  
+
   local sprite = self.sprite
-  
-  if not self.map:containsTile(self.destination) then 
+
+  if not self.map:containsTile(self.destination) then
     self:finish()
     return
   end
-  
+
   local data = self.map:getTilePixelCoordinates(self.destination)
-  
+
   self:push(TranslateCommand(data.top, data.spriteZ, sprite.speed.movement))
-  
+
   sprite:setAnimation("walk", false)
   sprite:setDirection(self.map:getFacingDirection(self.character.status.position:get(), self.destination))
   self:finish()
@@ -241,12 +241,12 @@ end
 
 function JumpCommand:execute()
   Command.execute(self)
-  
-  if not self.map:containsTile(self.destination) then 
+
+  if not self.map:containsTile(self.destination) then
     self:finish()
     return
   end
-  
+
   if self.destination == self.character.status.position then
     self:finish()
     return
@@ -255,7 +255,7 @@ function JumpCommand:execute()
   local from = self.map:getTilePixelCoordinates(self.character.status.position:get())
   local to = self.map:getTilePixelCoordinates(self.destination)
   local h = to.height - from.height
-  
+
   local dstbase = to.top + vec(0, h)
   local diff = dstbase - from.top
   self.from = from
@@ -266,7 +266,7 @@ function JumpCommand:execute()
   local j = math.max(h * 1.2, self.jumpFactor * math.sqrt(h*h + self.distance * self.distance))
   self.a = -2 * math.sqrt(j*(j-h)) + h - 2 * j -- magic
   self.b = h - self.a
-  
+
   local g = 1000
   self.duration = math.sqrt((4*j - h)/g) -- more magic
 
@@ -279,13 +279,13 @@ end
 function JumpCommand:update(dt)
   Command.update(self, dt)
   local sprite = self.sprite
-  
+
   self.progress = self.elapsed * self.speed
-  
+
   if self.progress > self.distance / 2 then
     sprite.z = self.to.spriteZ
   end
-  
+
   if self.progress > self.distance then
     self:finish()
     return (self.progress - self.distance) / self.speed
@@ -320,7 +320,7 @@ end
 
 function StepCommand:execute()
   Command.execute(self)
-  
+
   if type(self.destination) == "string" then
     self.destination = self.map.directions[self.destination] + self.character.status.position:get()
   end
@@ -328,16 +328,16 @@ function StepCommand:execute()
     self:finish()
     return
   end
-  
+
   local from = self.map:getTilePixelCoordinates(self.character.status.position:get())
   local to = self.map:getTilePixelCoordinates(self.destination)
-  
+
   if from.heightM == to.heightM then
     self:push(WalkCommand(self.destination, self.map))
   else
     self:push(JumpCommand(self.destination, self.map, self.duration or 0.5, self.jumpFactor or 0.8))
   end
-  
+
   self:finish()
 end
 

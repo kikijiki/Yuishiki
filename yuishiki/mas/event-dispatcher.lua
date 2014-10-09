@@ -13,7 +13,7 @@ end
 
   priority = priority or 0
   event_types = event_types or "all"
-  if type(event_types) ~= "table" then event_types = {event_type} end
+  if type(event_types) ~= "table" then event_types = {event_types} end
 
   for _,event_type in pairs(event_types) do
     table.insert(self.listeners[event_type], setmetatable({priority = priority, listener = l}, {__mode = "k"}))

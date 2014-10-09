@@ -13,13 +13,13 @@ local Tile = summon.class("Tile")
 
 function Tile:initialize(map, il, ir, data, level)
   self.texture = map.texture
-  self.coordinates = vec(il, ir)    
+  self.coordinates = vec(il, ir)
   self.height = 0
   self.visible = data[2] or true
   self.walkable = data[3] or true
   self.sync = data[4] or false
   self.neighbors = {all = {}}
-    
+
   if level then for _,p in pairs(level) do table.insert(data[1], p) end end
 
   self.subtiles = {}
@@ -28,21 +28,21 @@ function Tile:initialize(map, il, ir, data, level)
     local animationId = map.bindings[subtile]
     st.animation = map.animations[animationId]
     st.index = 1
-    
+
     if not self.sync then st.elapsed = math.random()
     else st.elapsed = 0 end
-  
+
     table.insert(self.subtiles, st)
-    
+
     self.height = self.height + st.animation.height
   end
 
-  self.size = #self.subtiles 
+  self.size = #self.subtiles
 end
 
 function Tile:draw()
   local pos = self.position:clone()
-  
+
   for i = self.size, 1, -1 do
     local st = self.subtiles[i]
     local ani = st.animation
@@ -51,8 +51,8 @@ function Tile:draw()
     local height = frame.source.height
     local quad = frame.source.quad
 
-    draw(self.texture.data, 
-      quad, pos.x - cnt.x, 
+    draw(self.texture.data,
+      quad, pos.x - cnt.x,
       pos.y - cnt.y - height)
 
     pos.y = pos.y - height
@@ -61,8 +61,8 @@ end
 
 function Tile:update(dt)
   for _,st in pairs(self.subtiles) do
-    st.elapsed, st.index = 
-      st.animation:update(dt, st.elapsed, st.index)     
+    st.elapsed, st.index =
+      st.animation:update(dt, st.elapsed, st.index)
   end
 end
 
@@ -85,7 +85,7 @@ end
 
 function Map.static.load(path)
   assert(path, "Path is nil.")
-  
+
   local map_data = summon.AssetLoader.loadRaw(path)
   local tileset = summon.AssetLoader.load("spritesheet", map_data.tileset)
   local map = Map(map_data.name, tileset)
@@ -96,24 +96,24 @@ function Map.static.load(path)
   for k,v in pairs(map_data.animations) do
     map.animations[k] = animation.parse(k, v, tileset, true)
   end
-  
+
   local max = {x = 0, y = 0, h = 0}
 
   for coord,tile_data in pairs(map_data.tiles) do
     local ir, il = coord[1], coord[2]
-    
+
     max.x = math.max(max.x, ir)
     max.y = math.max(max.y, il)
-    
+
     local tile = Tile(map, il, ir, tile_data, map_data.level)
     max.h = math.max(max.h, tile.height)
     map:assignTileCoordinates(tile)
-    
+
     table.insert(map.tiles, tile)
     if not map.grid[il] then map.grid[il] = {} end
     map.grid[il][ir] = tile
   end
-  
+
   local function setAdjacency(tile, x, y, dir)
     local c = tile.coordinates
     local n = map.grid[c.x + x]
@@ -123,13 +123,13 @@ function Map.static.load(path)
       table.insert(tile.neighbors.all, n)
     end
   end
-  
+
   for _,tile in pairs(map.tiles) do
     for dir, coord in pairs(map.directions) do
       setAdjacency(tile, coord.x, coord.y, dir)
     end
   end
-  
+
   map:computeDepth(max)
   map:computeAABB()
   return map
@@ -145,22 +145,22 @@ end
 
 function Map:computeAABB()
   local left, top, right, bottom = 0, 0, 0, 0
-  
+
   for _,tile in pairs(self.tiles) do
     local i = self:getTilePixelCoordinates(tile.coordinates)
     local dx, dy = self.tileset.tileOffset:unpack()
-    
+
     left = math.min(i.base.x - dx, left)
     right = math.max(i.base.x + dx, right)
     top = math.min(i.top.y - dy, top)
     bottom = math.max(i.base.y + dy, bottom)
   end
-  
+
   self.aabb = {
-    left = left, 
-    top = top, 
-    right = right, 
-    bottom = bottom, 
+    left = left,
+    top = top,
+    right = right,
+    bottom = bottom,
     width = right - left,
     height = bottom - top }
 end
@@ -169,12 +169,12 @@ function Map:computeDepth(max)
   local hstep = self.depth.hstep
   local step = max.h * hstep
   local back = (max.x + max.y) * step
-  
+
   for _,tile in pairs(self.tiles) do
     local x, y = tile.coordinates.x - 1, tile.coordinates.y - 1
     tile.z = back - (x + y) * step - tile.height * hstep
   end
-  
+
   self.depth.step = step
   self.depth.back = back
 end
@@ -198,25 +198,25 @@ end
 function Map:getFacingDirection(from, to)
   local diff = to - from
   local dir
-  
+
   if math.abs(diff.x) > math.abs(diff.y) then
     if diff.x > 0 then dir = "SW"
     else dir = "NE" end
   else
     if diff.y > 0 then dir = "SE"
-    else dir = "NW" end    
+    else dir = "NW" end
   end
-  
-  return dir 
+
+  return dir
 end
 
 function Map:moveEntity(e, v)
   local coord = e.map_coordinates + v
-  
+
   if self.grid[coord.y] and self.grid[coord.y][coord.x] then
     e.map_coordinates = coord
     self:place(e)
-  end  
+  end
 end
 
 function Map:containsTile(v)
@@ -229,7 +229,7 @@ function Map:getTilePixelCoordinates(v)
   local top = tile.position:clone()
   local height = 0
   local heightM = 0
-  
+
   for _,v in pairs(tile.subtiles) do
     local ani = v.animation
     local frame = ani.frames[v.index].source
@@ -237,7 +237,7 @@ function Map:getTilePixelCoordinates(v)
     height = height + frame.height
     heightM = heightM + ani.height
   end
-  
+
   return {
     base = tile.position,
     top = top,
@@ -248,7 +248,7 @@ function Map:getTilePixelCoordinates(v)
   }
 end
 
-function Map:pathTo(from, to)
+function Map:pathTo(from, to, out)
   local path = astar(self:getTile(from), self:getTile(to), self.tiles,
     function(tile)
       local ret = {}
@@ -262,10 +262,15 @@ function Map:pathTo(from, to)
     end,
     function(a, b)
       return a.coordinates:dist2(b.coordinates) + math.abs(a.height - b.height) * 10
-    end
+    end,
+    out
   )
   table.remove(path, 1)
   return path
+end
+
+function Map:directionsTo(from, to)
+  return self:pathTo(from, to, function(tile) return tile.coordinates end)
 end
 
 return Map

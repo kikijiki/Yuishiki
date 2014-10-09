@@ -24,7 +24,7 @@ end
 
 function Belief:onChange(old)
   if self.dispatcher then
-  local event = Event.Belief(self, old)
+    local event = Event.Belief(self, old)
     self.dispatcher:send(Event.Belief(self, old))
     if self.parent then
       self.parent:onChildChange(self, event)
@@ -83,13 +83,13 @@ Belief.Dynamic = DynamicBelief
 
 function DynamicBelief:initialize(name, data) assert(data) assert(data.f)
   Belief.initialize(self, name)
-  
+
   self.data = data -- keep for easy cloning.
   self.source = Belief.Source.Dynamic
   self.f = data.f
   self.refresh = data.refresh or {}
   self:update(true)
-  
+
   if self.refresh.timed then
     -- Register to an appropriate service
     assert(false, "Not implemented.") -- low priority
@@ -100,7 +100,7 @@ end
 function DynamicBelief:update(suppressEvent)
   local old = self.value
   self.value = self.f()
-  
+
   if suppressEvent ~= true then
     Belief.onChange(self, old)
   end

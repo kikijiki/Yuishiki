@@ -28,8 +28,6 @@ function Stage:initialize(data, characters)
     self.gm:addCharacter(characters[char], char)
   end
 
-  characters["char1"].agent.bdi:pushGoal("be in location", {x = 2, y = 2})
-
   if data.init then data.init(self, self.world, self.world.characters) end
   self.gm:start()
   self.gm:nextTurn()
@@ -85,6 +83,13 @@ function Stage:keypressed(key)
     self.gm.activeCharacter.agent.actuator.interface.attack(self.gm.world.characters["char2"])
   end
 
+  if key == "z" and self.gm.activeCharacter then
+    self.gm.activeCharacter.agent.bdi:pushGoal("be in location", {x = 1, y = 1})
+  end
+
+  if key == "x" and self.gm.activeCharacter then
+    self.gm.activeCharacter.agent.bdi.intention_base:dump()
+  end
 
   self.dispatcher:dispatch("keypressed", key)
 

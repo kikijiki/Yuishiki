@@ -12,10 +12,10 @@ function GM:initialize(world)
   self.items = {}
 
   self.turnCount = 0
-  self.paused = false
+  self.paused = true
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
-  self.logger = console.i
+  self.logger = summon.log.i
 end
 
 function GM:loadRuleset(ruleset)
@@ -46,7 +46,7 @@ function GM:loadItems(items)
 end
 
 function GM:applyRule(rule, ...)
-  if self.rules[rule] then
+  if self.rules[rule] then                                                      summon.log.i("RULE "..rule)
     return self.rules[rule](self, ...)
   else
     summon.log.w("Could not apply rule '"..rule.."'.")
@@ -61,7 +61,7 @@ function GM:nextTurn()
   self.turnCount = self.turnCount + 1
   self.initiative.current = 0
   self.activeCharacter = nil
-  self:applyRule("turnStart")
+  self:applyRule("turnStart")                                                   summon.log.i("NEW TURN")
 end
 
 function GM:updateInitiative(character)
@@ -126,7 +126,7 @@ function GM:nextCharacter()
   init.current = init.current + 1
   if init.current > #init.list then return false end
 
-  self.activeCharacter = init.list[init.current]
+  self.activeCharacter = init.list[init.current]                                summon.log.i("CHARACTER TURN: "..self.activeCharacter.name)
   return self.activeCharacter
 end
 
@@ -134,14 +134,18 @@ function GM:update(dt)
   self.world:update(dt)
 
   if self.paused then return end
-  
+
   local char = self.activeCharacter
   if not char then return end
+  if not char.commands:empty() then return end
 
   for i = 1, 10 do
-    if not char.commands:empty() then return end
     if not char.agent:step() or char.agent:waiting() then
-      self:nextCharacter()
+      if not char.commands:empty() then return end
+      if not self:nextCharacter() then
+        self:nextTurn()
+        self:nextCharacter()
+      end
       self:pause()
       return
     end

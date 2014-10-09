@@ -10,13 +10,13 @@ function Character:initialize(data)
   self.name = data.name
   self.modules = data.modules
   self.aimod = data.aimod
-  
+
   self.sprite = summon.AssetLoader.load("sprite", data.sprite)
   self.commands = summon.common.Stack()
   self.autoIdle = false
-  
+
   self.agent = ys.mas.Agent()
-  
+
   for _,v in pairs(self.aimod) do
     local aimod = summon.AssetLoader.load("aimod", v)
     self.agent:plug(aimod)
@@ -25,7 +25,7 @@ function Character:initialize(data)
   self.status = {}
   self.actions = {}
   self.items = {}
-  
+
   self:addStat("position", vec(1, 1))
 end
 
@@ -33,10 +33,10 @@ function Character:setGm(gm)
   self.gm = gm
   self.agent.actuator:setCaller({
     execute = function(a, ...)
-      self.gm:executeAction(self, a, ...)
+      return self.gm:executeAction(self, a, ...)
     end,
     canExecute = function(a, ...)
-      self.gm:canExecuteAction(self, a, ...)
+      return self.gm:canExecuteAction(self, a, ...)
     end
   })
 end
@@ -65,7 +65,7 @@ end
 
 function Character:updateCommands(dt)
   local cmd = self.commands
-  
+
   if self.autoIdle and cmd:empty() and not self.dead then
     self:setAnimation("idle")
     return
@@ -73,9 +73,9 @@ function Character:updateCommands(dt)
 
   while not cmd:empty() do
     local c = self.commands:top()
-    
+
     if c.status == "inactive" then c:execute()
-    elseif c.status == "finished" then 
+    elseif c.status == "finished" then
       c:onPop()
       cmd:pop()
     else
@@ -106,19 +106,19 @@ end
 function Character:bindStat(name, stat)
   local belief = self.agent:bindBelief(name, function() return stat:get() end)
   stat:listen(belief, function(stat, new, old)
-    belief:onChange(old) 
+    belief:onChange(old)
   end)
 end
 
 function Character:addStat(name, ...)
-  local stat = Stat(...) 
+  local stat = Stat(...)
   self.status[name] = stat
   self:bindStat(name, stat)
   return stat
 end
 
 function Character:addCStat(name, ...)
-  local stat = Stat.Composite(...) 
+  local stat = Stat.Composite(...)
   self.status[name] = stat
   self:bindStat(name, stat)
   return stat

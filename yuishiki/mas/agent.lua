@@ -16,10 +16,12 @@ function Agent:initialize()
 
   self.bdi = ys.bdi.Model(self)
 
-  self.interface = setmetatable({}, {
+  self.interface = setmetatable({
+    log = ys.log,
     bdi = self.bdi,
     internal = self,
     external = setmetatable({},{}),
+    }, {
     __newindex = function(t, k)
       ys.log.w("Trying to modify an interface.")
       return ys.common.uti.null_interface

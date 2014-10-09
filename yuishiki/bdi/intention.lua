@@ -24,36 +24,36 @@ end
 
 function Intention:step()
   self:checkConditions()
-  
+
   local top = self:top()
   if not top then return end
-  
+                                                                                ys.log.d("Intention top is "..top.getYsType().." <"..top.name..">") if top.status then ys.log.d("status -> "..top.status) end
   if top.getYsType() == "goal" then self:stepGoal(top) end
   if top.getYsType() == "plan" then self:stepPlan(top) end
 end
 
 function Intention:stepPlan(plan)
-  if plan.status == Plan.Status.Active then
+  if plan.status == Plan.Status.Active then                                     ys.log.d("Stepping in plan <"..plan.name.."> ["..plan.status.."]")
     local err, ret = plan:step()
-    
-    if err then plan:fail(Plan.FailReason.BodyFailed)
+
+    if err then plan:fail(Plan.FailReason.BodyFailed)                           ys.log.d("Plan failed")
     elseif plan:terminated() then
       if plan.condition.default(true).completion() then
-        plan:succeed()
+        plan:succeed()                                                          ys.log.d("Plan completed (success)")
       else
-        plan:fail(Plan.FailReason.ConditionFailed)
+        plan:fail(Plan.FailReason.ConditionFailed)                              ys.log.d("Plan completed (failure)")
       end
     end
   end
-  
+
   if plan.status == Plan.Status.Succeeded then
-    self:pop()
+    self:pop()                                                                  ys.log.d("Popping plan (success)")
     local goal = self:top()
     goal:succeed()
   elseif plan.status == Plan.Status.Failed then
-    self:pop()
+    self:pop()                                                                  ys.log.d("Popping plan (failure)")
     local goal = self:top()
-    
+
     if goal.retry then
       --
     else
@@ -64,23 +64,23 @@ function Intention:stepPlan(plan)
 end
 
 function Intention:stepGoal(goal)
-  if goal.status == Goal.Status.Active then
+  if goal.status == Goal.Status.Active then                                     ys.log.d("Stepping in goal <"..goal.name..">")
     local plan = self.agent.bdi:processGoal(goal)
     if plan then
-      self:push(plan)
+      self:push(plan)                                                           ys.log.d("Pushing new plan <"..plan.name..">")
       table.insert(goal.plans.history, plan)
       goal.plans.history[plan.name] = true
       goal.plans.last = plan
     else
-      goal:fail(Goal.FailReason.NoPlansAvailable)
+      goal:fail(Goal.FailReason.NoPlansAvailable)                               ys.log.d("Could not find any plan")
     end
-    
+
   end
-  
+
   if goal.status == Goal.Status.Succeeded then
-    self:pop()
+    self:pop()                                                                  ys.log.d("Popping plan (success)")
   elseif goal.status == Goal.Status.Failed then
-    self:pop()
+    self:pop()                                                                  ys.log.d("Popping plan (failure)")
   end
 end
 
@@ -101,21 +101,21 @@ function Intention:checkPlanConditions(index, plan)
     plan:fail(Plan.FailReason.ConditionFailed)
     return true
   end
-  
+
   -- drop condition
   if plan.condition.default(false).failure() then
     self:popn(self.stack.size - index)
     plan:fail(Plan.FailReason.ConditionFailed)
     return true
   end
-  
+
   -- success condition
   if plan.condition.default(false).success() then
     self:popn(self.stack.size - index)
     plan:succeed()
     return true
   end
-  
+
   return false
 end
 
@@ -126,21 +126,21 @@ function Intention:checkGoalConditions(index, goal)
     goal:fail(Goal.FailReason.ConditionFailed)
     return true
   end
-  
+
   -- drop condition
   if goal.condition.default(false).failure() then
     self:popn(self.stack.size - index)
     goal:fail(Goal.FailReason.ConditionFailed)
     return true
   end
-  
+
   -- success condition
   if goal.condition.default(false).success() then
     self:popn(self.stack.size - index)
     goal:succeed()
     return true
   end
-  
+
   return false
 end
 
@@ -197,10 +197,10 @@ end
 function Intention:waiting()
   local top = self.stack:top()
   if not top then return true end
-  
+
   if top:getYsType() == "plan" then
-    return 
-      top.condition.default(false).wait() or 
+    return
+      top.condition.default(false).wait() or
       top.status == Plan.Status.WaitEvent
   else
     return false
