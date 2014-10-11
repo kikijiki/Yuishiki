@@ -29,7 +29,7 @@ summon = {}
 
 --[[Graphics]]--
 --[[]] summon.graphics = love.graphics
---[[]] 
+--[[]]
 --[[]] summon.graphics.Camera  = require (path.."graphics.camera")
 --[[]] summon.graphics.Texture = require (path.."graphics.texture")
 --[[]] summon.graphics.Font    = require (path.."graphics.font")
@@ -42,9 +42,10 @@ summon = {}
 --[[]] summon.graphics.sprite.Animation   = require (path.."graphics.animation")
 --[[]] summon.graphics.sprite.SpriteSheet = require (path.."graphics.spritesheet")
 --[[]] summon.graphics.sprite.SpriteBatch = require (path.."graphics.spritebatch")
---[[]] 
+--[[]]
 --[[]] summon.graphics.Sprite             = require (path.."graphics.sprite")
 --[[]] summon.graphics.SpriteBatch        = summon.graphics.sprite.SpriteBatch
+--[[]] summon.graphics.MessageRenderer    = require (path.."graphics.message-renderer")
 
 --[[Map]]--
 --[[]] summon.graphics.Map = require (path.."graphics.map")
@@ -70,7 +71,5 @@ summon = {}
 --[[]] summon.AssetLoader.register("map",         "maps",     summon.graphics.Map.load,                false)
 --[[]] summon.AssetLoader.register("ruleset",     "rulesets", summon.game.Ruleset.load,                false)
 --[[]] summon.AssetLoader.register("unit",        "units",    summon.game.Unit.load,                   false)
-
-summon.graphics.SpeechRenderer = require (path.."graphics.speech-renderer")
 
 return summon

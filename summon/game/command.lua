@@ -6,6 +6,7 @@ local vec = summon.vec
 
 - Idle       Do nothing and use the idle animation.
 - Turn       Change direction.
+- LookAt     Change direction.
 - Animation  Change animation.
 - Wait       Let time pass.
 - Speak      Produce a speech bubble.
@@ -32,16 +33,16 @@ function Command:bind(character, callback)
   self.callback = callback
 end
 
-function Command:push(command, callback)
-  self.character:pushCommand(command, callback)
+function Command:push(...)
+  self.character:pushCommand(...)
 end
 
-function Command:pop()
-  self.character:popCommand()
+function Command:pop(...)
+  self.character:popCommand(...)
 end
 
-function Command:append()
-  self.character:appendCommand(command, callback)
+function Command:append(...)
+  self.character:appendCommand(...)
 end
 
 function Command:execute()
@@ -53,7 +54,7 @@ function Command:update(dt)
 end
 
 function Command:finish()
-  if self.callback then self.callback(self.sprite) end
+  if self.callback then self.callback(self.character, self.sprite) end
   self.status = "finished"
 end
 
@@ -77,7 +78,7 @@ function IdleCommand:execute()
   self:finish()
 end
 
-export.IdleCommand = IdleCommand
+export.idle = IdleCommand
 
 --[[Turn]]---------------------------------------------------------------------
 local TurnCommand = summon.class("TurnCommand", Command)
@@ -93,7 +94,25 @@ function TurnCommand:execute()
   self:finish()
 end
 
-export.TurnCommand = TurnCommand
+export.turn = TurnCommand
+
+--[[LookAt]]--------------------------------------------------------------------
+local LookAtCommand = summon.class("LookAtCommand", Command)
+
+function LookAtCommand:initialize(map, target)
+  Command.initialize(self, "LookAt")
+  self.target = target
+  self.map = map
+end
+
+function LookAtCommand:execute()
+  Command.execute(self)
+  local direction = self.map:getFacingDirection(self.character.status.position:get(), self.target.status.position:get())
+  self.sprite:setDirection(direction)
+  self:finish()
+end
+
+export.lookAt = LookAtCommand
 
 --[[Animation]]----------------------------------------------------------------
 local AnimationCommand = summon.class("AnimationCommand", Command)
@@ -109,7 +128,7 @@ function AnimationCommand:execute()
   self:finish()
 end
 
-export.AnimationCommand = AnimationCommand
+export.animation = AnimationCommand
 
 --[[Wait]]---------------------------------------------------------------------
 local WaitCommand = summon.class("WaitCommand", Command)
@@ -131,7 +150,7 @@ function WaitCommand:update(dt)
   end
 end
 
-export.WaitCommand = WaitCommand
+export.wait = WaitCommand
 
 --[[Speak]]--------------------------------------------------------------------
 local SpeakCommand = summon.class("SpeakCommand", Command)
@@ -148,7 +167,7 @@ function SpeakCommand:execute()
   self:finish()
 end
 
-export.SpeakCommand = SpeakCommand
+export.speak = SpeakCommand
 
 --[[Translate]]----------------------------------------------------------------
 
@@ -189,13 +208,13 @@ function TranslateCommand:update(dt)
   end
 end
 
-export.TranslateCommand = TranslateCommand
+export.translate = TranslateCommand
 
 --[[Walk]]---------------------------------------------------------------------
 
 local WalkCommand = summon.class("WalkCommand", Command)
 
-function WalkCommand:initialize(destination, map)
+function WalkCommand:initialize(map, destination)
   Command.initialize(self, "Walk")
   self.destination = destination
   self.map = map
@@ -213,7 +232,7 @@ function WalkCommand:execute()
 
   local data = self.map:getTilePixelCoordinates(self.destination)
 
-  self:push(TranslateCommand(data.top, data.spriteZ, sprite.speed.movement))
+  self:push("translate", {data.top, data.spriteZ, sprite.speed.movement})
 
   sprite:setAnimation("walk", false)
   sprite:setDirection(self.map:getFacingDirection(self.character.status.position:get(), self.destination))
@@ -225,13 +244,13 @@ function WalkCommand:onPop()
   --self.sprite:setAnimation("idle", false)
 end
 
-export.WalkCommand = WalkCommand
+export.walk = WalkCommand
 
 --[[Jump]]---------------------------------------------------------------------
 
 local JumpCommand = summon.class("JumpCommand", Command)
 
-function JumpCommand:initialize(destination, map, jumpFactor)
+function JumpCommand:initialize(map, destination, jumpFactor)
   Command.initialize(self, "Jump")
   self.destination = destination
   self.map = map
@@ -304,7 +323,7 @@ function JumpCommand:onPop()
   self.character.status.position:set(self.destination)
 end
 
-export.JumpCommand = JumpCommand
+export.jump = JumpCommand
 
 --[[Step]]---------------------------------------------------------------------
 
@@ -333,9 +352,9 @@ function StepCommand:execute()
   local to = self.map:getTilePixelCoordinates(self.destination)
 
   if from.heightM == to.heightM then
-    self:push(WalkCommand(self.destination, self.map))
+    self:push("walk", {self.map, self.destination})
   else
-    self:push(JumpCommand(self.destination, self.map, self.duration or 0.5, self.jumpFactor or 0.8))
+    self:push("jump", {self.map, self.destination, self.duration or 0.5, self.jumpFactor or 0.8})
   end
 
   self:finish()
@@ -345,7 +364,7 @@ function StepCommand:onPop()
   self.sprite:setAnimation("idle", false)
 end
 
-export.StepCommand = StepCommand
+export.step = StepCommand
 
 --[[Module export]]--
 

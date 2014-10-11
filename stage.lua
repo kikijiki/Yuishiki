@@ -1,5 +1,4 @@
-local Class = require "lib.middleclass"
-local Stage = Class("Stage")
+local Stage = summon.class("Stage")
 
 local BattleInterface = require "battle-interface"
 local EventDispatcher = require "event-dispatcher"
@@ -17,6 +16,9 @@ function Stage:initialize(data, characters)
   self.interface = BattleInterface(self)
   self.dispatcher = EventDispatcher()
   self.mouse = vec()
+  self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40)
+
+  self:listenToGM(self.gm)
 
   local path = summon.AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
   summon.fs.getDirectoryItems(path, function(file)
@@ -34,12 +36,33 @@ function Stage:initialize(data, characters)
   self.gm:nextCharacter()
 end
 
+function Stage:dispatch(...) self.dispatcher:dispatch(...) end
+function Stage:listen(...) self.dispatcher:listen(...) end
+
+function Stage:listenToGM(gm)
+  self.gm:listen(self, "next_character", function(c)
+    self.camera:follow(c.sprite)
+    self.interface:setCursor(c.sprite.position)
+  end)
+  self.gm:listen(self, "new_character",
+    function(c)
+      c:listen(self, "speak",
+        function(character, message, duration, position)
+          self.messageRenderer:speak(character.sprite, message, duration, position)
+        end)
+      c:listen(self, "bubble",
+        function(character, message, position, color)
+          self.messageRenderer:bubble(character.sprite, message, position, color)
+        end)
+    end)
+end
+
 function Stage:resize(w, h)
   self.width = w
   self.height = h
   self.camera:resize(w, h)
   self.canvas = sg.newCanvas(w, h)
-  self.dispatcher:dispatch("resize", w, h)
+  self:dispatch("resize", w, h)
 end
 
 function Stage:draw()
@@ -52,6 +75,7 @@ function Stage:draw()
 
   self.world:draw()
   sg.SpriteBatch.draw()
+  self.messageRenderer:draw()
   self.interface:drawCursor()
 
   self.camera:finish()
@@ -64,9 +88,10 @@ end
 function Stage:update(dt)
   self.gm:update(dt)
   self.camera:update(dt, self.mouse)
+  self.messageRenderer:update(dt)
   if self.gm.activeCharacter then
     self.interface:setCursor(
-      self.gm.activeCharacter.sprite:getTag("camera"))
+      self.gm.activeCharacter.sprite:getTag("head"))
   end
   self.interface:update(dt)
 end
@@ -84,21 +109,14 @@ function Stage:keypressed(key)
   end
 
   if key == "z" and self.gm.activeCharacter then
-    self.gm.activeCharacter.agent.bdi:pushGoal("be in location", {x = 1, y = 1})
+    self.gm.activeCharacter.agent.bdi:pushGoal("be in location", {x = 4, y = 3})
   end
 
   if key == "x" and self.gm.activeCharacter then
     self.gm.activeCharacter.agent.bdi.intention_base:dump()
   end
 
-  self.dispatcher:dispatch("keypressed", key)
-
-  if self.gm.activeCharacter then
-    if key == "up" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("NE", self.world.map)) end
-    if key == "down" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("SW", self.world.map)) end
-    if key == "left" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("NW", self.world.map)) end
-    if key == "right" then self.gm.activeCharacter:appendCommand(summon.game.Command.StepCommand("SE", self.world.map)) end
-  end
+  self:dispatch("keypressed", key)
 end
 
 function Stage:mousepressed(x, y, button)
@@ -120,12 +138,12 @@ function Stage:mousepressed(x, y, button)
     c:zoomOut()
   end
 
-  self.dispatcher:dispatch("mousepressed", x, y, button)
+  self:dispatch("mousepressed", x, y, button)
 end
 
 function Stage:mousereleased(x, y, button)
   if button == "l" then self.camera:stopDrag() end
-  self.dispatcher:dispatch("mousereleased", x, y, button)
+  self:dispatch("mousereleased", x, y, button)
 end
 
 return Stage

@@ -18,8 +18,12 @@ end
 
 function GoalBase:instance(name, parameters) assert(name)
   local schema = self.goal_schemas[name]
-  local goal = schema(self.agent, parameters)
-  return goal
+  if schema then
+    local goal = schema(self.agent, parameters)
+    return goal
+  else
+    ys.log.w("Could not find the goal <"..name..">.")
+  end
 end
 
 function GoalBase:canInstance(schema) assert(schema)

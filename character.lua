@@ -1,9 +1,9 @@
-local Class = require "lib.middleclass"
-local Character = Class("Character")
+local Character = summon.class("Character")
 
 local vec = summon.vec
 local Command = summon.game.Command
 local Stat = require "stat"
+local EventDispatcher = require "event-dispatcher"
 
 function Character:initialize(data)
   self.data = data
@@ -27,7 +27,12 @@ function Character:initialize(data)
   self.items = {}
 
   self:addStat("position", vec(1, 1))
+
+  self.dispatcher = EventDispatcher()
 end
+
+function Character:dispatch(...) self.dispatcher:dispatch(...) end
+function Character:listen(...) self.dispatcher:listen(...) end
 
 function Character:setGm(gm)
   self.gm = gm
@@ -89,18 +94,25 @@ function Character:popCommand()
   return self.commands:pop()
 end
 
-function Character:pushCommand(command, callback)
+function Character:pushCommand(command, args, callback)
+  command = Command[command](unpack(args))
   command:bind(self, callback)
   self.commands:push(command)
 end
 
-function Character:appendCommand(command, callback)
+function Character:appendCommand(command, args, callback)
+  command = Command[command](unpack(args))
   command:bind(self, callback)
   self.commands:insert(command, 1)
 end
 
 function Character:speak(message, duration)
-  summon.speechrenderer.add(self, message, duration, function() return self:getTag("head") + vec(10, -10) * self.scale end)
+  local position = function(s) return self.sprite:getTag("head") + vec(5, -5) * self.sprite.scale end
+  self:dispatch("speak", self, message, duration, position)
+end
+
+function Character:bubble(message, color)
+  self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
 end
 
 function Character:bindStat(name, stat)
@@ -136,8 +148,14 @@ end
 
 function Character:move(map, path)
   for _,v in pairs(path) do
-    self:appendCommand(Command.StepCommand(v, map))
+    self:appendCommand("step", {v, map})
   end
+end
+
+function Character:attack(map, target)
+  self:appendCommand("lookAt", {map, target})
+  self:appendCommand("animation", {"attack"})
+  self:speak("Uryaa!", 1)
 end
 
 function Character:equip(item, slot)

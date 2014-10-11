@@ -1,5 +1,4 @@
-local Class = require "lib.middleclass"
-local EventDispatcher = Class("EventDispatcher")
+local EventDispatcher = summon.class("EventDispatcher")
 
 function EventDispatcher:initialize()
   self.events = {}
@@ -22,7 +21,7 @@ end
 
 function EventDispatcher:dispatch(event, ...)
   if self.events[event] then
-    for _,callback in self.events[event] do
+    for _,callback in pairs(self.events[event]) do
       callback(...)
     end
   end

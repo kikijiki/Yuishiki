@@ -3,6 +3,7 @@ local GM = summon.class("GM")
 local Action = require "action"
 local Item = require "item"
 local Weapon = require "weapon"
+local EventDispatcher = require "event-dispatcher"
 local console = require "lib.console"
 
 function GM:initialize(world)
@@ -15,8 +16,12 @@ function GM:initialize(world)
   self.paused = true
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
+  self.dispatcher = EventDispatcher()
   self.logger = summon.log.i
 end
+
+function GM:dispatch(...) self.dispatcher:dispatch(...) end
+function GM:listen(...) self.dispatcher:listen(...) end
 
 function GM:loadRuleset(ruleset)
   if ruleset.rules then self:loadRules(ruleset.rules) end
@@ -61,7 +66,8 @@ function GM:nextTurn()
   self.turnCount = self.turnCount + 1
   self.initiative.current = 0
   self.activeCharacter = nil
-  self:applyRule("turnStart")                                                   summon.log.i("NEW TURN")
+  self:applyRule("turn_start")
+  self:dispatch("turn_start")
 end
 
 function GM:updateInitiative(character)
@@ -93,7 +99,7 @@ end
 
 function GM:addCharacter(character, id) assert(character)
   if not character.gm then -- if not already initialized
-    self:applyRule("initializeCharacter", character)
+    self:applyRule("initialize_character", character)
 
     if character.modules then
       for _,v in pairs(character.modules) do
@@ -113,6 +119,7 @@ function GM:addCharacter(character, id) assert(character)
   character:setGm(self)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
+  self:dispatch("new_character", character)
 end
 
 function GM:instanceItem(name)
@@ -126,7 +133,8 @@ function GM:nextCharacter()
   init.current = init.current + 1
   if init.current > #init.list then return false end
 
-  self.activeCharacter = init.list[init.current]                                summon.log.i("CHARACTER TURN: "..self.activeCharacter.name)
+  self.activeCharacter = init.list[init.current]
+  self:dispatch("next_character", self.activeCharacter)
   return self.activeCharacter
 end
 
@@ -222,13 +230,14 @@ function GM:kill(character)
 
   for i = 1, #init.list do
     local entry = init.list[i]
-    print("Entry "..i.." "..entry.name)
     if entry == character then print("removing "..entry.name)
       table.remove(init.list, i)
       table.remove(init.results, i)
       if init.current > i then init.current = init.current - 1 end
     end
   end
+
+  self:dispatch("kill_character", character)
 end
 
 function GM:log(msg)

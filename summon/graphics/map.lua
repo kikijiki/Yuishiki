@@ -199,6 +199,8 @@ function Map:getFacingDirection(from, to)
   local diff = to - from
   local dir
 
+  if diff.x == 0 and diff.y == 0 then return nil end
+
   if math.abs(diff.x) > math.abs(diff.y) then
     if diff.x > 0 then dir = "SW"
     else dir = "NE" end

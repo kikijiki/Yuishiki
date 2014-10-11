@@ -1,6 +1,4 @@
-local Class = require "lib.middleclass"
-
-local Action = Class("Action")
+local Action = summon.class("Action")
 
 function Action:initialize(data)
   self.body = data.body

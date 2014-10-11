@@ -1,5 +1,4 @@
-local Class = require "lib.middleclass"
-local World = Class("World")
+local World = summon.class("World")
 local vec = summon.vec
 
 function World:initialize(map) assert(map)
@@ -9,7 +8,7 @@ end
 
 function World:addCharacter(character, id) assert(character)
   character:setEnvironment(self)
-  
+
   if id then
     self.characters[id] = character
   else
@@ -20,7 +19,7 @@ end
 function World:placeCharacter(char, x, y)
   local pos
   if type(char) == "string" then char = self.characters[char] end
-  
+
   if not x then
     pos = char.status.position:get()
   else

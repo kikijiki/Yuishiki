@@ -1,5 +1,4 @@
-local Class = require "lib.middleclass"
-local Message = Class("state.Message")
+local Message = summon.class("state.Message")
 
 local Gamestate = require "lib.hump.gamestate"
 
@@ -37,7 +36,7 @@ function Message:draw()
   sg.print(self.title, margin, margin)
   font.description:apply()
   sg.printf(self.message, margin, margin * 2 + title_size, sg.getWidth())
-  
+
   if self.fade then
     sg.setColor(0, 0, 0, math.abs(self.fade))
     sg.rectangle("fill", 0, 0, sg.getWidth(), sg.getHeight())

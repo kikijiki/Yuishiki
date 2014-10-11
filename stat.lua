@@ -1,6 +1,5 @@
-local Class = require "lib.middleclass"
-local Stat = Class("Stat")
-local CompositeStat = Class("CompositeStat", Stat)
+local Stat = summon.class("Stat")
+local CompositeStat = summon.class("CompositeStat", Stat)
 Stat.Composite = CompositeStat
 
 function Stat:initialize(value)

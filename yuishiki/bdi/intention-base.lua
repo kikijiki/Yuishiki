@@ -24,7 +24,7 @@ function IntentionBase:onEvent(e)
   for _,intention in pairs(self.intentions) do
     local top = intention:top()
     if not top then return end
-    if top.getYsType() == "plan" and top.status == Plan.Status.WaitEvent then   ys.log.i("WAITINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+    if top.getYsType() == "plan" and top.status == Plan.Status.WaitEvent then
       local trigger = top.wait.trigger
       if trigger:check(e) then
         top:onEventTriggered(e)

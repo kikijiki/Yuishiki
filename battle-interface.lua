@@ -30,10 +30,11 @@ end
 
 function Cursor:draw()
   if not self.target then return end
+  sg.setColor(255, 255, 255, 255)
   sg.draw(
-    self.texture.data, 
-    self.target.x, self.target.y + self.dy, 0, 
-    self.scale, self.scale, 
+    self.texture.data,
+    self.target.x, self.target.y + self.dy, 0,
+    self.scale, self.scale,
     self.center.x, self.center.y);
 end
 
@@ -61,10 +62,10 @@ function BattleInterface:drawTurnOrder(x, y)
   local turnc = self.stage.gm.turnCount
   local spacing = fonts.normal:getHeight() + 10
   if turnc == 0 or init.current == 0 then return end
-  
+
   fonts.normal:apply()
   sg.setColor(255, 255, 255, 255)
-  
+
   for i = 1, #init.list do
     local j = (i + init.current) % #init.list + 1
     local name = init.results[j][2].name
@@ -78,10 +79,10 @@ end
 function drawBar(x, y, w, h, v, max, color)
   local barw = w * v / max
   barw = math.max(0, barw)
-  
+
   sg.setColor(30, 30, 30)
   sg.rectangle("fill", x, y, w, h)
-  
+
   sg.setColor(color)
   sg.rectangle("fill", x + 2, y + 2, barw - 4, h - 4)
 
@@ -89,7 +90,7 @@ function drawBar(x, y, w, h, v, max, color)
   fonts.normal:apply()
   sg.setColor(255, 255, 255)
   sg.print(v.."/"..max, x + pad, y + pad)
-  
+
   sg.setColor(180, 180, 180)
   sg.rectangle("line", x, y, w, h)
 end
@@ -105,23 +106,23 @@ function BattleInterface:drawCharacterInfo(char, x, y, w, scrh)
   local h = #stats * spacing + (spacing + 4) * 3 + spacing + padding
   y = scrh - y - h
   local sx, sy = x, y
-  
+
   sg.setColor(100, 100, 100, 200)
   sg.rectangle("fill", sx, sy, w + border * 2, h + border * 2)
-  
+
   x = x + border
   y = y + border + p2
-  
+
   sg.setColor(255, 255, 255, 255)
   fonts.normal:apply()
-  
+
   sg.printf(char.name, x, y, w, "center")
   y = y + spacing
-  
+
   drawBar(x + p2, y, w - padding, spacing, char.status.hp:get(), char.status.maxhp:get(), {200, 0, 0}) y = y + spacing + 4
   drawBar(x + p2, y, w - padding, spacing, char.status.mp:get(), char.status.maxmp:get(), {60, 60, 200}) y = y + spacing + 4
   drawBar(x + p2, y, w - padding, spacing, char.status.ap:get(), char.status.maxap:get(), {200, 200, 0}) y = y + spacing + 4
-  
+
   sg.setColor(255, 255, 255, 255)
   for _,stat in pairs(stats) do
     local v = char.status[stat]
@@ -129,7 +130,7 @@ function BattleInterface:drawCharacterInfo(char, x, y, w, scrh)
     sg.printf(tostring(v), x + w/2 + 5, y, w/2, "center")
     y = y + spacing
   end
-  
+
   sg.setLineWidth(border)
   sg.setColor(180, 180, 180)
   sg.rectangle("line", sx, sy, w + border * 2, y - sy)

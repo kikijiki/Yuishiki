@@ -24,7 +24,7 @@ function Sprite.static.load(path)
 
   local sprite = Sprite(ss)
   sprite.scale = data.scale
-  
+
   for k,v in pairs(data.animations) do
     local a = Animation.parse(k, v, ss)
     sprite.animations[k] = a
@@ -39,7 +39,7 @@ end
 
 function Sprite:setAnimation(name, reset)
   if not self.animations[name] then return end
-  
+
   local a = self.current.animation
   if a.name == name and a.loop <= 0 then
     if reset then a:reset() end
@@ -51,6 +51,7 @@ function Sprite:setAnimation(name, reset)
 end
 
 function Sprite:setDirection(dir)
+  if not dir then return end
   dir = string.upper(dir)
   self.direction = dir
 end
@@ -63,7 +64,7 @@ function Sprite:getTag(tag, side)
   local tags = self.current.frame.tags
   local pos = self.position
   if not tags[tag] then return end
-  
+
   if side and tags[tag][side] then
     return (pos + tags[tag][side].position * self.scale), tags[tag][side].z
   else
@@ -99,12 +100,12 @@ end
 function Sprite:draw()
   local frame = self.current.frame
   local scale = self.scale
-  
+
   if not frame.quad then return end
-  
+
   local pos = self.position
   local cnt = frame.center
-  
+
   if frame.mirror then
     draw(self.texture.data, frame.quad, pos.x, pos.y, 0, -scale, scale,  cnt.x, cnt.y)
   else
@@ -117,7 +118,7 @@ function Sprite:face(v)
   local diff1 = vec(v.x - v.y, v.x + v.y)
   local diff2 = vec(self.position.x - self.position.y, self.position.x + self.position.y)
   local diff = diff1 - diff2
-  
+
   if math.abs(diff.x) > math.abs(diff.y) then
     if diff.x > 0 then dir = "NE" else dir = "SW" end
   else

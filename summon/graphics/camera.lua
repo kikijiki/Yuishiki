@@ -16,7 +16,9 @@ function Camera:initialize()
   self.scaletolerance = 0.01
   self.vp = vec(0, 0)
   self.vp2 = vec(0, 0)
-  
+  self.max_scale = 10;
+  self.min_scale = 1/5;
+
   self.scale = 1
   self.target = vec(0, 0)
   self.drag = { active = false, x = 0, y = 0 }
@@ -45,7 +47,10 @@ function Camera:getTarget()
 end
 
 function Camera:zoom(factor)
-  self.scale = self.scale * factor
+  local newscale = self.scale * factor
+  if newscale > self.min_scale and newscale < self.max_scale then
+    self.scale = newscale
+  end
 end
 
 function Camera:zoomIn()
@@ -77,21 +82,21 @@ function Camera:update(dt, mouse)
   local diff = trg - cnt
   local len = diff:len()
 
-  if len * self._scale < self.tolerance then 
+  if len * self._scale < self.tolerance then
     cnt = trg
   else
     cnt = cnt + diff * self.speed * dt
   end
 
   self.center = -cnt
-  
+
   diff = self.scale - self._scale
   if math.abs(diff) / self.scale < self.scaletolerance then
     self._scale = self.scale
   else
     self._scale = self._scale + diff * self.scalespeed * dt
   end
-  
+
   if mouse then
     self:updateDrag(mouse)
   end
