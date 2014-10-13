@@ -13,7 +13,6 @@ function Character:initialize(data)
 
   self.sprite = summon.AssetLoader.load("sprite", data.sprite)
   self.commands = summon.common.Stack()
-  self.autoIdle = false
 
   self.agent = ys.mas.Agent()
 
@@ -55,8 +54,9 @@ function Character.static.loadAiMod(path)
   return summon.AssetLoader.loadRaw(path)
 end
 
-function Character:setEnvironment(env)
+function Character:setEnvironment(env, id)
   self.environment = env
+  self.id = id
 end
 
 function Character:draw()
@@ -70,11 +70,6 @@ end
 
 function Character:updateCommands(dt)
   local cmd = self.commands
-
-  if self.autoIdle and cmd:empty() and not self.dead then
-    self:setAnimation("idle")
-    return
-  end
 
   while not cmd:empty() do
     local c = self.commands:top()
@@ -141,21 +136,29 @@ function Character:addAction(name)
   self.agent.actuator:addAction(name)
 end
 
-function Character:kill()
+function Character:kill(callback)
   self.dead = true
   self.sprite:setAnimation("dead")
+  self:appendCommand("animation", {"dead"})
+  self:appendCommand("fade", {}, callback)
+  self:bubble("DEAD", {255, 0, 0})
 end
 
-function Character:move(map, path)
+function Character:move(map, path, callback)
   for _,v in pairs(path) do
-    self:appendCommand("step", {v, map})
+    self:appendCommand("step", {v, map}, callback)
   end
 end
 
-function Character:attack(map, target)
+function Character:attack(map, target, callback)
   self:appendCommand("lookAt", {map, target})
-  self:appendCommand("animation", {"attack"})
-  self:speak("Uryaa!", 1)
+  self:appendCommand("animation", {"attack"}, callback)
+  --self:speak("!", 1)
+end
+
+function Character:hit(dmg, callback)
+  self:bubble(dmg, {255, 127, 0})
+  self:appendCommand("animation", {"hit"}, callback)
 end
 
 function Character:equip(item, slot)

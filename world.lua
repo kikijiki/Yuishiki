@@ -7,12 +7,20 @@ function World:initialize(map) assert(map)
 end
 
 function World:addCharacter(character, id) assert(character)
-  character:setEnvironment(self)
+  character:setEnvironment(self, id)
 
   if id then
     self.characters[id] = character
   else
     table.insert(self.characters, character)
+  end
+end
+
+function World:removeCharacter(char)
+  if type(char) == "table" then
+    if char.id then self.characters[char.id] = nil end
+  else
+    self.characters[char] = nil
   end
 end
 

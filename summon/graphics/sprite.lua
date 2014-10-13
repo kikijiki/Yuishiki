@@ -2,6 +2,7 @@ assert(summon, "SUMMON is not loaded.")
 
 local vec = summon.vec
 local draw = summon.graphics.draw
+local setColor = summon.graphics.setColor
 local Animation = summon.graphics.sprite.Animation
 
 local Sprite = summon.class("Sprite")
@@ -16,6 +17,8 @@ function Sprite:initialize(spritesheet)
   self.direction = "SE"
   self.current = {}
   self.speed = {movement = 100, animation = 1}
+  self.color = {255, 255, 255}
+  self.alpha = 255
 end
 
 function Sprite.static.load(path)
@@ -38,16 +41,17 @@ function Sprite.static.load(path)
 end
 
 function Sprite:setAnimation(name, reset)
-  if not self.animations[name] then return end
+  if not self.animations[name] then return false end
 
   local a = self.current.animation
   if a.name == name and a.loop <= 0 then
     if reset then a:reset() end
-    return
+    return true
   end
 
   self.current.animation = self.animations[name]
   if not reset == false then self.current.animation:reset() end
+  return true
 end
 
 function Sprite:setDirection(dir)
@@ -93,6 +97,10 @@ function Sprite:updateAnimation(dt)
   self.current.center = frame.center
 end
 
+function Sprite:paused()
+  return self.current.animation.paused
+end
+
 function Sprite:update(dt)
   self:updateAnimation(dt)
 end
@@ -105,6 +113,9 @@ function Sprite:draw()
 
   local pos = self.position
   local cnt = frame.center
+
+  local c = self.color
+  setColor(c[1], c[2], c[3], self.alpha)
 
   if frame.mirror then
     draw(self.texture.data, frame.quad, pos.x, pos.y, 0, -scale, scale,  cnt.x, cnt.y)

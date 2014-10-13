@@ -223,7 +223,9 @@ function GM:getCharacterDistance(c1, c2)
 end
 
 function GM:kill(character)
-  character:kill()
+  character:kill(function()
+      self.world:removeCharacter(character)
+    end)
 
   local init = self.initiative
   print(#init.list, #init.results)

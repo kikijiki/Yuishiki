@@ -4,6 +4,7 @@ local vec = summon.vec
 local spritebatch = summon.graphics.sprite.SpriteBatch
 local animation = summon.graphics.sprite.Animation
 local draw = summon.graphics.draw
+local setColor = summon.graphics.setColor
 local astar = summon.common.astar
 
 math.randomseed(os.time())
@@ -50,7 +51,7 @@ function Tile:draw()
     local cnt = frame.source.center
     local height = frame.source.height
     local quad = frame.source.quad
-
+    setColor(255, 255, 255, 255)
     draw(self.texture.data,
       quad, pos.x - cnt.x,
       pos.y - cnt.y - height)

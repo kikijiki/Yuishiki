@@ -16,7 +16,8 @@ function Stage:initialize(data, characters)
   self.interface = BattleInterface(self)
   self.dispatcher = EventDispatcher()
   self.mouse = vec()
-  self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40)
+  self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40, "hgta.ttf", 60,
+    function(v) return self.camera:gameToScreen(v) end)
 
   self:listenToGM(self.gm)
 
@@ -75,11 +76,11 @@ function Stage:draw()
 
   self.world:draw()
   sg.SpriteBatch.draw()
-  self.messageRenderer:draw()
   self.interface:drawCursor()
 
   self.camera:finish()
   self.interface:draw()
+  self.messageRenderer:draw()
   sg.setCanvas()
   sg.pop()
   sg.draw(self.canvas)
@@ -97,6 +98,7 @@ function Stage:update(dt)
 end
 
 function Stage:keypressed(key)
+  local ac = self.gm.activeCharacter
   if key == "return" then
     self.gm:resume()
     --if char then
@@ -104,16 +106,20 @@ function Stage:keypressed(key)
     -- end
   end
 
-  if key == " " and self.gm.activeCharacter then
-    self.gm.activeCharacter.agent.actuator.interface.attack(self.gm.world.characters["char2"])
+  if key == " " and ac then
+    if ac.name == "Hikoichi" then
+      ac.agent.actuator.interface.attack(self.gm.world.characters["char2"])
+    else
+      ac.agent.actuator.interface.attack(self.gm.world.characters["char1"])
+    end
   end
 
-  if key == "z" and self.gm.activeCharacter then
-    self.gm.activeCharacter.agent.bdi:pushGoal("be in location", {x = 4, y = 3})
+  if key == "z" and ac then
+    ac.agent.bdi:pushGoal("be in location", {x = 4, y = 3})
   end
 
-  if key == "x" and self.gm.activeCharacter then
-    self.gm.activeCharacter.agent.bdi.intention_base:dump()
+  if key == "x" and ac then
+    ac.agent.bdi.intention_base:dump()
   end
 
   self:dispatch("keypressed", key)

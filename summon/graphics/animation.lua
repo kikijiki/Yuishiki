@@ -6,12 +6,12 @@ local function parseUnidirectional(a, data, ss)
   for _,v in pairs(data.frames) do
     local f = {}
     f.dt = v.dt / 1000
-    
+
     local src = ss:getFrame(v[1])
     f.source = src
     f.quad = src.quad
     f.center = src.center
-    
+
     table.insert(a.frames, f)
   end
   a.length = #a.frames
@@ -21,12 +21,12 @@ local function parseDirection(a, f, v, ss, dir)
   local frame = {}
 
   if v[dir] then
-    local src = ss:getFrame(v[dir]) 
+    local src = ss:getFrame(v[dir])
     frame.source = src
     frame.quad = src.quad
     frame.center = src.center
     frame.tags = {}
-    
+
     for k,tag in pairs(src.tags) do
       if tag.left then
         frame.tags[k] = {
@@ -36,7 +36,7 @@ local function parseDirection(a, f, v, ss, dir)
           },
           right = {
             z = tag.right.z,
-            position = tag.right.position - frame.center            
+            position = tag.right.position - frame.center
           }
         }
       else
@@ -49,8 +49,8 @@ local function parseDirection(a, f, v, ss, dir)
   else
     local mdir = assert(a.mirror and a.mirror[dir], "Direction "..dir.." is missing.")
     assert(v[mdir], "Mirrored direction "..mdir.." is missing.")
-    
-    local src = ss:getFrame(v[mdir]) 
+
+    local src = ss:getFrame(v[mdir])
     frame.mirror = true
     frame.source = src
     frame.quad = src.quad
@@ -63,14 +63,14 @@ local function parseDirection(a, f, v, ss, dir)
           right = {
             z = tag.left.z,
             position = summon.vec(
-              frame.center.x - tag.left.position.x, 
+              frame.center.x - tag.left.position.x,
               tag.left.position.y - frame.center.y)
           },
           left = {
             z = tag.right.z,
             position = summon.vec(
-              frame.center.x - tag.right.position.x, 
-              tag.right.position.y - frame.center.y)            
+              frame.center.x - tag.right.position.x,
+              tag.right.position.y - frame.center.y)
           }
         }
       else
@@ -80,7 +80,7 @@ local function parseDirection(a, f, v, ss, dir)
             frame.center.x - tag.position.x,
             tag.position.y - frame.center.y)
         }
-      end      
+      end
     end
   end
 
@@ -95,37 +95,37 @@ local function parseMultidirectional(a, data, ss)
     parseDirection(a, f, v, ss, "NW")
     parseDirection(a, f, v, ss, "SE")
     parseDirection(a, f, v, ss, "SW")
-    table.insert(a.frames, f) 
+    table.insert(a.frames, f)
   end
   a.length = #a.frames
 end
 
-local function updateState(self, dt, direction)  
+local function updateState(self, dt, direction)
   local frames = self.frames
   local length = self.length
   local elapsed = self.elapsed
   local index = self.index
-  
+
   if self.paused then
     if direction then return frames[index][direction]
     else return frames[index] end
-  end  
-  
+  end
+
   elapsed = elapsed + dt
   local nextframe = frames[index].dt
-  
-  if nextframe > 0 and length > 1 then
+
+  if nextframe > 0 then
     while elapsed > nextframe do
       elapsed = elapsed - nextframe
       index = index + 1
       if index > length then
         if self.loop > 0 then
-          if self.loops < self.loop then        
+          if self.loops < self.loop then
             index = 1
             self.loops = self.loops + 1
             if self.loops == self.loop then
               index = length
-              self.paused = true 
+              self.paused = true
             end
           end
         else
@@ -135,7 +135,7 @@ local function updateState(self, dt, direction)
       nextframe = frames[index].dt
     end
   end
-  
+
   self.index = index
   self.elapsed = elapsed
 
@@ -146,10 +146,10 @@ end
 function updateStateless(self, dt, elapsed, index, direction)
   local frames = self.frames
   local length = self.length
-  
+
   elapsed = elapsed + dt
   local nextframe = frames[index].dt
-  
+
   if nextframe > 0 and length > 1 then
     while elapsed > nextframe do
       elapsed = elapsed - nextframe
@@ -170,14 +170,14 @@ end
 
 function Animation.static.parse(name, data, ss, stateless)
   local a = Animation(data.directions)
-  
+
   a.name = name
   a.height = data.height
   a.mirror = data.mirror
   a.loop = data.loop or -1
   a.loops = 0
   a.paused = false
-  
+
   if a.directions then
     parseMultidirectional(a, data, ss)
   else

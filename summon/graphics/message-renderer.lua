@@ -7,10 +7,10 @@ local split = summon.common.uti.split
 
 local MessageRenderer = summon.class("MessageRenderer")
 
-function MessageRenderer:initialize(font, size)
+function MessageRenderer:initialize(mfont, msize, bfont, bsize, transform)
   self.speech = {
-    fontsize = size or 28,
-    fontname = font or "ipamp.ttf",
+    fontsize = msize or 28,
+    fontname = mfont or "ipamp.ttf",
     interline = 1,
     border = 4,
     padding = 8,
@@ -29,17 +29,18 @@ function MessageRenderer:initialize(font, size)
     "font", self.speech.fontname.."@"..self.speech.fontsize)
 
   self.bubbling = {
-    fontsize = size or 40,
-    fontname = font or "ipamp.ttf",
-    top = 200,
+    fontsize = bsize or 40,
+    fontname = bfont or "ipamp.ttf",
+    top = 400,
     fadeout = 50,
     speed = 250,
-    jitter = 50,
+    jitter = 10,
     bubbles = {}
   }
   self.bubbling.font = summon.AssetLoader.load(
     "font", self.bubbling.fontname.."@"..self.bubbling.fontsize)
 
+  self.transform = transform
 end
 
 function MessageRenderer:update(dt)
@@ -50,6 +51,7 @@ end
 function MessageRenderer:draw()
   self:drawSpeech()
   self:drawBubbles()
+  sg.setColor(255, 255, 255)
 end
 
 function MessageRenderer:speak(source, content, duration, position)
@@ -104,6 +106,7 @@ function MessageRenderer:drawSpeech()
       if type(position) == "function" then position = position(speech.source)
       elseif position.getPosition then position = position:getPosition() end
 
+      position = self.transform(position)
       local o = position:clone()
 
       o.x = o.x + s.arrow.offset
@@ -157,15 +160,16 @@ function MessageRenderer:bubble(sprite, message, position, color)
   if not b.bubbles[sprite] then b.bubbles[sprite] = {} end
   local col = color or {255, 255, 255, 255}
   if not col[4] then col[4] = 255 end
-  position.x = position.x + (b.jitter - 2*b.jitter*math.random()) - width / 2
   position.y = position.y - b.fontsize
-
+  position.x = position.x - width / 2
   table.insert(b.bubbles[sprite], {
     message = message,
+    size = {width, b.fontsize},
     position = position,
+    offset = vec((b.jitter - 2*b.jitter*math.random()), 0),
+    --offset = vec(0, 0),
     color = col,
-    alpha = 1,
-    offset = 0})
+    alpha = 1})
 end
 
 function MessageRenderer:updateBubbles(dt)
@@ -174,16 +178,16 @@ function MessageRenderer:updateBubbles(dt)
     for i = 1, #s do
       local bubble = s[i]
       if not bubble then return end
-      bubble.offset = bubble.offset + b.speed * dt
-      if bubble.offset > b.top then
+      bubble.offset.y = bubble.offset.y + b.speed * dt
+      if bubble.offset.y > b.top then
         table.remove(s, i)
         i = i - 1
       end
-      local remaining = b.top - bubble.offset
+      local remaining = b.top - bubble.offset.y
       if remaining < b.fadeout then
         bubble.alpha = remaining / b.fadeout
       end
-      if bubble.offset < b.fontsize then return end
+      if bubble.offset.y < b.fontsize then return end
     end
   end
 end
@@ -191,16 +195,30 @@ end
 function MessageRenderer:drawBubbles()
   for _,s in pairs(self.bubbling.bubbles) do
     for _,b in pairs(s) do
-      if b.offset > 0 then self:drawBubble(b) end
+      if b.offset.y > 0 then
+        self:drawBubble(b)
+      end
     end
   end
+
 end
 
 function MessageRenderer:drawBubble(b)
   local c = b.color
-  sg.setColor(c[1], c[2], c[3], c[4] * b.alpha)
   self.bubbling.font:apply()
-  sg.print(b.message, b.position.x, b.position.y - b.offset)
+  local pos = self.transform(b.position) - b.offset
+  sg.setColor(0, 0, 0, 255)
+  local d = 3
+  sg.print(b.message, pos.x, pos.y + d)
+  sg.print(b.message, pos.x, pos.y - d)
+  sg.print(b.message, pos.x + d, pos.y + d)
+  sg.print(b.message, pos.x + d, pos.y - d)
+  sg.print(b.message, pos.x - d, pos.y + d)
+  sg.print(b.message, pos.x - d, pos.y - d)
+  sg.print(b.message, pos.x - d, pos.y)
+  sg.print(b.message, pos.x + d, pos.y)
+  sg.setColor(c[1], c[2], c[3], c[4] * b.alpha)
+  sg.print(b.message, pos.x, pos.y)
 end
 
 return MessageRenderer

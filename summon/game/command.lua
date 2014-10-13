@@ -117,15 +117,28 @@ export.lookAt = LookAtCommand
 --[[Animation]]----------------------------------------------------------------
 local AnimationCommand = summon.class("AnimationCommand", Command)
 
-function AnimationCommand:initialize(animation)
+function AnimationCommand:initialize(animation, wait, reset, idle)
   Command.initialize(self, "Animation")
   self.animation = animation
+  self.wait = wait or true
+  self.reset = reset or true
+  self.idle = idle or true
 end
 
 function AnimationCommand:execute()
   Command.execute(self)
-  self.sprite:setAnimation(self.animation)
-  self:finish()
+  if not self.sprite:setAnimation(self.animation, self.reset) then
+    self:finish()
+  end
+
+  if not self.wait then self:finish() end
+end
+
+function AnimationCommand:update(dt)
+  if self.sprite:paused() then
+    if self.idle then self.sprite:setAnimation("idle") end
+    self:finish()
+  end
 end
 
 export.animation = AnimationCommand
@@ -365,6 +378,34 @@ function StepCommand:onPop()
 end
 
 export.step = StepCommand
+
+--[[FadeOut]]----------------------------------------------------------------
+local FadeCommand = summon.class("FadeCommand", Command)
+
+function FadeCommand:initialize(duration, to, from)
+  Command.initialize(self, "FadeOut")
+  self.duration = duration or 1
+  self.from = from
+  self.to = to or 0
+end
+
+function FadeCommand:execute()
+  Command.execute(self)
+  if not self.from then self.from = self.sprite.alpha end
+  self.da = self.to - self.from
+  self.elapsed = 0
+end
+
+function FadeCommand:update(dt)
+  self.elapsed = self.elapsed + dt
+  self.sprite.alpha = self.from + (self.elapsed / self.duration) * self.da
+  if self.elapsed > self.duration then
+    self.sprite.alpha = self.to
+    self:finish()
+  end
+end
+
+export.fade = FadeCommand
 
 --[[Module export]]--
 
