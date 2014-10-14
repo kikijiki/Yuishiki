@@ -186,10 +186,11 @@ function Intention:popPlan()
   plan.on.deactivation()
 end
 
+-- TODO: this will skip on failure/success callbacks.
 function Intention:popn(n)
   local ret = {}
   for i = 1, n do
-    table.insert(self:pop())
+    table.insert(ret, self:pop())
   end
   return ret
 end

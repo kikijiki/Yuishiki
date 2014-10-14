@@ -5,6 +5,7 @@ local vec = summon.vec
 --[[Commands list
 
 - Idle       Do nothing and use the idle animation.
+- Delay      Wait.
 - Turn       Change direction.
 - LookAt     Change direction.
 - Animation  Change animation.
@@ -14,6 +15,7 @@ local vec = summon.vec
 - Walk       Look towards the destination, use the walk animation and move.
 - Jump       Look to the destination and jump using the jump animation.
 - Step       Walk to an adjacent tile in a certain direction.
+- Fade       Lerp on alpha.
 ]]
 
 --[[COMMAND BASE CLASS]]--
@@ -79,6 +81,28 @@ function IdleCommand:execute()
 end
 
 export.idle = IdleCommand
+
+--[[Delay]]---------------------------------------------------------------------
+local DelayCommand = summon.class("DelayCommand", Command)
+
+function DelayCommand:initialize(delay)
+  Command.initialize(self, "Delay")
+  self.elapsed = 0
+  self.delay = delay
+end
+
+function DelayCommand:execute()
+  Command.execute(self)
+end
+
+function DelayCommand:update(dt)
+  self.elapsed = self.elapsed + dt
+  if self.elapsed >= self.delay then
+    self:finish()
+  end
+end
+
+export.delay = DelayCommand
 
 --[[Turn]]---------------------------------------------------------------------
 local TurnCommand = summon.class("TurnCommand", Command)

@@ -152,6 +152,7 @@ end
 
 function Character:attack(map, target, callback)
   self:appendCommand("lookAt", {map, target})
+  target:appendCommand("lookAt", {map, self})
   self:appendCommand("animation", {"attack"}, callback)
   --self:speak("!", 1)
 end

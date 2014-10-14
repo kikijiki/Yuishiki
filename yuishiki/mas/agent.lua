@@ -29,8 +29,6 @@ function Agent:initialize()
   })
 end
 
--- Private
-
 function Agent:dispatchEvent(event)
   self.dispatcher:send(event)
 end
@@ -38,8 +36,6 @@ end
 function Agent:systemEvent(name, ...)
   self:dispatchEvent(Event.System(name, ...))
 end
-
--- Public
 
 function Agent:waiting()
   return self.bdi:waiting()

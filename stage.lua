@@ -16,7 +16,7 @@ function Stage:initialize(data, characters)
   self.interface = BattleInterface(self)
   self.dispatcher = EventDispatcher()
   self.mouse = vec()
-  self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40, "hgta.ttf", 60,
+  self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30,
     function(v) return self.camera:gameToScreen(v) end)
 
   self:listenToGM(self.gm)

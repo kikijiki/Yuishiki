@@ -26,51 +26,59 @@ function Model:initialize(agent)
   })
 end
 
--- Private
-
 function Model:selectIntention()
   if self.functions.selectIntention then
     return self.functions.selectIntention(self, self.intention_base)
-  else
-    for _,v in pairs(self.intention_base.intentions) do
-      if not v:empty() then return v end
-    end
+  end
+  --Default
+  for _,intention in pairs(self.intention_base.intentions) do
+    if not intention:waiting() then return intention end
   end
 end
 
-function Model:selectOption(goal, options)
-  if self.functions.selectOption then
-    return self.functions.selectOption(self, options)
-  else
-    for _,v in pairs(options) do
-      if not goal.plans.history[v.name] then
-        goal.plans.history[v.name] = v
-        return v
-      end
+function Model:selectPlan(goal, options)
+  if self.functions.selectBestPlan then
+    return self.functions.selectPlan(self, goal, options)
+  end
+
+  -- Default
+  local best, best_confidence = 0
+  for _,schema in pairs(options) do
+    local confidence = 0
+    if schema.confidence then
+      confidence = schema.confidence(self.agent.interface, self.belief_base.interface, goal)
+    end
+    if not best or confidence > best_confidence then
+      best = schema
+      best_confidence = confidence
     end
   end
+  return best
 end
 
 function Model:processGoal(goal)
   local event = Event.Goal(goal)
-  local options = self.plan_base:filter(event)
+  local plans, metaplans = self.plan_base:filter(event)
 
-  if options == nil or #options == 0 then
+  if plans == nil or #plans == 0 then
     ys.log.i("No plans available for the goal <"..goal.name..">.")
     return nil
   end
 
-  local plan_schema = self:selectOption(goal, options)
+  local plan_schema
+
+  if metaplans then plan_schema = self:selectPlan(goal, metaplans) end
+  if not plan_schema then plan_schema = self:selectPlan(goal, plans) end
 
   if not plan_schema then
     ys.log.i("No plans could be selected for the goal <"..goal.name..">.")
     return nil
+  else
+    local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
+    table.insert(goal.plan_history, plan)
+    return plan
   end
-
-  return self.plan_base:instance(plan_schema, goal.parameters)
 end
-
--- Public
 
 function Model:waiting()
   return self.intention_base:waiting()

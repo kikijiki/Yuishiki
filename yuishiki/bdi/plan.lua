@@ -14,13 +14,17 @@ function Plan.static.define(name, data)
 
   P.static.default = data
   P.static.members = {
-    "name", "body", "goal", "creation", "condition",
+    "name", "body", "meta", "confidence", "triggers", "condition",
     "on", "manage_subgoal_failure", "priority" }
 
   P.static.name = name
   P.static.body = data.body
-  P.static.goal = Trigger.fromData(data.goal)
-  P.static.creation = Trigger.fromData(data.creation)
+  P.static.meta = data.meta
+  P.static.confidence = data.confidence
+  P.static.triggers = {
+    goal = Trigger.fromData(data.goal),
+    creation = Trigger.fromData(data.creation)
+  }
   P.static.condition = ys.common.ManualTrigger(data.condition)
   P.static.on = ys.common.ManualTrigger(data.on)
   P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
@@ -41,9 +45,9 @@ function Plan.static.extend(name)
   return ys.class(plan_class_prefix..name, ys.bdi.Plan)
 end
 
-function Plan:initialize(agent, parameters) assert(agent)
+function Plan:initialize(agent, parameters, goal) assert(agent)
   self.parameters = parameters or {}
-
+  self.goal = goal
   self.agent = agent
   self.status = Plan.Status.New
   self.results = {history = {}, last = nil}
