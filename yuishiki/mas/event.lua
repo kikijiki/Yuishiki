@@ -6,6 +6,7 @@ Event.EventType = ys.common.uti.makeEnum("Goal", "Message", "System", "Belief", 
 
 function Event:initialize(event_type, name, source, parameters) assert(event_type)
   self.event_type = event_type
+  self.name = name
   self.source = source
   self.parameters = parameters or {}
 end

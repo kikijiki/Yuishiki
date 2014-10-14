@@ -5,24 +5,12 @@ local Plan, Trigger = ys.bdi.Plan, ys.mas.Trigger
 
 function PlanBase:initialize(agent) assert(agent)
   self.agent = agent
-  self.plan_schemas = {}
-  self.triggers = {goal = {}, creation = {}}
-end
-
-function watchTrigger(triggers, schema)
-  if not schema[name] then return end
-  local et = schema[name].event_type
-  if not triggers[et] then triggers[et] = {} end
-  table.insert(triggers[et], schema)
+  self.schemas = {}
 end
 
 function PlanBase:register(schema)
   assert(schema and schema.name and schema.body)
-
-  self.plan_schemas[schema.name] = schema
-
-  if schema.goal then table.insert(self.triggers.goal, schema) end
-  if schema.creation then table.insert(self.triggers.creation, schema) end
+  self.schemas[schema.name] = schema
 end
 
 function PlanBase:instance(schema, parameters, goal) assert(schema)
@@ -37,11 +25,11 @@ function PlanBase:canInstance(schema, parameters) assert(schema)
   else return true end
 end
 
-function PlanBase:filter(goal)
+function PlanBase:filter(event)
   local plans = {}
   local metaplans = {}
-  for _,schema in pairs(self.triggers.goal) do
-    if schema.triggers.goal:check(goal) and self:canInstance(schema) then
+  for _,schema in pairs(self.schemas) do
+    if schema.trigger:check(event) and self:canInstance(schema) then
       if schema.meta then table.insert(metaplans, schema)
       else table.insert(plans, schema) end
     end
@@ -50,8 +38,8 @@ function PlanBase:filter(goal)
 end
 
 function PlanBase:onEvent(event)
-  for _,schema in pairs(self.triggers.creation) do
-    if schema.triggers.creation:check(event) and self:canInstance(schema) then
+  for _,schema in pairs(self.schemas) do
+    if schema.trigger:check(event) and self:canInstance(schema) then
       local plan = self:instance(schema, event.parameters)
       goal_base.agent.bdi:addIntention(plan)
     end

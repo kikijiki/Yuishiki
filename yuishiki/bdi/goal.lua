@@ -36,7 +36,7 @@ end
 
 function Goal:initialize(parameters)
   self.parameters = parameters
-  self.plan_history = {}
+  self.past = {history = {}, plans = {}, last = nil}
 end
 
 function Goal:fail(reason, plan)

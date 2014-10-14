@@ -42,7 +42,8 @@ function Model:selectPlan(goal, options)
   end
 
   -- Default
-  local best, best_confidence = 0
+  local best
+  local best_confidence = 0
   for _,schema in pairs(options) do
     local confidence = 0
     if schema.confidence then
@@ -53,13 +54,14 @@ function Model:selectPlan(goal, options)
       best_confidence = confidence
     end
   end
+
   return best
 end
 
 function Model:processGoal(goal)
   local event = Event.Goal(goal)
   local plans, metaplans = self.plan_base:filter(event)
-
+  
   if plans == nil or #plans == 0 then
     ys.log.i("No plans available for the goal <"..goal.name..">.")
     return nil
@@ -74,9 +76,7 @@ function Model:processGoal(goal)
     ys.log.i("No plans could be selected for the goal <"..goal.name..">.")
     return nil
   else
-    local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
-    table.insert(goal.plan_history, plan)
-    return plan
+    return self.plan_base:instance(plan_schema, goal.parameters, goal)
   end
 end
 

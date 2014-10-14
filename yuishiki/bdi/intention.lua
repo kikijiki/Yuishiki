@@ -33,11 +33,13 @@ function Intention:step()
 end
 
 function Intention:stepPlan(plan)
-  if plan.status == Plan.Status.Active then                                     ys.log.d("Stepping in plan <"..plan.name.."> ["..plan.status.."]")
-    local err, ret = plan:step()
+  if plan.status == Plan.Status.Active then                                     ys.log.d("Stepping in plan <"..plan.name..">")
+    local err, data = plan:step()
 
-    if err then plan:fail(Plan.FailReason.BodyFailed)                           ys.log.d("Plan failed")
-    elseif plan:terminated() then
+    if err then
+      plan:fail(Plan.FailReason.BodyFailed)                                     ys.log.d("Plan failed", data)
+    end
+    if plan:terminated() and not plan.status == Plan.Status.Failed then
       if plan.condition.default(true).completion() then
         plan:succeed()                                                          ys.log.d("Plan completed (success)")
       else
@@ -55,7 +57,7 @@ function Intention:stepPlan(plan)
     local goal = self:top()
 
     if goal.retry then
-      --
+      -- TODO ? or it is managed somewhere else, can't remember.
     else
       goal:fail(Goal.FailReason.PlanFailed)
       self:pop()
@@ -68,9 +70,9 @@ function Intention:stepGoal(goal)
     local plan = self.agent.bdi:processGoal(goal)
     if plan then
       self:push(plan)                                                           ys.log.d("Pushing new plan <"..plan.name..">")
-      table.insert(goal.plans.history, plan)
-      goal.plans.history[plan.name] = true
-      goal.plans.last = plan
+      table.insert(goal.past.history, plan)
+      goal.past.plans[plan.name] = true
+      goal.past.last = plan
     else
       goal:fail(Goal.FailReason.NoPlansAvailable)                               ys.log.d("Could not find any plan")
     end

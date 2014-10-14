@@ -4,26 +4,19 @@ local EventType = Event.EventType
 
 --[[ Trigger ]]--
 
-function Trigger:initialize(event_type, event_name)
-  assert(event_type)
-
+function Trigger:initialize(event_type, event_name) assert(event_type)
   self.event_type = event_type
   self.event_name = event_name
 end
 
 function Trigger:check(event)
   if not event then return false end
-  if self.event_name and not self.event_name == event.name then return false end
-  return event.event_type == self.event_type
-end
-
---[[ Goal Trigger ]]--
-
-local GoalTrigger = ys.class("GoalTrigger", Trigger)
-Trigger.Goal = GoalTrigger
-
-function GoalTrigger:initialize(goal_name)
-  Trigger.initialize(self, EventType.Goal, goal_name)
+  if event.event_type ~= self.event_type then return false end
+  if self.event_name then
+    return self.event_name == event.name
+  else
+    return true
+  end
 end
 
 --[[ Parametrized Trigger ]]--
@@ -51,6 +44,15 @@ function ParametrizedTrigger:check(event)
   end
 
   return true
+end
+
+--[[ Goal Trigger ]]--
+
+local GoalTrigger = ys.class("GoalTrigger", ParametrizedTrigger)
+Trigger.Goal = GoalTrigger
+
+function GoalTrigger:initialize(goal_name, goal_parameters)
+  ParametrizedTrigger.initialize(self, EventType.Goal, goal_name, goal_parameters)
 end
 
 --[[ Custom Trigger ]]--

@@ -19,12 +19,9 @@ function Plan.static.define(name, data)
 
   P.static.name = name
   P.static.body = data.body
-  P.static.meta = data.meta
+  P.static.meta = data.meta or false
   P.static.confidence = data.confidence
-  P.static.triggers = {
-    goal = Trigger.fromData(data.goal),
-    creation = Trigger.fromData(data.creation)
-  }
+  P.static.trigger = Trigger.fromData(data.trigger)
   P.static.condition = ys.common.ManualTrigger(data.condition)
   P.static.on = ys.common.ManualTrigger(data.on)
   P.static.manage_subgoal_failure = data.manage_subgoal_failure or false

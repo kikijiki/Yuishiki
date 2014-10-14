@@ -115,7 +115,8 @@ function Stage:keypressed(key)
   end
 
   if key == "z" and ac then
-    ac.agent.bdi:pushGoal("be in location", {x = 4, y = 3})
+    ac.agent.bdi:pushGoal("be in range", {target = self.gm.world.characters["char2"], range = 1})
+    ac.agent.bdi.intention_base:dump()
   end
 
   if key == "x" and ac then

@@ -12,6 +12,8 @@ math.randomseed(os.time())
 local Map = summon.class("Map")
 local Tile = summon.class("Tile")
 
+local tile_id_generator = summon.common.uti.idGenerator("tile")
+
 function Tile:initialize(map, il, ir, data, level)
   self.texture = map.texture
   self.coordinates = vec(il, ir)
@@ -20,6 +22,7 @@ function Tile:initialize(map, il, ir, data, level)
   self.walkable = data[3] or true
   self.sync = data[4] or false
   self.neighbors = {all = {}}
+  self.id = tile_id_generator()
 
   if level then for _,p in pairs(level) do table.insert(data[1], p) end end
 
@@ -251,7 +254,8 @@ function Map:getTilePixelCoordinates(v)
   }
 end
 
-function Map:pathTo(from, to, out)
+-- TODO: walkable only
+function Map:pathTo(from, to, out, walkable_only)
   local path = astar(self:getTile(from), self:getTile(to), self.tiles,
     function(tile)
       local ret = {}
@@ -274,6 +278,22 @@ end
 
 function Map:directionsTo(from, to)
   return self:pathTo(from, to, function(tile) return tile.coordinates end)
+end
+
+function addTileRecursive(tiles, tile, range)
+  tiles[tile] = tile.coordinates
+  if range == 0 then return end
+  for _,n in pairs(tile.neighbors.all) do addTileRecursive(tiles, n, range - 1) end
+end
+
+function Map:getRange(target, range, exclude_target, walkable_only)
+  local tiles = {}
+  local target_tile = self:getTile(target)
+  addTileRecursive(tiles, target_tile, range)
+  if exclude_target then tiles[target_tile] = nil end
+  local ret = {}
+  for _,v in pairs(tiles) do table.insert(ret, v) end
+  return ret
 end
 
 return Map
