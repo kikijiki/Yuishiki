@@ -13,21 +13,20 @@ function Character:initialize(data)
 
   self.sprite = summon.AssetLoader.load("sprite", data.sprite)
   self.commands = summon.common.Stack()
+  self.dispatcher = EventDispatcher()
 
   self.agent = ys.mas.Agent()
+
+  self.status    = {} self.agent:addBeliefset("status")
+  self.equipment = {} self.agent:addBelief("equipment", {})
+  self.actions   = {}
+
+  self:addStat("position", vec(1, 1))
 
   for _,v in pairs(self.aimod) do
     local aimod = summon.AssetLoader.load("aimod", v)
     self.agent:plug(aimod)
   end
-
-  self.status = {}
-  self.actions = {}
-  self.items = {}
-
-  self:addStat("position", vec(1, 1))
-
-  self.dispatcher = EventDispatcher()
 end
 
 function Character:dispatch(...) self.dispatcher:dispatch(...) end
@@ -110,24 +109,19 @@ function Character:bubble(message, color)
   self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
 end
 
-function Character:bindStat(name, stat)
-  local belief = self.agent:bindBelief(name, function() return stat:get() end)
-  stat:listen(belief, function(stat, new, old)
-    belief:onChange(old)
-  end)
-end
-
 function Character:addStat(name, ...)
   local stat = Stat(...)
   self.status[name] = stat
-  self:bindStat(name, stat)
+  local belief = self.agent:setBelief("status", name, function() return stat:get() end)
+  stat:listen(belief, function(stat, new, old) belief:onChange(old) end)
   return stat
 end
 
 function Character:addCStat(name, ...)
   local stat = Stat.Composite(...)
   self.status[name] = stat
-  self:bindStat(name, stat)
+  local belief = self.agent:setBelief("status", name, function() return stat:get() end)
+  stat:listen(belief, function(stat, new, old) belief:onChange(old) end)
   return stat
 end
 
@@ -154,7 +148,6 @@ function Character:attack(map, target, callback)
   self:appendCommand("lookAt", {map, target})
   target:appendCommand("lookAt", {map, self})
   self:appendCommand("animation", {"attack"}, callback)
-  --self:speak("!", 1)
 end
 
 function Character:hit(dmg, callback)
@@ -164,9 +157,8 @@ end
 
 function Character:equip(item, slot)
   if slot then
-    self.items[slot] = item
-  else
-    table.insert(self.items, item)
+    self.equipment[slot] = item
+    self.agent:setBelief("equipment", slot, item)
   end
 end
 

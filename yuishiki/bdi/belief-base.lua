@@ -6,7 +6,7 @@ local Event, Belief = ys.bdi.event, ys.bdi.Belief
 function BeliefBase:initialize(agent) assert(agent)
   self.beliefs = {}
   self.agent = agent
-  
+
   -- TODO: finish the interface (belief operators)
   self.interface = setmetatable({
     set = setmetatable({},{
@@ -18,7 +18,7 @@ function BeliefBase:initialize(agent) assert(agent)
         end
         return function(x) belief:set(x) end
       end
-    }),    
+    }),
   }, {
     __index = function(t, k)
       return self.beliefs[k]:get()
@@ -30,14 +30,27 @@ function BeliefBase:initialize(agent) assert(agent)
   })
 end
 
-function BeliefBase:set(belief)
-  if self.beliefs[belief.name] then ys.log.i("Overwriting belief <"..belief.name..">.") end
-  belief.dispatcher = self.agent.dispatcher
-  self.beliefs[belief.name] = belief
+function BeliefBase:set(belief, path)
+  if type(path) == "string" and path:len() > 0 then
+    local bs = self:get(path, -1)
+    bs:set(belief.na)
+  else --root belief
+    if self.beliefs[belief.name] then ys.log.i("Overwriting belief <"..belief.name..">.") end
+    belief.dispatcher = self.agent.dispatcher
+    self.beliefs[belief.name] = belief
+  end
 end
 
-function BeliefBase:get(name)
-  return self.beliefs[name]
+function BeliefBase:unset(name)
+  self.beliefs[name] = nil
+end
+
+function BeliefBase:get(path) --TODO fix
+  local belief = self.beliefs
+  for k in string.gmatch(name, '([^.]+)') do
+    belief = belief[k]
+  end
+  return belief
 end
 
 function BeliefBase:bind(name, data)

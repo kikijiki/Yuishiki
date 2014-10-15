@@ -52,10 +52,10 @@ function BeliefEvent:initialize(belief, old, ...) assert(belief)
   self.description = "[Event - internal] belief <"..belief.name..">"
 end
 
-local BeliefSetEvent = ys.class("BeliefSetEvent", Event)
-Event.Belief = BeliefEvent
+local BeliefsetEvent = ys.class("BeliefsetEvent", Event)
+Event.Beliefset = BeliefsetEvent
 
-function BeliefSetEvent:initialize(beliefset, change, key, ...) assert(beliefset) assert(change)
+function BeliefsetEvent:initialize(beliefset, change, key, ...) assert(beliefset) assert(change)
   Event.initialize(self,
     Event.EventType.Belief,
     beliefset.name,

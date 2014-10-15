@@ -87,9 +87,39 @@ function Agent:plug(mod)
   return true
 end
 
-function Agent:bindBelief(name, ...)
+--[[ External beliefs manipulation ]]--
+
+function Agent:addBelief(name, ...)
   local belief = ys.bdi.Belief.External(name, ...)
   self.bdi.belief_base:set(belief)
+  return belief
+end
+
+function Agent:addBeliefset(name)
+  local beliefset = ys.bdi.Belief.Set(name)
+  self.bdi.belief_base:set(beliefset)
+  return beliefset
+end
+
+function Agent:deleteBelief(name)
+  self.bdi.belief_base:unset(name)
+end
+
+function Agent:setBelief(beliefset, key, belief, ...)
+  belief = ys.bdi.Belief.External(belief, ...)
+  beliefset = self.bdi.belief_base:get(beliefset)
+  beliefset:set(key, belief)
+  return belief
+end
+
+function Agent:unsetBelief(beliefset, key)
+  self.bdi.belief_base:get(beliefset):unset(key)
+end
+
+function Agent:appendBelief(beliefset, belief, ...)
+  belief = ys.bdi.Belief.External(belief, ...)
+  beliefset = self.bdi.belief_base:get(beliefset)
+  beliefset:append(belief)
   return belief
 end
 
