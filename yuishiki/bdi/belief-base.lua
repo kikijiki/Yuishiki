@@ -32,11 +32,37 @@ function BeliefBase:resolve(path, create)
 end
 
 
-function BeliefBase:set(data, name, path)
+function BeliefBase:add(data, name, path, getter, setter)
   local root = self:resolve(path, true)
   root[name] = data
-  self.lookup[path.."."..name] = data
+  self.lookup[path.."."..name] = {
+    data = data,
+    getter = getter,
+    setter = setter,
+    internal = false -- TODO
+  }
   -- TODO create and dispatch event for root change
+end
+
+function BeliefBase:get(path)
+  local belief = self.lookup[path]
+  if not belief then return end
+  if belief.getter then return belief.getter(belief.data)
+  else return belief.data end
+end
+
+function BeliefBase:set(path, ...)
+  local belief = self.lookup[path]
+  if not belief then return end
+
+  local old = belief.data
+  if belief.setter then
+    belief.setter(belief.data, ...)
+  else
+    belief.data = select(1, ...)
+  end
+
+  --TODO create and dispatch event for belief change
 end
 
 return BeliefBase
