@@ -4,14 +4,30 @@ local BeliefBase = ys.common.class("BDI_BeliefBase")
 local Event, Belief = ys.bdi.event, ys.bdi.Belief
 
 function BeliefBase:initialize(agent) assert(agent)
-  self.beliefs = {}
+  self.beliefs = Belief.Set()
   self.agent = agent
 
-  -- TODO: finish the interface (belief operators)
+  -- TODO: finish the interface (belief operators), use path!
   self.interface = setmetatable({
     set = setmetatable({},{
       __index = function(t, k)
         local belief = self.beliefs[k]
+        if belief then
+          if belief.class.name == "Beliefset" then return belief
+          else
+            return setmetatable({}, {
+              __call = function(...)
+                belief:set(...)
+              end
+            })
+          end
+        else
+          return setmetatable({}, {
+            __call = function(...)
+              t:set(...)
+            end
+          })
+        end
         if not belief then
           belief = ys.bdi.Belief.Internal(k, nil)
           self:set(belief)
@@ -21,7 +37,9 @@ function BeliefBase:initialize(agent) assert(agent)
     }),
   }, {
     __index = function(t, k)
-      return self.beliefs[k]:get()
+      local belief = self.beliefs[k]
+      if belief.class.name == "Beliefset" then return belief
+      else return belief:get() end
     end,
     __newindex = function(t, k)
       ys.log.w("Trying to modify an interface.")
@@ -30,31 +48,30 @@ function BeliefBase:initialize(agent) assert(agent)
   })
 end
 
-function BeliefBase:set(belief, path)
-  if type(path) == "string" and path:len() > 0 then
-    local bs = self:get(path, -1)
-    bs:set(belief.na)
-  else --root belief
-    if self.beliefs[belief.name] then ys.log.i("Overwriting belief <"..belief.name..">.") end
-    belief.dispatcher = self.agent.dispatcher
-    self.beliefs[belief.name] = belief
-  end
-end
-
-function BeliefBase:unset(name)
-  self.beliefs[name] = nil
-end
-
-function BeliefBase:get(path) --TODO fix
+-- Index = [-1, x]
+function BeliefBase:resolve(path, index)
   local belief = self.beliefs
-  for k in string.gmatch(name, '([^.]+)') do
-    belief = belief[k]
+  local last
+  local i = 1
+
+  for token in string.gmatch(path, '([^.]+)') do
+    last = token
+    belief = belief[token]
+    i = i + 1
+    if index > 0 and i >= index then break end
   end
-  return belief
+
+  return belief, last
 end
 
-function BeliefBase:bind(name, data)
-  self.beliefs[name]:bind(data)
+function BeliefBase:set(path, name, belief)
+  assert(belief)
+  assert(type(path) == "string" and path:len() > 0)
+
+  local bs self:resolve(path)
+  bs:set(name, belief)
+
+  belief.dispatcher = self.agent.dispatcher
 end
 
 return BeliefBase

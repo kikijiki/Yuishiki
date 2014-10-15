@@ -7,10 +7,10 @@ Belief.static.Source = ys.common.uti.makeEnum("Internal", "External")
 
 local Event = ys.mas.Event
 
-function Belief:initialize(name, value) assert(name)
-  self.name = name
+function Belief:initialize(value, source)
   self.path = nil
   self.value = value
+  self.source = source
 end
 
 function Belief:get()
@@ -42,9 +42,8 @@ end
 local InternalBelief = ys.common.class("InternalBelief", Belief)
 Belief.Internal = InternalBelief
 
-function InternalBelief:initialize(name, value)
-  Belief.initialize(self, name, value)
-  self.source = Belief.Source.Internal
+function InternalBelief:initialize(value)
+  Belief.initialize(self, value, Belief.Source.Internal)
 end
 
 --[[External Belief]]--
@@ -52,9 +51,8 @@ end
 local ExternalBelief = ys.common.class("ExternalBelief", Belief)
 Belief.External = ExternalBelief
 
-function ExternalBelief:initialize(name, value)
-  Belief.initialize(self, name, value)
-  self.source = Belief.Source.External
+function ExternalBelief:initialize(value, Belief.Source.External)
+  Belief.initialize(self, value)
 end
 
 function ExternalBelief:get()
@@ -63,7 +61,7 @@ function ExternalBelief:get()
 end
 
 function ExternalBelief:set()
-  ys.log.w("Trying to change the external belief <"..self.name..">.")
+  ys.log.w("Trying to change the external belief <"..self.path..">.")
 end
 
 --[[BeliefSet]]
@@ -71,15 +69,15 @@ end
 local Beliefset = ys.common.class("Beliefset", Belief)
 Belief.Set = Beliefset
 
-function Beliefset:initialize(name)
-  Belief.initialize(self, name)
-  self.value = {}
+function Beliefset:initialize(source)
+  Belief.initialize(self, {}, source or Belief.Source.External)
   self.keys = {}
 end
 
 function Beliefset:set(k, v)
   self.value[k] = v
   self.keys[v] = k
+  v.path = self.path + "." + k
   self:onChange("set", k, v)
 end
 
@@ -94,11 +92,16 @@ function Beliefset:get(k)
   return self.value[k]
 end
 
+function Beliefset:__index(t, k)
+  return self:get(k)
+end
+
+function Beliefset:__newindex(t, k, v)
+  return self:set(k, v)
+end
+
 function Beliefset:append(v)
-  table.insert(self.value, v)
-  local k = #self.values
-  self.keys[v] = k
-  self:onChange("append", k, v)
+  self:set(#self.values + 1, v)
 end
 
 function Beliefset:pairs()
@@ -127,10 +130,9 @@ function Beliefset:onChildChange(child_event)
   end
 end
 
--- TODO beliefset, dynamic
-function Belief.fromData(name, data)
-  if data[1] == "internal" then return Belief.Internal(name, select(2, unpack(data))) end
-  if data[1] == "external" then return Belief.External(name, select(2, unpack(data))) end
+-- TODO beliefset, use path
+function Belief.fromData(path, data)
+  return Belief.Internal(unpack(data)) end
 end
 
 return Belief
