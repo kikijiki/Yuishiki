@@ -1,5 +1,6 @@
 return function(loader)
   local class = loader.require "middleclass"
+  local log = loader.load "log"
   local Goal = loader.load "goal"
   local Plan = loader.load "plan"
   local Event = loader.load "event"
@@ -25,7 +26,7 @@ return function(loader)
       local goal = schema(self.agent, parameters)
       return goal
     else
-      ys.log.w("Could not find the goal <"..name..">.")
+      log.w("Could not find the goal <"..name..">.")
     end
   end
 

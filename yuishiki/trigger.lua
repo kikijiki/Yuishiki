@@ -1,9 +1,8 @@
 return function(loader)
-local class = loader.require "middleclass"
-local Event = loader.load "event"
-
+  local class = loader.require "middleclass"
+  local uti = loader.load "uti"
+  local Event = loader.load "event"
   local Trigger = class("Trigger")
-  local EventType = Event.EventType
 
   --[[ Trigger ]]--
 
@@ -78,7 +77,7 @@ local Event = loader.load "event"
 
   --[[ Belief Trigger ]]--
 
-  local BeliefTrigger = class("BeliefTrigger", CustomTrigger)
+  local BeliefTrigger = class("BeliefTrigger", Trigger)
   Trigger.Belief = BeliefTrigger
 
   BeliefTrigger.static.conditions = {
@@ -96,18 +95,53 @@ local Event = loader.load "event"
     in_range_ex   = function(old, new, p1, p2) return new <  p2 and new > p1  end,
   }
 
-  function BeliefTrigger:initialize(name, condition, ...)
-    assert(name)
-    assert(BeliefTrigger.conditions[condition])
+  function BeliefTrigger:initialize(path, condition, ...)
+    Trigger.initialize(self, Event.Type.Belief, path)
+    self.path_start = path
+    self.path_end = path
+    self.condition = condition
+    self.parameters = {...}
+  end
 
-    CustomTrigger.initialize(self, EventType.Belief, name,
-      function(trigger, event, parameters)
-        local old = event.parameters.old_value
-        local new = event.parameters.belief:get()
-        local f = BeliefTrigger.conditions[condition]
-        return f(old, new, unpack(trigger.parameters))
-      end,
-      {...})
+  function BeliefTrigger:starts(path)
+    if path = "*" then path = nil end
+    self.path_start = path
+    return self
+  end
+
+  function BeliefTrigger:ends(path)
+    if path = "*" then path = nil end
+    self.path_end = path
+    return self
+  end
+
+  function BeliefTrigger:condition(f, ...)
+    self.condition = f
+    self.parameters = {...}
+    return self
+  end
+
+  function BeliefTrigger:check(event)
+    -- Check path
+
+    if self.path_start and not uti.startsWith(event.name, self.path_start) then return false end
+    if self.path_end and not uti.endsWith(event.name, self.path_end) then return false end
+
+    -- Check conditions
+
+    local old = event.parameters.old_value
+    local new = event.parameters.belief:get()
+
+    if self.condition then
+      local condition
+      if type(self.condition) == "function" then
+        return BeliefTrigger.conditions[self.condition](old, new, unpack(self.parameters))
+      else
+        return condition(old, new, unpack(self.parameters))
+      end
+    end
+
+    return true
   end
 
   function Trigger.static.fromData(data)
@@ -119,7 +153,13 @@ local Event = loader.load "event"
     if trigger_type == "goal"         then return Trigger.Goal        (unpack(args)) end
     if trigger_type == "parametrized" then return Trigger.Parametrized(unpack(args)) end
     if trigger_type == "custom"       then return Trigger.Custom      (unpack(args)) end
-    if trigger_type == "belief"       then return Trigger.Belief      (unpack(args)) end
+    if trigger_type == "belief"       then
+      local trigger = Trigger.Belief(args[1])
+      if args["begins"] then trigger:begins(args["begins"]) end
+      if args["ends"] then trigger:ends(args["ends"]) end
+      if args["condition"] then trigger:condition(unpack(args["condition"])) end
+      return trigger
+    end
   end
 
   return Trigger

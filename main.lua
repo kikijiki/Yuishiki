@@ -2,15 +2,15 @@ local gamestate = require "lib.hump.gamestate"
 local timer = require "lib.hump.timer"
 local console = require "lib.console"
 
-require "yuishiki"
+local ys = require "yuishiki"()
 require "summon"
 
 local sg = summon.graphics
 
-ys.log.showTime = false
-ys.log.showInfo = false
-ys.log.verbosity = ys.log.Verbosity.verbose
--- ys.log.addRawOutput(console.i, false)
+log.showTime = false
+log.showInfo = false
+log.verbosity = log.Verbosity.verbose
+-- log.addRawOutput(console.i, false)
 
 summon.log = ys.log
 

@@ -2,6 +2,7 @@ return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
+  local MamualTrigger = loader.load "manual-trigger"
   local Event = loader.load "event"
 
   local Plan = class("Plan")
@@ -12,7 +13,7 @@ return function(loader)
   Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
 
   function Plan.static.define(name, data)
-    local P = ys.class(plan_class_prefix..name, ys.bdi.Plan)
+    local P = class(plan_class_prefix..name, Plan)
 
     P.static.default = data
     P.static.members = {
@@ -24,8 +25,8 @@ return function(loader)
     P.static.meta = data.meta or false
     P.static.confidence = data.confidence
     P.static.trigger = Trigger.fromData(data.trigger)
-    P.static.condition = ys.common.ManualTrigger(data.condition)
-    P.static.on = ys.common.ManualTrigger(data.on)
+    P.static.condition = ManualTrigger(data.condition)
+    P.static.on = ManualTrigger(data.on)
     P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
     P.static.priority = data.priority or 0
 
@@ -41,7 +42,7 @@ return function(loader)
   end
 
   function Plan.static.extend(name)
-    return ys.class(plan_class_prefix..name, ys.bdi.Plan)
+    return class(plan_class_prefix..name, Plan)
   end
 
   function Plan:initialize(agent, parameters, goal) assert(agent)
@@ -73,8 +74,8 @@ return function(loader)
     table.insert(self.results.history, ret)
     self.results.last = ret
 
-    --[[5.2]]-- if err then ys.log.w("Error in plan body.", table.unpack(ret)) end
-    --[[5.1]] if err then ys.log.w("Error in plan body.", unpack(ret)) end
+    --[[5.2]]-- if err then log.w("Error in plan body.", table.unpack(ret)) end
+    --[[5.1]] if err then log.w("Error in plan body.", unpack(ret)) end
     return err, ret
   end
 
@@ -106,11 +107,11 @@ return function(loader)
     end
   end
 
-  function Plan:waitForBelief(name, condition, ...)
+  function Plan:waitForBelief(...)
     if not name then
       return self:yield()
     else
-      local trigger = Trigger.Belief(name, condition, ...)
+      local trigger = Trigger.Belief(...)
       return self:waitForTrigger(trigger)
     end
   end

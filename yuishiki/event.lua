@@ -2,8 +2,10 @@ return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
 
+  --[[ Base ]]--
+
   local Event = class("Event")
-  Event.EventType = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
+  Event.static.Type = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
 
   function Event:initialize(event_type, name, parameters) assert(event_type)
     self.event_type = event_type
@@ -11,91 +13,57 @@ return function(loader)
     self.parameters = parameters or {}
   end
 
+  --[[ Goal ]]--
+
   local GoalEvent = class("GoalEvent", Event)
   Event.Goal = GoalEvent
 
   function GoalEvent:initialize(goal) assert(goal)
     Event.initialize(self,
-      Event.EventType.Goal,
+      Event.Type.Goal,
       goal.name,
       { goal = goal })
   end
+
+  --[[ Message ]]--
 
   local MessageEvent = class("MessageEvent", Event)
   Event.Message = MessageEvent
 
   function MessageEvent:initialize(message) assert(message)
     Event.initialize(self,
-      Event.EventType.Message,
+      Event.Type.Message,
       nil,
       { message = message })
   end
 
+  --[[ Belief ]]--
+
   local BeliefEvent = class("BeliefEvent", Event)
   Event.Belief = BeliefEvent
 
-  function BeliefEvent:initialize(belief, old, ...) assert(belief)
+  function BeliefEvent:initialize(belief, status, new, old) assert(belief)
     Event.initialize(self,
-      Event.EventType.Belief,
-      belief.name,
+      Event.Type.Belief,
+      belief.full_path,
       {
-        old_value = old,
         belief = belief,
-        params = {...}
+        status = status,
+        new = new,
+        old = old
       })
-
-    self.description = "[Event - internal] belief <"..belief.name..">"
   end
 
-  local BeliefsetEvent = class("BeliefsetEvent", Event)
-  Event.Beliefset = BeliefsetEvent
-
-  function BeliefsetEvent:initialize(beliefset, change, key, ...) assert(beliefset) assert(change)
-    Event.initialize(self,
-      Event.EventType.Belief,
-      beliefset.name,
-      {
-        change = change,
-        key = key,
-        params = {...}
-      })
-
-    self.description = "[Event - internal] beliefset <"..beliefset.name.."> -> "..change.." "..key or ""
-  end
+  --[[ System ]]--
 
   local SystemEvent = class("SystemEvent", Event)
   Event.System = SystemEvent
 
   function SystemEvent:initialize(name, ...) assert(name)
     return Event.initialize(self,
-      Event.EventType.System,
+      Event.Type.System,
       name,
       {...})
-  end
-
-  local ActuatorEvent = class("ActuatorEvent", Event)
-  Event.Actuator = ActuatorEvent
-
-  function ActuatorEvent:initialize(id, finished, data)
-    return Event.initialize(self,
-      Event.EventType.Actuator,
-      nil,
-      { id = id,
-        finished = finished,
-        data = data
-      })
-  end
-
-  function Event:__tostring()
-    if self.description then
-      return self.description
-    else
-      local buf = {
-        "[Event - ", self.source or "source unknown", "] ",
-        self.name or "unknown"
-      }
-      return table.concat(buf)
-    end
   end
 
   return Event

@@ -1,10 +1,10 @@
-local Stat = summon.class("Stat")
-local CompositeStat = summon.class("CompositeStat", Stat)
-Stat.Composite = CompositeStat
+local class = require "lib.middleclass"
+local Observable = require "observable"
+
+local Stat = class("Stat", Observable)
 
 function Stat:initialize(value)
   self.value = value or 0
-  self.listeners = setmetatable({},{__mode="k"})
 end
 
 function Stat:__tostring()
@@ -34,19 +34,8 @@ function Stat:get()
   return self.value
 end
 
-function Stat:listen(l, c)
-  self.listeners[l] = c
-end
-
-function Stat:unlisten(l)
-  self.listeners[l] = nil
-end
-
-function Stat:notify(v, old)
-  for _,listener in pairs(self.listeners) do
-    listener(self, v, old)
-  end
-end
+local CompositeStat = class("CompositeStat", Stat)
+Stat.Composite = CompositeStat
 
 function CompositeStat:initialize(value)
   Stat.initialize(self, value)
@@ -100,6 +89,16 @@ end
 function CompositeStat:sub(v)
   self.base = self.base - v
   return self:update()
+end
+
+-- TODO table stat
+-- TODO vector stat?
+
+-- TODO
+function Stat.fromData(name, stat_type, ...)
+  if stat_type == "basic"     then return Stat(name, ...)           end
+  if stat_type == "composite" then return Stat.Composite(name, ...) end
+  if stat_type == "table"     then return Stat.Table(name, ...)     end
 end
 
 return Stat

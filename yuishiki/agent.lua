@@ -1,7 +1,13 @@
 return function(loader)
   local class = loader.require "middleclass"
-  local Event = loader.load "event"
   local uti = loader.load "uti"
+  local log = loader.load "log"
+  local Event = loader.load "event"
+  local BDIModel = loader.load "bdi-model"
+  local Goal = loader.load "goal"
+  local Plan = loader.load "plan"
+  local Belief = loader.load "belief"
+  local Actuator = loader.load "actuator"
 
   local Agent = class("Agent")
 
@@ -11,26 +17,29 @@ return function(loader)
     self.id = generateId()
     self.step_count = 0
 
-    self.actuator = ys.mas.Actuator()
+    self.actuator = Actuator
     self.sensors = {}
 
     self.modules = {}
     self.custom = {}
 
-    self.bdi = ys.bdi.Model(self)
+    self.bdi = BDIModel(self)
 
     self.interface = setmetatable({
-      log = ys.log,
+      log = log,
       bdi = self.bdi,
       internal = self,
       external = setmetatable({},{}),
       }, {
       __newindex = function(t, k)
-        ys.log.w("Trying to modify an interface.")
-        return ys.common.uti.null_interface
+        log.w("Trying to modify an interface.")
+        return uti.null_interface
       end
     })
   end
+
+  function Agent:setBelief(...) return self.bdi.belief_base:set(...) end
+  function Agent:unsetBelief(...) return self.bdi.belief_base:unset(...) end
 
   function Agent:dispatch(event)
     self.bdi:dispatch(event)
@@ -42,7 +51,7 @@ return function(loader)
 
   function Agent:step()
     self.step_count = self.step_count + 1
-    ys.log.i("Step "..self.step_count)
+    log.i("Step "..self.step_count)
     return self.bdi:step();
   end
 
@@ -58,21 +67,21 @@ return function(loader)
 
     if mod.g then
       for k,v in pairs(mod.g) do
-        local goal_schema = ys.bdi.Goal.define(k, v)
+        local goal_schema = Goal.define(k, v)
         self.bdi.goal_base:register(goal_schema)
       end
     end
 
     if mod.p then
       for k,v in pairs(mod.p) do
-        local plan_schema = ys.bdi.Plan.define(k, v)
+        local plan_schema = Plan.define(k, v)
         self.bdi.plan_base:register(plan_schema)
       end
     end
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        local belief = ys.bdi.Belief.fromData(k, v)
+        local belief = Belief.fromData(k, v)
         self.bdi.belief_base:set(belief)
       end
     end

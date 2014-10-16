@@ -1,17 +1,30 @@
 return function(loader)
   local class = loader.require "middleclass"
+  local uti = loader.load "uti"
+  local log = loader.load "log"
   local Event = loader.load "event"
+  local Intention = loader.load "intention"
+  local BeliefBase = loader.load "belief-base"
+  local GoalBase = loader.load "goal-base"
+  local PlanBase = loader.load "plan-base"
+  local IntentionBase = loader.load "intention-base"
 
   local BDIModel = class("BDIModel")
 
   function BDIModel:initialize(agent)
     self.agent = agent
 
-    self.belief_base    = ys.bdi.BeliefBase(agent)
-    self.goal_base      = ys.bdi.GoalBase(agent)
-    self.plan_base      = ys.bdi.PlanBase(agent)
-    self.intention_base = ys.bdi.IntentionBase(agent)
+    self.belief_base    = BeliefBase()
+    self.goal_base      = GoalBase(agent)
+    self.plan_base      = PlanBase(agent)
+    self.intention_base = IntentionBase(agent)
     self.functions = {}
+
+    local dispatcher = function(...) return self:dispatch(...) end
+    self.belief_base   :addObserver(self, dispatcher)
+    self.goal_base     :addObserver(self, dispatcher)
+    self.goal_base     :addObserver(self, dispatcher)
+    self.intention_base:addObserver(self, dispatcher)
 
     self.interface = setmetatable({}, {
       beliefs = self.belief_base.interface,
@@ -19,8 +32,8 @@ return function(loader)
       internal = agent,
       external = setmetatable({},{}),
       __newindex = function(t, k)
-        ys.log.w("Trying to modify an interface.")
-        return ys.common.uti.null_interface
+        log.w("Trying to modify an interface.")
+        return uti.null_interface
       end
     })
   end
@@ -69,7 +82,7 @@ return function(loader)
     local plans, metaplans = self.plan_base:filter(event)
 
     if plans == nil or #plans == 0 then
-      ys.log.i("No plans available for the goal <"..goal.name..">.")
+      log.i("No plans available for the goal <"..goal.name..">.")
       return
     end
 
@@ -79,7 +92,7 @@ return function(loader)
     if not plan_schema then plan_schema = self:selectPlan(goal, plans) end
 
     if not plan_schema then
-      ys.log.i("No plans could be selected for the goal <"..goal.name..">.")
+      log.i("No plans could be selected for the goal <"..goal.name..">.")
       return nil
     else
       return self.plan_base:instance(plan_schema, goal.parameters, goal)
@@ -92,17 +105,17 @@ return function(loader)
 
   function BDIModel:step()
     if self:waiting() then
-      ys.log.i("No executable intentions.")
+      log.i("No executable intentions.")
       return false
     end
 
     local intention = self:selectIntention()
 
     if intention then
-      ys.log.i("Executing intention <"..intention.id..">.")
+      log.i("Executing intention <"..intention.id..">.")
       self.intention_base:execute(intention)
     else
-      ys.log.i("No active intentions.")
+      log.i("No active intentions.")
       return false
     end
 
@@ -115,7 +128,7 @@ return function(loader)
     if intention then
       intention:push(goal)
     else
-      intention = ys.bdi.Intention()
+      intention = Intention()
       intention:push(goal)
       self.intention_base:add(intention)
     end

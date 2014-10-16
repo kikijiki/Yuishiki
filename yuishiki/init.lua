@@ -1,13 +1,17 @@
 --[[Yuishiki AI - 唯識永合]]--
 
+local module_path = ...
+
 return function (base_path)
+  if not base_path then base_path = module_path end
+  base_path = base_path .. "."
 
   local loader = {}
   loader.load = function(lib, ...)
-    return require(base_path.."."..lib)(loader, ...)
+    return require(base_path..lib)(loader, ...)
   end
   loader.require = function(lib)
-    return require(base_path.."."..lib)
+    return require(base_path..lib)
   end
 
   ys = {}

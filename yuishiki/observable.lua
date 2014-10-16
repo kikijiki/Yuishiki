@@ -13,7 +13,7 @@ return function(loader)
 
   function Observable:notify(...)
     for _,observer in pairs(self.observers) do
-      listener(...)
+      observer(...)
     end
   end
 

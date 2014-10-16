@@ -1,12 +1,12 @@
 return function(loader)
   local class = loader.require "middleclass"
+  local uti = loader.load "uti"
   local Event = loader.load "event"
   local Observable = loader.load "observable"
-  local uti = loader.load "uti"
 
   local Belief = class("BDI.Belief", Observable)
 
-  Belief.static.Source = uti.makeEnum("Internal", "External")
+  Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 
   function Belief:initialize(value, name, path, readonly)
     self.name = name
@@ -39,7 +39,7 @@ return function(loader)
       self.value = value
     end
 
-    self:notify(self, self:get(), old)
+    self:notify(self:get(), old)
   end
 
   return Belief

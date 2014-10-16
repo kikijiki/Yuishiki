@@ -8,7 +8,7 @@ return function(loader)
   local generateId =  uti.makeIdGenerator("sensor")
 
   function Sensor.static.define(name)
-    local S = ys.class(sensor_class_prefix..name, ys.mas.Sensor)
+    local S = class(sensor_class_prefix..name, Sensor)
     S.static.name = name
 
     S.initialize = function(self, agent)
@@ -36,7 +36,7 @@ return function(loader)
   end
 
   function Sensor:process(event, beliefs)
-    ys.log.w("Virtual method not implemented.")
+    log.w("Virtual method not implemented.")
   end
 
   function Sensor.getYsType()

@@ -1,6 +1,7 @@
 return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
+  local log = loader.load "log"
   local Goal = loader.load "goal"
   local Plan = loader.load "plan"
   local Stack = loader.load "stack"
@@ -33,33 +34,33 @@ return function(loader)
 
     local top = self:top()
     if not top then return end
-                                                                                  ys.log.d("Intention top is "..top.getYsType().." <"..top.name..">") if top.status then ys.log.d("status -> "..top.status) end
+                                                                                  log.d("Intention top is "..top.getYsType().." <"..top.name..">") if top.status then log.d("status -> "..top.status) end
     if top.getYsType() == "goal" then self:stepGoal(top) end
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
   function Intention:stepPlan(plan)
-    if plan.status == Plan.Status.Active then                                     ys.log.d("Stepping in plan <"..plan.name..">")
+    if plan.status == Plan.Status.Active then                                     log.d("Stepping in plan <"..plan.name..">")
       local err, data = plan:step()
 
       if err then
-        plan:fail(Plan.FailReason.BodyFailed)                                     ys.log.d("Plan failed", data)
+        plan:fail(Plan.FailReason.BodyFailed)                                     log.d("Plan failed", data)
       end
       if plan:terminated() and not plan.status == Plan.Status.Failed then
         if plan.condition.default(true).completion() then
-          plan:succeed()                                                          ys.log.d("Plan completed (success)")
+          plan:succeed()                                                          log.d("Plan completed (success)")
         else
-          plan:fail(Plan.FailReason.ConditionFailed)                              ys.log.d("Plan completed (failure)")
+          plan:fail(Plan.FailReason.ConditionFailed)                              log.d("Plan completed (failure)")
         end
       end
     end
 
     if plan.status == Plan.Status.Succeeded then
-      self:pop()                                                                  ys.log.d("Popping plan (success)")
+      self:pop()                                                                  log.d("Popping plan (success)")
       local goal = self:top()
       goal:succeed()
     elseif plan.status == Plan.Status.Failed then
-      self:pop()                                                                  ys.log.d("Popping plan (failure)")
+      self:pop()                                                                  log.d("Popping plan (failure)")
       local goal = self:top()
 
       if goal.retry then
@@ -72,23 +73,23 @@ return function(loader)
   end
 
   function Intention:stepGoal(goal)
-    if goal.status == Goal.Status.Active then                                     ys.log.d("Stepping in goal <"..goal.name..">")
+    if goal.status == Goal.Status.Active then                                     log.d("Stepping in goal <"..goal.name..">")
       local plan = self.agent.bdi:processGoal(goal)
       if plan then
-        self:push(plan)                                                           ys.log.d("Pushing new plan <"..plan.name..">")
+        self:push(plan)                                                           log.d("Pushing new plan <"..plan.name..">")
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
         goal.past.last = plan
       else
-        goal:fail(Goal.FailReason.NoPlansAvailable)                               ys.log.d("Could not find any plan")
+        goal:fail(Goal.FailReason.NoPlansAvailable)                               log.d("Could not find any plan")
       end
 
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self:pop()                                                                  ys.log.d("Popping plan (success)")
+      self:pop()                                                                  log.d("Popping plan (success)")
     elseif goal.status == Goal.Status.Failed then
-      self:pop()                                                                  ys.log.d("Popping plan (failure)")
+      self:pop()                                                                  log.d("Popping plan (failure)")
     end
   end
 
@@ -154,12 +155,12 @@ return function(loader)
 
   function Intention:push(e)
     if not e then
-      ys.log.w("Intention:push ignored (element is nil).")
+      log.w("Intention:push ignored (element is nil).")
       return
     end
     if e.getYsType() == "goal" then self:pushGoal(e)
     elseif e.getYsType() == "plan" then self:pushPlan(e)
-    else ys.log.w("Intention:push ignored (not a plan nor a goal).") end
+    else log.w("Intention:push ignored (not a plan nor a goal).") end
   end
 
   function Intention:pop()

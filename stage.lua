@@ -1,5 +1,3 @@
-local Stage = summon.class("Stage")
-
 local BattleInterface = require "battle-interface"
 local EventDispatcher = require "event-dispatcher"
 local World = require "world"
@@ -8,13 +6,14 @@ local GM = require "gm"
 local sg = summon.graphics
 local vec = summon.vec
 
+local Stage = summon.class("Stage", EventDispatcher)
+
 function Stage:initialize(data, characters)
   local map = summon.AssetLoader.load("map", data.map)
   self.world = World(map)
   self.gm = GM(self.world)
   self.camera = sg.Camera()
   self.interface = BattleInterface(self)
-  self.dispatcher = EventDispatcher()
   self.mouse = vec()
   self.messageRenderer = sg.MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30,
     function(v) return self.camera:gameToScreen(v) end)
@@ -36,9 +35,6 @@ function Stage:initialize(data, characters)
   self.gm:nextTurn()
   self.gm:nextCharacter()
 end
-
-function Stage:dispatch(...) self.dispatcher:dispatch(...) end
-function Stage:listen(...) self.dispatcher:listen(...) end
 
 function Stage:listenToGM(gm)
   self.gm:listen(self, "next_character", function(c)

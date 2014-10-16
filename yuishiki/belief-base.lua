@@ -2,14 +2,18 @@ return function(loader)
   local class = loader.require "middleclass"
   local Event = loader.load "event"
   local Belief = loader.load "belief"
+  local Observable = loader.load "observable"
 
-  local BeliefBase = class("BDI.BeliefBase")
+  local BeliefBase = class("BDI.BeliefBase", Observable)
 
-  function BeliefBase:initialize(agent) assert(agent)
-    self.agent = agent
-
+  function BeliefBase:initialize()
     self.lookup = {}
     self.beliefs = {}
+
+    self.observer = function(belief, new, old)
+      local event = Event.Belief(belief, Belief.Status.changed, new, old)
+      self:notify(event)
+    end
 
     -- TODO
     interface = self
@@ -38,14 +42,25 @@ return function(loader)
     return belief, last
   end
 
-  -- TODO create and dispatch event for root change
   -- TODO check for overwrite?
   function BeliefBase:set(data, name, path, readonly)
     local belief = Belief(data, name, path, readonly)
-    local root = self:resolve(path, true)
+    belief:addObserver(self, self.observer)
 
-    root[name] = belief
     self.lookup[belief.full_path] = belief
+    local root = self:resolve(path, true)
+    root[name] = belief
+
+    local event = Event.Belief(belief, Belief.Status.new, belief:get())
+    self:notify(event)
+
+    return belief
+  end
+
+  function BeliefBase:unset(path)
+    -- TODO
+    local event = Event.Belief(belief, Belief.Status.deleted, belief:get())
+    self:notify(event)
   end
 
   function BeliefBase:get(path)

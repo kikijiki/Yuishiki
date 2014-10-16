@@ -1,5 +1,6 @@
 return function(loader)
   local class = loader.require "middleclass"
+  local log = loader.load "log"
   local Plan = loader.load "plan"
 
   local IntentionBase = class("BDI.IntentionBase")
@@ -54,9 +55,9 @@ return function(loader)
 
   function IntentionBase:dump()
     for _,intention in pairs(self.intentions) do
-      ys.log.i(intention.id)
+      log.i(intention.id)
       for _,element in pairs(intention.stack.elements) do
-        ys.log.i(" - "..element.name.." ["..element.status.."]")
+        log.i(" - "..element.name.." ["..element.status.."]")
       end
     end
   end

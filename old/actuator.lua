@@ -37,7 +37,7 @@ function Actuator:initialize(agent, actions) assert(agent)
       return function(...) return self:execute(k, ...) end
     end,
     __newindex = function(t, k)
-      ys.log.w("Trying to modify an interface.")
+      log.w("Trying to modify an interface.")
       return ys.common.uti.null_interface
     end
   })
@@ -53,10 +53,10 @@ function Actuator:updateThread(data) assert(data)
   local ret = {coroutine.resume(thread, self, unpack(data.parameters))}
   local err = ret[1] == false
   table.remove(ret, 1)
-  ----[5.2] if err == false then ys.log.w("Actuator <"..self.class.name.."> raised an error:", table.unpack(ret)) end
+  ----[5.2] if err == false then log.w("Actuator <"..self.class.name.."> raised an error:", table.unpack(ret)) end
   local finished = (coroutine.status(thread) == "dead")
   if not finished and err == false then
-    ys.log.w("Actuator <"..self.class.name.."> raised an error:", unpack(ret))
+    log.w("Actuator <"..self.class.name.."> raised an error:", unpack(ret))
   end
   local event = ys.mas.Event.Actuator(data.id, finished, ret)
   self.agent:sendInternalEvent(event)
@@ -69,11 +69,11 @@ function Actuator:execute(action, ...)
 
   if a then
     if a.canExecute and not a.canExecute(self, ...) then
-      ys.log.w("Actuator <"..self.class.name.."> raised an error: execution condition of action <"..action.."> is not satisfied.")
+      log.w("Actuator <"..self.class.name.."> raised an error: execution condition of action <"..action.."> is not satisfied.")
       return
     end
   else
-    ys.log.w("Actuator <"..self.class.name.."> raised an error: action <"..action.."> does not exist.")
+    log.w("Actuator <"..self.class.name.."> raised an error: action <"..action.."> does not exist.")
     return
   end
   

@@ -11,12 +11,12 @@ function DeviceBase:initialize(agent) assert(agent)
         local sensor = self.sensors[k]
         if sensor then return dev.interface
         else
-          ys.log.w("Unknown sensor <"..k..">.")
+          log.w("Unknown sensor <"..k..">.")
           return ys.common.uti.null_interface
         end
       end,
       __newindex = function(t, k)
-        ys.log.w("Trying to modify an interface.")
+        log.w("Trying to modify an interface.")
         return ys.common.uti.null_interface
       end
     }),
@@ -25,12 +25,12 @@ function DeviceBase:initialize(agent) assert(agent)
         local actuator = self.actuators[k]
         if actuator then return dev.interface
         else
-          ys.log.w("Unknown actuator <"..k..">.")
+          log.w("Unknown actuator <"..k..">.")
           return ys.common.uti.null_interface
         end
       end,
       __newindex = function(t, k)
-        ys.log.w("Trying to modify an interface.")
+        log.w("Trying to modify an interface.")
         return ys.common.uti.null_interface
       end
     })

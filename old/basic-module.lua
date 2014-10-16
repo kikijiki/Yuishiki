@@ -11,10 +11,10 @@ m:add(
     retry = false,
     on = {
       failure = function(goal, agent)
-        ys.log.d("goal failed")
+        log.d("goal failed")
       end,
       success = function(goal, agent)
-        ys.log.d("goal succeeded")
+        log.d("goal succeeded")
       end
     }}
   )

@@ -2,6 +2,7 @@ return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
+  local ManualTrigger = loader.load "manual-trigger"
 
   local Goal = class("Goal")
 
@@ -11,16 +12,16 @@ return function(loader)
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
-    local G = ys.class(goal_class_prefix..name, ys.bdi.Goal)
+    local G = class(goal_class_prefix..name, Goal)
 
     G.static.default = data
     G.static.members = {"name", "creation", "condition", "limit", "on", "retry"}
 
     G.static.name = name
     G.static.creation = Trigger.fromData(data.creation)
-    G.static.condition = ys.common.ManualTrigger(data.condition)
+    G.static.condition = ManualTrigger(data.condition)
     G.static.limit = data.limit
-    G.static.on = ys.common.ManualTrigger(data.on)
+    G.static.on = ManualTrigger(data.on)
     G.static.retry = data.retry
 
     G.initialize = function(self, agent, parameters)
@@ -34,7 +35,7 @@ return function(loader)
   end
 
   function Goal.static.extend(name)
-    return ys.class(goal_class_prefix..name, ys.bdi.Goal)
+    return class(goal_class_prefix..name, Goal)
   end
 
   function Goal:initialize(parameters)

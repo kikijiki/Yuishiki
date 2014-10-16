@@ -1,9 +1,10 @@
-local Character = summon.class("Character")
-
 local vec = summon.vec
-local Command = summon.game.Command
+local ys = require "yuishiki"
 local Stat = require "stat"
+local Command = summon.game.Command
 local EventDispatcher = require "event-dispatcher"
+
+local Character = summon.class("Character", EventDispatcher)
 
 function Character:initialize(data)
   self.data = data
@@ -13,24 +14,20 @@ function Character:initialize(data)
 
   self.sprite = summon.AssetLoader.load("sprite", data.sprite)
   self.commands = summon.common.Stack()
-  self.dispatcher = EventDispatcher()
 
-  self.agent = ys.mas.Agent()
+  self.agent = ys.Agent()
 
-  self.status    = {} self.agent:addBeliefset("status")
-  self.equipment = {} self.agent:addBelief("equipment", {})
+  self.status    = {}
+  self.equipment = {}
   self.actions   = {}
 
-  self:addStat("position", vec(1, 1))
+  self:addStat("position", "basic", vec(1, 1))
 
   for _,v in pairs(self.aimod) do
     local aimod = summon.AssetLoader.load("aimod", v)
     self.agent:plug(aimod)
   end
 end
-
-function Character:dispatch(...) self.dispatcher:dispatch(...) end
-function Character:listen(...) self.dispatcher:listen(...) end
 
 function Character:setGm(gm)
   self.gm = gm
@@ -109,19 +106,13 @@ function Character:bubble(message, color)
   self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
 end
 
-function Character:addStat(name, ...)
-  local stat = Stat(...)
-  self.status[name] = stat
-  local belief = self.agent:setBelief("status", name, function() return stat:get() end)
-  stat:listen(belief, function(stat, new, old) belief:onChange(old) end)
-  return stat
-end
+function Character:addStat(...)
+  local stat = Stat.fromData(...)
+  if not stat then return end
 
-function Character:addCStat(name, ...)
-  local stat = Stat.Composite(...)
   self.status[name] = stat
-  local belief = self.agent:setBelief("status", name, function() return stat:get() end)
-  stat:listen(belief, function(stat, new, old) belief:onChange(old) end)
+  local belief = self.agent:setBelief(stat, stat.name, "status", true)
+  stat:addObserver(belief, function(new, old) belief:notify(new, old) end)
   return stat
 end
 
