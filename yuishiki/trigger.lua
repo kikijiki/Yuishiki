@@ -54,7 +54,7 @@ return function(loader)
   Trigger.Goal = GoalTrigger
 
   function GoalTrigger:initialize(goal_name, goal_parameters)
-    ParametrizedTrigger.initialize(self, EventType.Goal, goal_name, goal_parameters)
+    ParametrizedTrigger.initialize(self, Event.Type.Goal, goal_name, goal_parameters)
   end
 
   --[[ Custom Trigger ]]--
@@ -104,13 +104,13 @@ return function(loader)
   end
 
   function BeliefTrigger:starts(path)
-    if path = "*" then path = nil end
+    if path == "*" then path = nil end
     self.path_start = path
     return self
   end
 
   function BeliefTrigger:ends(path)
-    if path = "*" then path = nil end
+    if path == "*" then path = nil end
     self.path_end = path
     return self
   end

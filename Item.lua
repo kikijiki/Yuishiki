@@ -1,4 +1,5 @@
-local Item = summon.class("Item")
+local class = require "lib.middleclass"
+local Item = class("Item")
 
 function Item:initialize(name, item_type, slot)
   self.name = name

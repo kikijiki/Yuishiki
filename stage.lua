@@ -1,3 +1,4 @@
+local class = require "lib.middleclass"
 local BattleInterface = require "battle-interface"
 local EventDispatcher = require "event-dispatcher"
 local World = require "world"
@@ -6,9 +7,11 @@ local GM = require "gm"
 local sg = summon.graphics
 local vec = summon.vec
 
-local Stage = summon.class("Stage", EventDispatcher)
+local Stage = class("Stage", EventDispatcher)
 
 function Stage:initialize(data, characters)
+  EventDispatcher.initialize(self)
+  
   local map = summon.AssetLoader.load("map", data.map)
   self.world = World(map)
   self.gm = GM(self.world)

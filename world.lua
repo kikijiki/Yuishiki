@@ -1,5 +1,7 @@
-local World = summon.class("World")
+local class = require "lib.middleclass"
 local vec = summon.vec
+
+local World = class("World")
 
 function World:initialize(map) assert(map)
   self.characters = {}

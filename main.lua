@@ -7,9 +7,9 @@ require "summon"
 
 local sg = summon.graphics
 
-log.showTime = false
-log.showInfo = false
-log.verbosity = log.Verbosity.verbose
+ys.log.showTime = false
+ys.log.showInfo = false
+ys.log.verbosity = ys.log.Verbosity.verbose
 -- log.addRawOutput(console.i, false)
 
 summon.log = ys.log
@@ -17,9 +17,10 @@ summon.log = ys.log
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
 
+summon.AssetLoader.register("character", "characters", require("character").load, false)
+summon.AssetLoader.register("aimod", "aimods", require("character").loadAiMod, false)
+
 function love.load()
-  summon.AssetLoader.register("character", "characters", require("character").load, false)
-  summon.AssetLoader.register("aimod", "aimods", require("character").loadAiMod, false)
   gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })
 
   summon.fs.getDirectoryItems(scenarios_path, function(file)

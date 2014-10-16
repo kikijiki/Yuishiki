@@ -1,5 +1,7 @@
+local class = require "lib.middleclass"
 local Item = require "item"
-local Weapon = summon.class("Weapon", Item)
+
+local Weapon = class("Weapon", Item)
 
 function Weapon:initialize(data)
   Item.initialize(self, data.name, "weapon", "weapon")

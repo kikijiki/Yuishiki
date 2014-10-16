@@ -4,9 +4,11 @@ return function(loader)
   local Belief = loader.load "belief"
   local Observable = loader.load "observable"
 
-  local BeliefBase = class("BDI.BeliefBase", Observable)
+  local BeliefBase = class("BeliefBase", Observable)
 
   function BeliefBase:initialize()
+    Observable.initialize(self)
+
     self.lookup = {}
     self.beliefs = {}
 

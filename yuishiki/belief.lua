@@ -9,6 +9,8 @@ return function(loader)
   Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 
   function Belief:initialize(value, name, path, readonly)
+    Observable.initialize(self)
+
     self.name = name
     self.base_path = path
     self.full_path = path.."."..name
@@ -39,7 +41,7 @@ return function(loader)
       self.value = value
     end
 
-    self:notify(self:get(), old)
+    self:notify(self, self:get(), old)
   end
 
   return Belief

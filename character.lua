@@ -1,12 +1,15 @@
+local class = require "lib.middleclass"
 local vec = summon.vec
-local ys = require "yuishiki"
 local Stat = require "stat"
 local Command = summon.game.Command
 local EventDispatcher = require "event-dispatcher"
+local ys = require "yuishiki"()
 
-local Character = summon.class("Character", EventDispatcher)
+local Character = class("Character", EventDispatcher)
 
 function Character:initialize(data)
+  EventDispatcher.initialize(self)
+
   self.data = data
   self.name = data.name
   self.modules = data.modules
@@ -106,19 +109,19 @@ function Character:bubble(message, color)
   self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
 end
 
-function Character:addStat(...)
+function Character:addStat(name, ...)
   local stat = Stat.fromData(...)
   if not stat then return end
 
   self.status[name] = stat
-  local belief = self.agent:setBelief(stat, stat.name, "status", true)
-  stat:addObserver(belief, function(new, old) belief:notify(new, old) end)
+  local belief = self.agent:setBelief(stat, name, "status", true)
+  stat:addObserver(belief, function(new, old) belief:notify(belief, new, old) end)
   return stat
 end
 
 function Character:addAction(name)
   self.actions[name] = true
-  self.agent.actuator:addAction(name)
+  self.agent:addAction(name)
 end
 
 function Character:kill(callback)

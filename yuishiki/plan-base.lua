@@ -2,10 +2,13 @@ return function(loader)
   local class = loader.require "middleclass"
   local Plan = loader.load "plan"
   local Trigger = loader.load "trigger"
+  local Observable = loader.load "observable"
 
-  local PlanBase = class("BDI.PlanBase")
+  local PlanBase = class("PlanBase", Observable)
 
   function PlanBase:initialize(agent) assert(agent)
+    Observable.initialize(self)
+    
     self.agent = agent
     self.schemas = {}
   end

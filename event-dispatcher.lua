@@ -1,4 +1,5 @@
-local EventDispatcher = summon.class("EventDispatcher")
+local class = require "lib.middleclass"
+local EventDispatcher = class("EventDispatcher")
 
 function EventDispatcher:initialize()
   self.events = {}

@@ -2,7 +2,7 @@ return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
-  local MamualTrigger = loader.load "manual-trigger"
+  local ManualTrigger = loader.load "manual-trigger"
   local Event = loader.load "event"
 
   local Plan = class("Plan")

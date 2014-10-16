@@ -2,6 +2,7 @@ return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
+  local Observable = loader.load "observable"
   local Event = loader.load "event"
   local Intention = loader.load "intention"
   local BeliefBase = loader.load "belief-base"
@@ -9,9 +10,11 @@ return function(loader)
   local PlanBase = loader.load "plan-base"
   local IntentionBase = loader.load "intention-base"
 
-  local BDIModel = class("BDIModel")
+  local BDIModel = class("BDIModel", Observable)
 
   function BDIModel:initialize(agent)
+    Observable.initialize(self)
+
     self.agent = agent
 
     self.belief_base    = BeliefBase()
@@ -23,7 +26,7 @@ return function(loader)
     local dispatcher = function(...) return self:dispatch(...) end
     self.belief_base   :addObserver(self, dispatcher)
     self.goal_base     :addObserver(self, dispatcher)
-    self.goal_base     :addObserver(self, dispatcher)
+    self.plan_base     :addObserver(self, dispatcher)
     self.intention_base:addObserver(self, dispatcher)
 
     self.interface = setmetatable({}, {

@@ -2,10 +2,13 @@ return function(loader)
   local class = loader.require "middleclass"
   local log = loader.load "log"
   local Plan = loader.load "plan"
+  local Observable = loader.load "observable"
 
-  local IntentionBase = class("BDI.IntentionBase")
+  local IntentionBase = class("IntentionBase", Observable)
 
   function IntentionBase:initialize(agent) assert(agent)
+    Observable.initialize(self)
+    
     self.agent = agent
     self.intentions = {}
   end

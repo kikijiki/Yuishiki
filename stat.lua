@@ -4,11 +4,12 @@ local Observable = require "observable"
 local Stat = class("Stat", Observable)
 
 function Stat:initialize(value)
+  Observable.initialize(self)
   self.value = value or 0
 end
 
 function Stat:__tostring()
-  return self.value
+  return tostring(self.value)
 end
 
 function Stat:update(v)
@@ -95,10 +96,10 @@ end
 -- TODO vector stat?
 
 -- TODO
-function Stat.fromData(name, stat_type, ...)
-  if stat_type == "basic"     then return Stat(name, ...)           end
-  if stat_type == "composite" then return Stat.Composite(name, ...) end
-  if stat_type == "table"     then return Stat.Table(name, ...)     end
+function Stat.fromData(stat_type, ...)
+  if stat_type == "basic"     then return Stat(...)           end
+  if stat_type == "composite" then return Stat.Composite(...) end
+  if stat_type == "table"     then return Stat.Table(...)     end
 end
 
 return Stat

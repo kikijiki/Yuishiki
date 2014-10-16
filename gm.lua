@@ -1,12 +1,15 @@
-local GM = summon.class("GM")
-
+local class = require "lib.middleclass"
 local Action = require "action"
 local Item = require "item"
 local Weapon = require "weapon"
 local EventDispatcher = require "event-dispatcher"
 local console = require "lib.console"
 
+local GM = class("GM", EventDispatcher)
+
 function GM:initialize(world)
+  EventDispatcher.initialize(self)
+
   self.world = world
   self.rules = {}
   self.actions = {}
@@ -16,12 +19,8 @@ function GM:initialize(world)
   self.paused = true
   self.initiative = {results = {}, list = {}, current = 0}
   self.activeCharacter = nil
-  self.dispatcher = EventDispatcher()
   self.logger = summon.log.i
 end
-
-function GM:dispatch(...) self.dispatcher:dispatch(...) end
-function GM:listen(...) self.dispatcher:listen(...) end
 
 function GM:loadRuleset(ruleset)
   if ruleset.rules then self:loadRules(ruleset.rules) end

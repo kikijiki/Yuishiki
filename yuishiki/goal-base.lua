@@ -5,10 +5,13 @@ return function(loader)
   local Plan = loader.load "plan"
   local Event = loader.load "event"
   local Trigger = loader.load "trigger"
+  local Observable = loader.load "observable"
 
-  local GoalBase = class("BDI.GoalBase")
+  local GoalBase = class("GoalBase", Observable)
 
   function GoalBase:initialize(agent) assert(agent)
+    Observable.initialize(self)
+    
     self.agent = agent
     self.goal_schemas = {}
     self.inhibited = {}

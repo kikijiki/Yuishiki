@@ -1,4 +1,6 @@
-local BattleInterface = summon.class("BattelInterface")
+local class = require "lib.middleclass"
+
+local BattleInterface = class("BattelInterface")
 local Cursor = summon.class("Cursor")
 
 local sg = summon.graphics

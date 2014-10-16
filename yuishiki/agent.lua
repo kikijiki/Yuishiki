@@ -17,7 +17,7 @@ return function(loader)
     self.id = generateId()
     self.step_count = 0
 
-    self.actuator = Actuator
+    self.actuator = Actuator()
     self.sensors = {}
 
     self.modules = {}
@@ -40,6 +40,7 @@ return function(loader)
 
   function Agent:setBelief(...) return self.bdi.belief_base:set(...) end
   function Agent:unsetBelief(...) return self.bdi.belief_base:unset(...) end
+  function Agent:addAction(...) return self.actuator:addAction(...) end
 
   function Agent:dispatch(event)
     self.bdi:dispatch(event)
@@ -81,8 +82,8 @@ return function(loader)
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        local belief = Belief.fromData(k, v)
-        self.bdi.belief_base:set(belief)
+        -- TODO
+        -- self:setBelief()
       end
     end
 

@@ -17,9 +17,9 @@ return function (base_path)
   ys = {}
 
   ys.uti           = loader.load ("uti")
+  ys.log           = loader.load ("log")
   ys.PriorityQueue = loader.load ("priority-queue")
   ys.Stack         = loader.load ("stack")
-  ys.log           = loader.load ("log")
   ys.ManualTrigger = loader.load ("manual-trigger")
   ys.Observable    = loader.load ("observable")
 
