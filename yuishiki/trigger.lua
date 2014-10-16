@@ -23,7 +23,7 @@ end
 
 --[[ Parametrized Trigger ]]--
 
-local ParametrizedTrigger = ys.class("ParametrizedTrigger", Trigger)
+local ParametrizedTrigger = class("ParametrizedTrigger", Trigger)
 Trigger.Parametrized = ParametrizedTrigger
 
 function ParametrizedTrigger:initialize(event_type, event_name, parameters)
@@ -50,7 +50,7 @@ end
 
 --[[ Goal Trigger ]]--
 
-local GoalTrigger = ys.class("GoalTrigger", ParametrizedTrigger)
+local GoalTrigger = class("GoalTrigger", ParametrizedTrigger)
 Trigger.Goal = GoalTrigger
 
 function GoalTrigger:initialize(goal_name, goal_parameters)
@@ -59,7 +59,7 @@ end
 
 --[[ Custom Trigger ]]--
 
-local CustomTrigger = ys.common.class("CustomTrigger", Trigger)
+local CustomTrigger = class("CustomTrigger", Trigger)
 Trigger.Custom = CustomTrigger
 
 function CustomTrigger:initialize(event_type, event_name, f, parameters)
@@ -77,7 +77,7 @@ end
 
 --[[ Belief Trigger ]]--
 
-local BeliefTrigger = ys.common.class("BeliefTrigger", CustomTrigger)
+local BeliefTrigger = class("BeliefTrigger", CustomTrigger)
 Trigger.Belief = BeliefTrigger
 
 BeliefTrigger.static.conditions = {

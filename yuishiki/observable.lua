@@ -15,3 +15,5 @@ function Observable:notify(...)
     listener(...)
   end
 end
+
+return Observable

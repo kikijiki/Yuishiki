@@ -1,9 +1,10 @@
 local class = require "lib.middleclass"
 local Event = require "event"
+local uti = require "uti"
 
 local Agent = class("Agent")
 
-local generateId = ys.common.uti.makeIdGenerator("agent")
+local generateId = uti.makeIdGenerator("agent")
 
 function Agent:initialize()
   self.id = generateId()

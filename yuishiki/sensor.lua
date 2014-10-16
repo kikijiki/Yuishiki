@@ -4,7 +4,7 @@ local uti = require "uti"
 local Sensor = class("Sensor")
 local sensor_class_prefix = "sensor_"
 
-local generateId =  ys.common.uti.makeIdGenerator("sensor")
+local generateId =  uti.makeIdGenerator("sensor")
 
 function Sensor.static.define(name)
   local S = ys.class(sensor_class_prefix..name, ys.mas.Sensor)

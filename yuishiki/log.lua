@@ -1,10 +1,13 @@
-local Log = {
-  Verbosity = {verbose = 3, normal = 2, minimal = 1, none = 0},
-  color = ys.common.ansicolors
-}
+local ansicolors = require "lib.ansicolors".noReset
+local inspect = require "lib.inspect"
 
-local inspect = ys.common.inspect
-local ansicolors = ys.common.ansicolors.noReset
+local log = {
+  Verbosity = {verbose = 3, normal = 2, minimal = 1, none = 0},
+  showInfo = true,
+  showTime = true,
+  useAnsiColors = false,
+  verbosity = 2
+}
 
 local outputs = {
   full = {},
@@ -19,8 +22,6 @@ local colors = {
   line = ansicolors("%{bright cyan}"),
   message = ""
 }
-
-Log.verbosity = Log.Verbosity.normal
 
 local tags = {
   INF = {
@@ -44,10 +45,6 @@ local tags = {
     level = 1,
     die = true}
 }
-
-Log.showInfo = true
-Log.showTime = true
-Log.useAnsiColors = false
 
 local function sendRawOutput(normal, colored)
   for _,out in pairs(outputs.raw) do
@@ -73,7 +70,7 @@ end
 
 local function writeToLog(tag_name, ...)
   local tag = tags[tag_name]
-  if tag.level > Log.verbosity then return end
+  if tag.level > log.verbosity then return end
 
   local msg = {}
   local meta = {color = {}, normal = {}}
@@ -88,11 +85,11 @@ local function writeToLog(tag_name, ...)
   data.time = t
   data.msg = msg
 
-  if Log.showTime then
+  if log.showTime then
     table.insert(meta, "["..t.hour..":"..t.min..":"..t.sec.."]")
   end
 
-  if Log.showInfo then
+  if log.showInfo then
     local loginfoColor = {
       colors.source, (info.source or "[unknown]"), colors.reset,
       colors.arrow, "->", colors.reset,
@@ -117,36 +114,36 @@ local function writeToLog(tag_name, ...)
   if tag.die then error(table.concat(msg), 3) end
 end
 
-function Log.addRawOutput(out, useAnsiColor)
+function log.addRawOutput(out, useAnsiColor)
   table.insert(outputs.raw, {f = out, color = useAnsiColor})
 end
 
-function Log.addOutput(out)
+function log.addOutput(out)
   table.insert(outputs.full, out)
 end
 
-Log.i = function(...)
+function log.i(...)
   writeToLog("INF", ...)
 end
 
-Log.d = function(...)
+function log.d(...)
   writeToLog("DBG", ...)
 end
 
-Log.w = function(...)
+function log.w(...)
   writeToLog("WRN", ...)
 end
 
-Log.e = function(...)
+function log.e(...)
   writeToLog("ERR", ...)
 end
 
-Log.inspect = function(x)
-  print(inspect(x))
+function log.inspect(x)
+  log.i(inspect(x))
 end
 
-Log.check = function(value, ...)
+function log.check(value, ...)
   if not value then writeToLog("ERR", 1, true, ...) end
 end
 
-return Log
+return log

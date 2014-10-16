@@ -1,11 +1,12 @@
 local class = require "lib.middleclass"
+local uti = require "uti"
 local Goal = require "goal"
 local Plan = require "plan"
 local Stack = require "stack"
 
 local Intention = class("Intention")
 
-local generateId = ys.common.uti.makeIdGenerator("intention")
+local generateId = uti.makeIdGenerator("intention")
 
 function Intention:initialize()
   self.stack = Stack()

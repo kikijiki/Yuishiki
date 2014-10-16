@@ -1,11 +1,11 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
+local Event = require "event"
+local Observable = require "observable"
+local uti = require "uti"
 
-local Event = ys.mas.Event
-local EventDispatcher = ys.common.EventDispatcher
+local Belief = class("BDI.Belief", Observable)
 
-local Belief = ys.common.class("BDI.Belief", EventDispatcher)
-
-Belief.static.Source = ys.common.uti.makeEnum("Internal", "External")
+Belief.static.Source = uti.makeEnum("Internal", "External")
 
 function Belief:initialize(value, name, path, getter, setter)
   self.name = name

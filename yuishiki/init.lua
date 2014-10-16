@@ -1,7 +1,7 @@
 --[[Yuishiki AI - 唯識永合]]--
 
 local path = ... .. "."
-
+path = ""
 ys = {}
 
 ys.class         = require (path.."lib.middleclass")
@@ -16,11 +16,10 @@ ys.Observable    = require (path.."observable")
 
 ys.Agent         = require (path.."agent")
 ys.Event         = require (path.."event")
-ys.EventQueue    = require (path.."event-queue")
 ys.Sensor        = require (path.."sensor")
 ys.Actuator      = require (path.."actuator")
 
-ys.BDIModel      = require (path.."model")
+ys.BDIModel      = require (path.."bdi-model")
 ys.Belief        = require (path.."belief")
 ys.BeliefBase    = require (path.."belief-base")
 ys.Plan          = require (path.."plan")

@@ -1,14 +1,14 @@
 local class = require "lib.middleclass"
-
+local uti = require "uti"
 local Trigger = require "trigger"
 local Event = require "event"
 
 local Plan = class("Plan")
 local plan_class_prefix = "plan_"
 
-Plan.static.Status = ys.common.uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed")
-Plan.static.FailReason = ys.common.uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
-Plan.static.Condition = ys.common.uti.makeEnum("Success", "Failure", "Context", "Completion")
+Plan.static.Status = uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed")
+Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
+Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
 
 function Plan.static.define(name, data)
   local P = ys.class(plan_class_prefix..name, ys.bdi.Plan)
