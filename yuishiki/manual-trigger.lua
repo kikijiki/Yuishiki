@@ -16,7 +16,7 @@ local MT = {
     if t then return call(t, rawget(self, "_default_args"))
     else return null end
   end,
-  
+
   __newindex = function(self, k, v)
     rawget(self, "_triggers")[k] = v
   end
@@ -34,7 +34,7 @@ return setmetatable({}, {
           local trigger = rawget(t._triggers, k)
           if trigger then
             return call(trigger, rawget(t, "_default_args"))
-          else 
+          else
             return function() return x end
           end
         end
