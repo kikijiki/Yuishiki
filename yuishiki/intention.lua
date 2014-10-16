@@ -1,9 +1,9 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
+local Goal = require "goal"
+local Plan = require "plan"
+local Stack = require "stack"
 
-local Stack = ys.common.Stack
-local Goal, Plan = ys.bdi.Goal, ys.bdi.Plan
-local Intention = ys.common.class("Intention")
-Intention.static._ys_component_type = "intention"
+local Intention = class("Intention")
 
 local generateId = ys.common.uti.makeIdGenerator("intention")
 
@@ -12,6 +12,10 @@ function Intention:initialize()
   self.active_goals = {}
   self.goal_count = {}
   self.id = generateId()
+end
+
+function Intention.getYsType()
+  return "intention"
 end
 
 function Intention:top()

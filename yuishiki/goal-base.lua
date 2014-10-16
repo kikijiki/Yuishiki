@@ -1,8 +1,10 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
+local Goal = require "goal"
+local Plan = require "plan"
+local Event = require "event"
+local Trigger = require "trigger"
 
-local GoalBase = ys.common.class("BDI_GoalBase")
-local Goal, Plan, Trigger = ys.bdi.Goal, ys.bdi.Plan, ys.mas.Trigger
-local Event = ys.mas.Event
+local GoalBase = class("BDI.GoalBase")
 
 function GoalBase:initialize(agent) assert(agent)
   self.agent = agent

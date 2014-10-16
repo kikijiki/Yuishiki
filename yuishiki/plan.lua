@@ -1,9 +1,10 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
 
-local Plan = ys.common.class("BDI_Plan")
+local Trigger = require "trigger"
+local Event = require "event"
+
+local Plan = class("Plan")
 local plan_class_prefix = "plan_"
-
-local Event, Trigger = ys.mas.Event, ys.mas.Trigger
 
 Plan.static.Status = ys.common.uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed")
 Plan.static.FailReason = ys.common.uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
@@ -48,6 +49,10 @@ function Plan:initialize(agent, parameters, goal) assert(agent)
   self.agent = agent
   self.status = Plan.Status.New
   self.results = {history = {}, last = nil}
+end
+
+function Plan.getYsType()
+  return "plan"
 end
 
 -- TODO: parameter passing
@@ -153,10 +158,6 @@ function Plan:yield(...) assert(self)
   self.on.yield()
   coroutine.yield(...)
   self.on.resume()
-end
-
-function Plan.getYsType()
-  return "plan"
 end
 
 return Plan

@@ -1,5 +1,7 @@
-local Agent = ys.common.class("Agent")
-local Event, AgentModule = ys.mas.Event, ys.mas.AgentModule
+local class = require "lib.middleclass"
+local Event = require "event"
+
+local Agent = class("Agent")
 
 local generateId = ys.common.uti.makeIdGenerator("agent")
 
@@ -7,7 +9,6 @@ function Agent:initialize()
   self.id = generateId()
   self.step_count = 0
 
-  self.dispatcher  = ys.mas.EventDispatcher()
   self.actuator = ys.mas.Actuator()
   self.sensors = {}
 
@@ -29,12 +30,8 @@ function Agent:initialize()
   })
 end
 
-function Agent:dispatchEvent(event)
-  self.dispatcher:send(event)
-end
-
-function Agent:systemEvent(name, ...)
-  self:dispatchEvent(Event.System(name, ...))
+function Agent:dispatch(event)
+  self.bdi:dispatch(event)
 end
 
 function Agent:waiting()
@@ -50,7 +47,7 @@ end
 function Agent:onEvent(event)
   for _,sensor in pairs(self.sensors) do
     local sensor_event = sensor:onEvent(event)
-    if sensor_event then self:dispatchEvent(sensor_event) end
+    if sensor_event then self:dispatch(sensor_event) end
   end
 end
 
@@ -85,42 +82,6 @@ function Agent:plug(mod)
   end
 
   return true
-end
-
---[[ External beliefs manipulation ]]--
-
-function Agent:addBelief(name, ...)
-  local belief = ys.bdi.Belief.External(name, ...)
-  self.bdi.belief_base:set(belief)
-  return belief
-end
-
-function Agent:addBeliefset(name)
-  local beliefset = ys.bdi.Belief.Set(name)
-  self.bdi.belief_base:set(beliefset)
-  return beliefset
-end
-
-function Agent:deleteBelief(name)
-  self.bdi.belief_base:unset(name)
-end
-
-function Agent:setBelief(beliefset, key, belief, ...)
-  belief = ys.bdi.Belief.External(belief, ...)
-  beliefset = self.bdi.belief_base:get(beliefset)
-  beliefset:set(key, belief)
-  return belief
-end
-
-function Agent:unsetBelief(beliefset, key)
-  self.bdi.belief_base:get(beliefset):unset(key)
-end
-
-function Agent:appendBelief(beliefset, belief, ...)
-  belief = ys.bdi.Belief.External(belief, ...)
-  beliefset = self.bdi.belief_base:get(beliefset)
-  beliefset:append(belief)
-  return belief
 end
 
 return Agent

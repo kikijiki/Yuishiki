@@ -1,6 +1,6 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
 
-local Stack = ys.common.class("Stack")
+local Stack = class("Stack")
 
 function Stack:initialize()
   self.size = 0
@@ -44,9 +44,9 @@ end
 function Stack:iterator(start)
   local index = start or 1
   return function()
-    if index <= self.size then 
+    if index <= self.size then
       local ret = self.elements[index]
-      index = index + 1 
+      index = index + 1
       return index, ret
     end
   end

@@ -1,6 +1,7 @@
-local IntentionBase = ys.common.class("BDI_IntentionBase")
+local class = require "lib.middleclass"
+local Plan = require "plan"
 
-local Plan = ys.bdi.Plan
+local IntentionBase = class("BDI.IntentionBase")
 
 function IntentionBase:initialize(agent) assert(agent)
   self.agent = agent

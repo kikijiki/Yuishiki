@@ -1,13 +1,12 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
+local uti = require "uti"
 
-local Event = ys.common.class("Event")
-Event.Source = ys.common.uti.makeEnum("Internal", "External")
-Event.EventType = ys.common.uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
+local Event = class("Event")
+Event.EventType = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
 
-function Event:initialize(event_type, name, source, parameters) assert(event_type)
+function Event:initialize(event_type, name, parameters) assert(event_type)
   self.event_type = event_type
   self.name = name
-  self.source = source
   self.parameters = parameters or {}
 end
 
@@ -18,10 +17,7 @@ function GoalEvent:initialize(goal) assert(goal)
   Event.initialize(self,
     Event.EventType.Goal,
     goal.name,
-    Event.Source.Internal,
-    {
-      goal = goal
-    })
+    { goal = goal })
 end
 
 local MessageEvent = ys.class("MessageEvent", Event)
@@ -31,7 +27,6 @@ function MessageEvent:initialize(message) assert(message)
   Event.initialize(self,
     Event.EventType.Message,
     nil,
-    Event.Source.Internal,
     { message = message })
 end
 
@@ -42,7 +37,6 @@ function BeliefEvent:initialize(belief, old, ...) assert(belief)
   Event.initialize(self,
     Event.EventType.Belief,
     belief.name,
-    Event.Source.Internal,
     {
       old_value = old,
       belief = belief,
@@ -59,7 +53,6 @@ function BeliefsetEvent:initialize(beliefset, change, key, ...) assert(beliefset
   Event.initialize(self,
     Event.EventType.Belief,
     beliefset.name,
-    Event.Source.Internal,
     {
       change = change,
       key = key,
@@ -76,7 +69,6 @@ function SystemEvent:initialize(name, ...) assert(name)
   return Event.initialize(self,
     Event.EventType.System,
     name,
-    Event.Source.Internal,
     {...})
 end
 
@@ -87,7 +79,6 @@ function ActuatorEvent:initialize(id, finished, data)
   return Event.initialize(self,
     Event.EventType.Actuator,
     nil,
-    Event.Source.Internal,
     { id = id,
       finished = finished,
       data = data

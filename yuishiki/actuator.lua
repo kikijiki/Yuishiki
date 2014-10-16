@@ -1,8 +1,10 @@
-local Actuator = ys.common.class("Actuator")
+local class = require "lib.middleclass"
+
+local Actuator = class("Actuator")
 
 function Actuator:initialize()
   self.actions = {}
-  
+
   self.interface = setmetatable({}, {
     __index = function(_, k)
       if k == "can" then

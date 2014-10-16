@@ -1,8 +1,9 @@
-assert(ys, "Yuishiki is not loaded.")
+local class = require "lib.middleclass"
+local Trigger = require "trigger"
 
-local Goal = ys.common.class("BDI_Goal")
+local Goal = class("Goal")
+
 local goal_class_prefix = "goal_"
-local Trigger = ys.mas.Trigger
 
 Goal.static.Status = ys.common.uti.makeEnum("New", "Active", "Succeeded", "Failed")
 Goal.static.FailReason = ys.common.uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
@@ -39,6 +40,10 @@ function Goal:initialize(parameters)
   self.past = {history = {}, plans = {}, last = nil}
 end
 
+function Goal.getYsType()
+  return "goal"
+end
+
 function Goal:fail(reason, plan)
   self.status = Goal.Status.Failed
   self.failReason = reason or Goal.FailReason.Unknown
@@ -53,10 +58,6 @@ end
 function Goal:activate()
   self.status = Goal.Status.Active
   self.on.activation()
-end
-
-function Goal.getYsType()
-  return "goal"
 end
 
 return Goal

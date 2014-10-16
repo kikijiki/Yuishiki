@@ -1,7 +1,9 @@
-local Model = ys.common.class("BDI_Model")
-local Event = ys.mas.Event
+local class = require "lib.middleclass"
+local Event = require "event"
 
-function Model:initialize(agent)
+local BDIModel = class("BDIModel")
+
+function BDIModel:initialize(agent)
   self.agent = agent
 
   self.belief_base    = ys.bdi.BeliefBase(agent)
@@ -9,10 +11,6 @@ function Model:initialize(agent)
   self.plan_base      = ys.bdi.PlanBase(agent)
   self.intention_base = ys.bdi.IntentionBase(agent)
   self.functions = {}
-
-  agent.dispatcher:register(self.plan_base, nil, -2)
-  agent.dispatcher:register(self.goal_base, nil, -2)
-  agent.dispatcher:register(self.intention_base, nil, -1)
 
   self.interface = setmetatable({}, {
     beliefs = self.belief_base.interface,
@@ -26,17 +24,24 @@ function Model:initialize(agent)
   })
 end
 
-function Model:selectIntention()
+function BDIModel:dispatch(event)
+  self.goal_base:onEvent(event)
+  self.plan_base:onEvent(event)
+  self.intention_base:onEvent(event)
+end
+
+function BDIModel:selectIntention()
   if self.functions.selectIntention then
     return self.functions.selectIntention(self, self.intention_base)
   end
+
   --Default
   for _,intention in pairs(self.intention_base.intentions) do
     if not intention:waiting() then return intention end
   end
 end
 
-function Model:selectPlan(goal, options)
+function BDIModel:selectPlan(goal, options)
   if self.functions.selectBestPlan then
     return self.functions.selectPlan(self, goal, options)
   end
@@ -58,13 +63,13 @@ function Model:selectPlan(goal, options)
   return best
 end
 
-function Model:processGoal(goal)
+function BDIModel:processGoal(goal)
   local event = Event.Goal(goal)
   local plans, metaplans = self.plan_base:filter(event)
-  
+
   if plans == nil or #plans == 0 then
     ys.log.i("No plans available for the goal <"..goal.name..">.")
-    return nil
+    return
   end
 
   local plan_schema
@@ -80,20 +85,18 @@ function Model:processGoal(goal)
   end
 end
 
-function Model:waiting()
+function BDIModel:waiting()
   return self.intention_base:waiting()
 end
 
-function Model:step()
-  self.agent:systemEvent("begin_step", self.agent.step_count)
-
-  --[[Schedule intentions]]--
+function BDIModel:step()
   if self:waiting() then
     ys.log.i("No executable intentions.")
     return false
   end
 
   local intention = self:selectIntention()
+
   if intention then
     ys.log.i("Executing intention <"..intention.id..">.")
     self.intention_base:execute(intention)
@@ -102,11 +105,10 @@ function Model:step()
     return false
   end
 
-  self.agent:systemEvent("end_step", self.agent.step_count)
   return true
 end
 
-function Model:pushGoal(name, parameters, intention)
+function BDIModel:pushGoal(name, parameters, intention)
   local goal = self.goal_base:instance(name, parameters)
 
   if intention then
@@ -120,4 +122,4 @@ function Model:pushGoal(name, parameters, intention)
   return goal
 end
 
-return Model
+return BDIModel

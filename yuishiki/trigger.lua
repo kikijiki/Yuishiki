@@ -1,5 +1,7 @@
-local Trigger = ys.common.class("Trigger")
-local Event = ys.mas.Event
+local class = require "lib.middleclass"
+local Event = require "event"
+
+local Trigger = class("Trigger")
 local EventType = Event.EventType
 
 --[[ Trigger ]]--
