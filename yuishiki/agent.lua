@@ -26,7 +26,7 @@ return function(loader)
     self.bdi = BDIModel(self)
 
     self.interface = setmetatable({
-      log = log,
+      log = print,
       bdi = self.bdi,
       internal = self,
       external = setmetatable({},{}),

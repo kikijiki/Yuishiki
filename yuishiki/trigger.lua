@@ -81,18 +81,18 @@ return function(loader)
   Trigger.Belief = BeliefTrigger
 
   BeliefTrigger.static.conditions = {
-    equal         = function(old, new, p)      return new == p                end,
-    changed       = function(old, new)         return old ~= new              end,
-    at_least      = function(old, new, p)      return new >= p                end,
-    at_most       = function(old, new, p)      return new <= p                end,
-    more_than     = function(old, new, p)      return new >  p                end,
-    less_than     = function(old, new, p)      return new <  p                end,
-    increased     = function(old, new)         return new >  old              end,
-    decreased     = function(old, new)         return old >  new              end,
-    not_increased = function(old, new)         return new <= old              end,
-    not_decreased = function(old, new)         return old >= new              end,
-    in_range      = function(old, new, p1, p2) return new <= p2 and new >= p1 end,
-    in_range_ex   = function(old, new, p1, p2) return new <  p2 and new > p1  end,
+    equal         = function(new, old, p)      return new == p                end,
+    changed       = function(new, old)         return new ~= old              end,
+    at_least      = function(new, old, p)      return new >= p                end,
+    at_most       = function(new, old, p)      return new <= p                end,
+    more_than     = function(new, old, p)      return new >  p                end,
+    less_than     = function(new, old, p)      return new <  p                end,
+    increased     = function(new, old)         return new >  old              end,
+    decreased     = function(new, old)         return old >  new              end,
+    not_increased = function(new, old)         return new <= old              end,
+    not_decreased = function(new, old)         return old >= new              end,
+    in_range      = function(new, old, p1, p2) return new <= p2 and new >= p1 end,
+    in_range_ex   = function(new, old, p1, p2) return new <  p2 and new > p1  end,
   }
 
   function BeliefTrigger:initialize(path, condition, ...)
@@ -129,15 +129,15 @@ return function(loader)
 
     -- Check conditions
 
-    local old = event.parameters.old_value
-    local new = event.parameters.belief:get()
+    local new = event.parameters.new
+    local old = event.parameters.old
 
     if self.condition then
       local condition
       if type(self.condition) == "function" then
-        return BeliefTrigger.conditions[self.condition](old, new, unpack(self.parameters))
+        return self.condition(new, old, unpack(self.parameters))
       else
-        return condition(old, new, unpack(self.parameters))
+        return BeliefTrigger.conditions[self.condition](new, old, unpack(self.parameters))
       end
     end
 

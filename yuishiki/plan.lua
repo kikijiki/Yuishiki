@@ -1,6 +1,7 @@
 return function(loader)
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
+  local log = loader.load "log"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
   local Event = loader.load "event"
@@ -36,6 +37,7 @@ return function(loader)
       self.thread = coroutine.create(self.body)
       self.on.setDefaultArguments(self, agent)
       self.condition.setDefaultArguments(self, agent)
+      self.step_count = 0
     end
 
     return P
@@ -62,7 +64,8 @@ return function(loader)
     if self.status ~= Plan.Status.Active then return end
 
     self.on.step()
-
+    self.step_count = self.step_count + 1
+                                                                                print("STEP")
     local ret = {coroutine.resume(self.thread,
       self.agent.interface,
       self,
@@ -108,12 +111,7 @@ return function(loader)
   end
 
   function Plan:waitForBelief(...)
-    if not name then
-      return self:yield()
-    else
-      local trigger = Trigger.Belief(...)
-      return self:waitForTrigger(trigger)
-    end
+    return self:waitForTrigger(Trigger.Belief(...))
   end
 
   function Plan:waitForActuator(id)

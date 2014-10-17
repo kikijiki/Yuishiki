@@ -18,7 +18,7 @@ return function(loader)
     end
 
     -- TODO
-    interface = self
+    self.interface = self.beliefs
   end
 
   function BeliefBase:resolve(path, create)

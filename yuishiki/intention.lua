@@ -34,33 +34,33 @@ return function(loader)
 
     local top = self:top()
     if not top then return end
-                                                                                  log.d("Intention top is "..top.getYsType().." <"..top.name..">") if top.status then log.d("status -> "..top.status) end
+
     if top.getYsType() == "goal" then self:stepGoal(top) end
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
   function Intention:stepPlan(plan)
-    if plan.status == Plan.Status.Active then                                     log.d("Stepping in plan <"..plan.name..">")
+    if plan.status == Plan.Status.Active then                                   log.d("Stepping in plan <"..plan.name..">")
       local err, data = plan:step()
 
       if err then
-        plan:fail(Plan.FailReason.BodyFailed)                                     log.d("Plan failed", data)
+        plan:fail(Plan.FailReason.BodyFailed)                                   log.d("Plan failed", data)
       end
       if plan:terminated() and not plan.status == Plan.Status.Failed then
         if plan.condition.default(true).completion() then
-          plan:succeed()                                                          log.d("Plan completed (success)")
+          plan:succeed()                                                        log.d("Plan completed (success)")
         else
-          plan:fail(Plan.FailReason.ConditionFailed)                              log.d("Plan completed (failure)")
+          plan:fail(Plan.FailReason.ConditionFailed)                            log.d("Plan completed (failure)")
         end
       end
     end
 
     if plan.status == Plan.Status.Succeeded then
-      self:pop()                                                                  log.d("Popping plan (success)")
+      self:pop()                                                                log.d("Popping plan (success)")
       local goal = self:top()
       goal:succeed()
     elseif plan.status == Plan.Status.Failed then
-      self:pop()                                                                  log.d("Popping plan (failure)")
+      self:pop()                                                                log.d("Popping plan (failure)")
       local goal = self:top()
 
       if goal.retry then
@@ -70,26 +70,27 @@ return function(loader)
         self:pop()
       end
     end
+                                                                                log.d("Plan still running...")
   end
 
   function Intention:stepGoal(goal)
-    if goal.status == Goal.Status.Active then                                     log.d("Stepping in goal <"..goal.name..">")
+    if goal.status == Goal.Status.Active then                                   log.d("Stepping in goal <"..goal.name..">")
       local plan = self.agent.bdi:processGoal(goal)
       if plan then
-        self:push(plan)                                                           log.d("Pushing new plan <"..plan.name..">")
+        self:push(plan)                                                         log.d("Pushing new plan <"..plan.name..">")
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
         goal.past.last = plan
       else
-        goal:fail(Goal.FailReason.NoPlansAvailable)                               log.d("Could not find any plan")
+        goal:fail(Goal.FailReason.NoPlansAvailable)                             log.d("Could not find any plan")
       end
 
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self:pop()                                                                  log.d("Popping plan (success)")
+      self:pop()                                                                log.d("Popping plan (success)")
     elseif goal.status == Goal.Status.Failed then
-      self:pop()                                                                  log.d("Popping plan (failure)")
+      self:pop()                                                                log.d("Popping plan (failure)")
     end
   end
 
