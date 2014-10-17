@@ -1,7 +1,11 @@
+local Stack
+
 return function(loader)
+  if Stack then return Stack end
+  
   local class = loader.require "middleclass"
 
-  local Stack = class("Stack")
+  Stack = class("Stack")
 
   function Stack:initialize()
     self.size = 0

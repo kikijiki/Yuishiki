@@ -1,8 +1,12 @@
+local Sensor
+
 return function(loader)
+  if Sensor then return Sensor end
+  
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
 
-  local Sensor = class("Sensor")
+  Sensor = class("Sensor")
   local sensor_class_prefix = "sensor_"
 
   local generateId =  uti.makeIdGenerator("sensor")

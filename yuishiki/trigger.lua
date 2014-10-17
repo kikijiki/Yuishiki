@@ -1,8 +1,13 @@
+local Trigger
+
 return function(loader)
+  if Trigger then return Trigger end
+  
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Event = loader.load "event"
-  local Trigger = class("Trigger")
+
+  Trigger = class("Trigger")
 
   --[[ Trigger ]]--
 

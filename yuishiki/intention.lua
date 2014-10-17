@@ -1,4 +1,8 @@
+local Intention
+
 return function(loader)
+  if Intention then return Intention end
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"

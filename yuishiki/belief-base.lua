@@ -1,10 +1,15 @@
+local BeliefBase
+
 return function(loader)
+  if BeliefBase then return BeliefBase end
+
   local class = loader.require "middleclass"
+  local log = loader.load "log"
   local Event = loader.load "event"
   local Belief = loader.load "belief"
   local Observable = loader.load "observable"
 
-  local BeliefBase = class("BeliefBase", Observable)
+  BeliefBase = class("BeliefBase", Observable)
 
   function BeliefBase:initialize()
     Observable.initialize(self)
@@ -22,21 +27,19 @@ return function(loader)
   end
 
   function BeliefBase:resolve(path, create)
-    local belief = self.beliefs
-    local last
+    if not path then return end
 
-    if path then
-      for token in string.gmatch(path, '([^.]+)') do
-        last = token
-        if belief[token] then
+    local belief = self.beliefs
+    for token in string.gmatch(path, '([^.]+)') do
+      last = token
+      if belief[token] then
+        belief = belief[token]
+      else
+        if create then
+          belief[token] = {}
           belief = belief[token]
         else
-          if create then
-            belief[token] = {}
-            belief = belief[token]
-          else
-            return nil, last
-          end
+          return nil, last
         end
       end
     end
@@ -44,13 +47,27 @@ return function(loader)
     return belief, last
   end
 
+  function BeliefBase.static.parsePath(path)
+    if not path then return end
+    local from, to = path:find('%.([^%.]*)$') print(from, to)
+    if from then
+      return path:sub(1, from - 1), path:sub(from + 1)
+    else
+      return path
+    end
+  end
+
   -- TODO check for overwrite?
-  function BeliefBase:set(data, name, path, readonly)
-    local belief = Belief(data, name, path, readonly)
+  function BeliefBase:set(data, name, base_path, readonly)
+    if not base_path then
+      base_path, name = BeliefBase.parsePath(path)
+    end
+
+    local belief = Belief(data, name, base_path, readonly)
     belief:addObserver(self, self.observer)
 
-    self.lookup[belief.full_path] = belief
-    local root = self:resolve(path, true)
+    self.lookup[path] = belief
+    local root = self:resolve(base_path, true)
     root[name] = belief
 
     local event = Event.Belief(belief, Belief.Status.new, belief:get())
@@ -67,6 +84,12 @@ return function(loader)
 
   function BeliefBase:get(path)
     return self.lookup[path]
+  end
+
+  function BeliefBase:dump()
+    for k,v in pairs(self.lookup) do
+      log.i("Belief ["..k.."] = ", v)
+    end
   end
 
   return BeliefBase

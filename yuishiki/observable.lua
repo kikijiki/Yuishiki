@@ -1,7 +1,11 @@
+local Observable
+
 return function(loader)
+  if Observable then return Observable end
+  
   local class = loader.require "middleclass"
 
-  local Observable = class("Observable")
+  Observable = class("Observable")
 
   function Observable:initialize()
     self.observers = setmetatable({}, {__mode="k"})

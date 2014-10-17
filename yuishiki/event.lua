@@ -1,10 +1,14 @@
+local Event
+
 return function(loader)
+  if Event then return Event end
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
 
   --[[ Base ]]--
 
-  local Event = class("Event")
+  Event = class("Event")
   Event.static.Type = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
 
   function Event:initialize(event_type, name, parameters) assert(event_type)

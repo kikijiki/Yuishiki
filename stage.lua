@@ -11,7 +11,7 @@ local Stage = class("Stage", EventDispatcher)
 
 function Stage:initialize(data, characters)
   EventDispatcher.initialize(self)
-  
+
   local map = summon.AssetLoader.load("map", data.map)
   self.world = World(map)
   self.gm = GM(self.world)
@@ -120,6 +120,7 @@ function Stage:keypressed(key)
 
   if key == "x" and ac then
     ac.agent.bdi.intention_base:dump()
+    ac.agent.bdi.belief_base:dump()
   end
 
   self:dispatch("keypressed", key)

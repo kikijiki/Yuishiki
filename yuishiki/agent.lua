@@ -1,4 +1,8 @@
+local Agent
+
 return function(loader)
+  if Agent then return Agent end
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
@@ -9,7 +13,7 @@ return function(loader)
   local Belief = loader.load "belief"
   local Actuator = loader.load "actuator"
 
-  local Agent = class("Agent")
+  Agent = class("Agent")
 
   local generateId = uti.makeIdGenerator("agent")
 
@@ -82,8 +86,7 @@ return function(loader)
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        -- TODO
-        -- self:setBelief()
+        self.bdi.belief_base:set(k, v)
       end
     end
 

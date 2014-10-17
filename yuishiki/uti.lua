@@ -1,5 +1,9 @@
+local uti
+
 return function(loader)
-  local uti = {}
+  if uti then return uti end
+  
+  uti = {}
 
   local null_metatable = {}
   local null_function = function() return setmetatable({}, null_metatable) end

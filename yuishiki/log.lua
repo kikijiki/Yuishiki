@@ -1,8 +1,12 @@
+local log
+
 return function(loader)
+  if log then return log end
+  
   local ansicolors = loader.require "ansicolors".noReset
   local inspect = loader.require "inspect"
 
-  local log = {
+  log = {
     Verbosity = {verbose = 3, normal = 2, minimal = 1, none = 0},
     showInfo = true,
     showTime = true,

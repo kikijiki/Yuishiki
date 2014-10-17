@@ -1,10 +1,14 @@
+local Goal
+
 return function(loader)
+  if Goal then return Goal end
+  
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
 
-  local Goal = class("Goal")
+  Goal = class("Goal")
 
   local goal_class_prefix = "goal_"
 

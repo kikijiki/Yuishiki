@@ -1,4 +1,8 @@
+local Plan
+
 return function(loader)
+  if Plan then return Plan end
+  
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
@@ -6,7 +10,7 @@ return function(loader)
   local ManualTrigger = loader.load "manual-trigger"
   local Event = loader.load "event"
 
-  local Plan = class("Plan")
+  Plan = class("Plan")
   local plan_class_prefix = "plan_"
 
   Plan.static.Status = uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed")

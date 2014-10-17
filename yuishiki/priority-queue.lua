@@ -1,7 +1,11 @@
+local PriorityQueue
+
 return function(loader)
+  if PriorityQueue then return PriorityQueue end
+  
   local class = loader.require "middleclass"
 
-  local PriorityQueue = class("PriorityQueue")
+  PriorityQueue = class("PriorityQueue")
 
   function PriorityQueue:initialize(compare, content)
     self.cmp = compare or (function(a, b) return a < b end)
