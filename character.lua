@@ -115,7 +115,7 @@ function Character:addStat(name, ...)
 
   self.status[name] = stat
   local belief = self.agent:setBelief(stat, name, "status", true)
-  stat:addObserver(belief, function(new, old) belief:notify(belief, new, old) end)
+  stat:addObserver(belief, function(new, old, ...) belief:notify(belief, new, old, ...) end)
   return stat
 end
 

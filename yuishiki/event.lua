@@ -46,15 +46,16 @@ return function(loader)
   local BeliefEvent = class("BeliefEvent", Event)
   Event.Belief = BeliefEvent
 
-  function BeliefEvent:initialize(belief, status, new, old) assert(belief)
+  function BeliefEvent:initialize(belief, status, new, old, ...) assert(belief)
     Event.initialize(self,
       Event.Type.Belief,
-      belief.full_path,
+      belief.path,
       {
         belief = belief,
         status = status,
         new = new,
-        old = old
+        old = old,
+        args = {...}
       })
   end
 

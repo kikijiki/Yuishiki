@@ -21,8 +21,8 @@ return function(loader)
     self.lookup = {}
     self.beliefs = {}
 
-    self.observer = function(belief, new, old)
-      local event = Event.Belief(belief, Belief.Status.changed, new, old)
+    self.observer = function(belief, new, old, ...)
+      local event = Event.Belief(belief, Belief.Status.changed, new, old, ...)
       self:notify(event)
     end
 
@@ -74,9 +74,9 @@ return function(loader)
       base_path, name = BeliefBase.parsePath(name)
     end
 
-    local full_path = base_path.."."..name
+    local full_path = BeliefBase.appendPath(base_path, name)
 
-    local belief = Belief(data, name, base_path, readonly)
+    local belief = Belief(data, name, full_path, readonly)
     belief:addObserver(self, self.observer)
 
     self.lookup[full_path] = belief

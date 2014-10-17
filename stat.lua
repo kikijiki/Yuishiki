@@ -92,8 +92,60 @@ function CompositeStat:sub(v)
   return self:update()
 end
 
--- TODO table stat
--- TODO vector stat?
+local TableStat = class("TableStat", Stat)
+Stat.Table = TableStat
+
+function TableStat:initialize(v)
+  if type(v) == "table" then
+    Stat.initialize(self, v)
+  else
+    Stat.initialize(self, {})
+  end
+end
+
+function TableStat:set(k, v)
+  local old = self.value[k]
+  self.value[k] = v
+  if v ~= old then
+    self:update(k, v, old)
+  end
+end
+
+function TableStat:insert(v)
+  local old = self.value
+  table.insert(self.value, v)
+  self:update(#self.value, v)
+  return #self.value
+end
+
+function TableStat:get(k)
+  if k then
+    return self.value[k]
+  else
+    return self.value
+  end
+end
+
+function TableStat:pairs()
+  return pairs(self.value)
+end
+
+function TableStat:update(key, new_element, old_element)
+  self:notify(self.value, nil, key, new_element, old_element)
+end
+
+function TableStat:__tostring()
+  local out = {"{"}
+  for k,v in pairs(self.value) do
+    table.insert(out, "[")
+    table.insert(out, tostring(k))
+    table.insert(out, "] = ")
+    table.insert(out, tostring(v))
+    table.insert(out, ", ")
+  end
+  table.remove(out)
+  return table.concat(out)
+end
 
 -- TODO
 function Stat.fromData(stat_type, ...)
