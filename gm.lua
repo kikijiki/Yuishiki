@@ -7,6 +7,8 @@ local console = require "lib.console"
 
 local GM = class("GM", EventDispatcher)
 
+local max_steps_per_update = 10
+
 function GM:initialize(world)
   EventDispatcher.initialize(self)
 
@@ -144,9 +146,10 @@ function GM:update(dt)
 
   local char = self.activeCharacter
   if not char then return end
+
   if not char.commands:empty() then return end
 
-  for i = 1, 10 do
+  for i = 1, max_steps_per_update do
     if not char.agent:step() or char.agent:waiting() then
       if not char.commands:empty() then return end
       if not self:nextCharacter() then
