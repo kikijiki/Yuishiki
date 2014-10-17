@@ -2,7 +2,7 @@ local Trigger
 
 return function(loader)
   if Trigger then return Trigger end
-  
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Event = loader.load "event"
@@ -104,8 +104,7 @@ return function(loader)
     Trigger.initialize(self, Event.Type.Belief, path)
     self.path_start = path
     self.path_end = path
-    self.condition = condition
-    self.parameters = {...}
+    self:condition(condition, ...)
   end
 
   function BeliefTrigger:starts(path)
@@ -120,33 +119,28 @@ return function(loader)
     return self
   end
 
-  function BeliefTrigger:condition(f, ...)
-    self.condition = f
+  function BeliefTrigger:condition(condition, ...)
+    if not condition then return end
+    if type(condition) == "function" then self.condition = condition end
+    if type(condition) == "string" then self.condition = BeliefTrigger.conditions[condition] end
     self.parameters = {...}
     return self
   end
 
   function BeliefTrigger:check(event)
     -- Check path
-
     if self.path_start and not uti.startsWith(event.name, self.path_start) then return false end
     if self.path_end and not uti.endsWith(event.name, self.path_end) then return false end
 
     -- Check conditions
 
-    local new = event.parameters.new
-    local old = event.parameters.old
-
     if self.condition then
-      local condition
-      if type(self.condition) == "function" then
-        return self.condition(new, old, unpack(self.parameters))
-      else
-        return BeliefTrigger.conditions[self.condition](new, old, unpack(self.parameters))
-      end
+      local new = event.parameters.new
+      local old = event.parameters.old
+      return self.condition(new, old, unpack(self.parameters))
+    else
+      return true
     end
-
-    return true
   end
 
   function Trigger.static.fromData(data)

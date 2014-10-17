@@ -86,7 +86,7 @@ return function(loader)
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        self.bdi.belief_base:set(k, v)
+        self.bdi.belief_base:set(v, k)
       end
     end
 

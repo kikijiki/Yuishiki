@@ -27,15 +27,18 @@ return function(loader)
   end
 
   function Belief:get()
-    if self.value.get then return self.value:get()
-    else return self.value end
+    if type(self.value) == "table" and self.value.get then
+      return self.value:get()
+    else
+      return self.value
+    end
   end
 
   function Belief:set(value)
     if self.readonly then return end
     local old = self:get()
 
-    if self.value.set then
+    if type(self.value) == "table" and self.value.set then
       self.value:set(value)
     else
       self.value = value

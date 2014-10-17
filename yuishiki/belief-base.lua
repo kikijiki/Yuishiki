@@ -9,6 +9,10 @@ return function(loader)
   local Belief = loader.load "belief"
   local Observable = loader.load "observable"
 
+  local PATH_SEPARATOR = "."
+  local PATH_TRAVERSER_PATTERN = '([^'..PATH_SEPARATOR..']+)'
+  local PATH_SPLITTER_PATTERN = '%'..PATH_SEPARATOR..'([^%'..PATH_SEPARATOR..']*)$'
+
   BeliefBase = class("BeliefBase", Observable)
 
   function BeliefBase:initialize()
@@ -30,7 +34,7 @@ return function(loader)
     if not path then return end
 
     local belief = self.beliefs
-    for token in string.gmatch(path, '([^.]+)') do
+    for token in string.gmatch(path, PATH_TRAVERSER_PATTERN) do
       last = token
       if belief[token] then
         belief = belief[token]
@@ -49,7 +53,7 @@ return function(loader)
 
   function BeliefBase.static.parsePath(path)
     if not path then return end
-    local from, to = path:find('%.([^%.]*)$') print(from, to)
+    local from, to = path:find(PATH_SPLITTER_PATTERN)
     if from then
       return path:sub(1, from - 1), path:sub(from + 1)
     else
@@ -57,16 +61,25 @@ return function(loader)
     end
   end
 
+  function BeliefBase.static.appendPath(a, b)
+    return a..PATH_SEPARATOR..b
+  end
+
   -- TODO check for overwrite?
   function BeliefBase:set(data, name, base_path, readonly)
+    assert(data)
+    assert(name)
+
     if not base_path then
-      base_path, name = BeliefBase.parsePath(path)
+      base_path, name = BeliefBase.parsePath(name)
     end
+
+    local full_path = base_path.."."..name
 
     local belief = Belief(data, name, base_path, readonly)
     belief:addObserver(self, self.observer)
 
-    self.lookup[path] = belief
+    self.lookup[full_path] = belief
     local root = self:resolve(base_path, true)
     root[name] = belief
 

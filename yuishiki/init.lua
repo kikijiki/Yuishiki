@@ -2,7 +2,11 @@
 
 local module_path = ...
 
+local ys
+
 return function (base_path)
+  if ys then return ys end
+  
   if not base_path then base_path = module_path end
   base_path = base_path .. "."
 
