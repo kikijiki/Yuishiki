@@ -1,3 +1,9 @@
+--- The plan class.
+--
+-- Dependencies: `middleclass`, `uti`, `log`, `Trigger`, `ManualTrigger`, `Event`
+--
+-- @classmod Plan
+
 local Plan
 
 return function(loader)
@@ -17,13 +23,30 @@ return function(loader)
   Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
   Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
 
+  --- Create a new plan class from the definition data.
+  -- The following can be specified:
+  --
+  -- - `body`: a function defining the main code of the plan.
+  -- - `meta`: true if the plan is a metaplan (optional, default = false).
+  -- - `confidence`: a function returning a value that represents how good this plan is in the current situation (optional).
+  -- - `trigger`: definition of the creation trigger of the plan.
+  -- - `condition`: definition of a manual trigger for [completion, context, initial, failure, success].
+  -- - `on`: definition of a manual trigger for [success, failure, yield, resume].
+  -- - `manage\_subgoal\_failure`: if true, when a subgoal fails the plan must not fail automatically (optional, default = true).
+  --
+  -- All the functions are called with these arguments: `agent, plan, parameters, beliefs, actuator`.
+  -- @param name the name of the plan
+  -- @param data a table containing the definitions
+  -- @return the new class.
+  -- @usage this is used when including a module.
+  -- @see Trigger
   function Plan.static.define(name, data)
     local P = class(plan_class_prefix..name, Plan)
 
     P.static.default = data
     P.static.members = {
       "name", "body", "meta", "confidence", "triggers", "condition",
-      "on", "manage_subgoal_failure", "priority" }
+      "on", "manage_subgoal_failure" }
 
     P.static.name = name
     P.static.body = data.body
@@ -33,14 +56,20 @@ return function(loader)
     P.static.condition = ManualTrigger(data.condition)
     P.static.on = ManualTrigger(data.on)
     P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
-    P.static.priority = data.priority or 0
 
     P.initialize = function(self, agent, parameters)
       Plan.initialize(self, agent, parameters)
       for _,v in pairs(P.members) do self[v] = P[v] end
       self.thread = coroutine.create(self.body)
-      self.on.setDefaultArguments(self, agent)
-      self.condition.setDefaultArguments(self, agent)
+      self.exported = {
+        self.agent.interface,
+        self,
+        self.parameters,
+        self.agent.bdi.belief_base.interface,
+        self.agent.actuator.interface
+      }
+      self.on.setDefaultArguments(table.unpack(self.exported))
+      self.condition.setDefaultArguments(table.unpack(self.exported))
       self.step_count = 0
     end
 
@@ -70,12 +99,7 @@ return function(loader)
     self.on.step()
     self.step_count = self.step_count + 1
 
-    local ret = {coroutine.resume(self.thread,
-      self.agent.interface,
-      self,
-      self.parameters,
-      self.agent.bdi.belief_base.interface,
-      self.agent.actuator.interface)}
+    local ret = {coroutine.resume(self.thread, table.unpack(self.exported))}
 
     local err = table.remove(ret, 1) == false
     table.insert(self.results.history, ret)

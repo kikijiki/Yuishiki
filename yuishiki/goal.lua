@@ -2,7 +2,7 @@ local Goal
 
 return function(loader)
   if Goal then return Goal end
-  
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
@@ -31,8 +31,18 @@ return function(loader)
     G.initialize = function(self, agent, parameters)
       Goal.initialize(self, parameters)
       for _,v in pairs(G.members) do self[v] = G[v] end
-      self.on.setDefaultArguments(self, agent)
-      self.condition.setDefaultArguments(self, agent)
+
+      self.on.setDefaultArguments(
+        self.agent.interface,
+        self,
+        self.parameters,
+        self.agent.bdi.belief_base.interface)
+        
+      self.condition.setDefaultArguments(self,
+        self.agent.interface,
+        self,
+        self.parameters,
+        self.agent.bdi.belief_base.interface)
     end
 
     return G

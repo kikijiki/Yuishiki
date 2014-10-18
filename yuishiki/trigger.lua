@@ -1,3 +1,9 @@
+--- The trigger class.
+--
+-- Dependencies: `middleclass`, `uti`, `log`, `Event`
+--
+-- @classmod Trigger
+
 local Trigger
 
 return function(loader)
