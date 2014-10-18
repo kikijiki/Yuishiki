@@ -89,13 +89,13 @@ function Character:popCommand()
 end
 
 function Character:pushCommand(command, args, callback)
-  command = Command[command](unpack(args))
+  command = Command[command](table.unpack(args))
   command:bind(self, callback)
   self.commands:push(command)
 end
 
 function Character:appendCommand(command, args, callback)
-  command = Command[command](unpack(args))
+  command = Command[command](table.unpack(args))
   command:bind(self, callback)
   self.commands:insert(command, 1)
 end

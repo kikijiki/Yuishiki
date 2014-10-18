@@ -43,28 +43,15 @@ return function(loader)
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
-  function Intention:stepPlan(plan)
-    if plan.status == Plan.Status.Active then                                   log.d("Stepping in plan <"..plan.name..">")
-      local err, data = plan:step()
-
-      if err then
-        plan:fail(Plan.FailReason.BodyFailed)                                   log.d("Plan failed", data)
-      end
-      if plan:terminated() and not plan.status == Plan.Status.Failed then
-        if plan.condition.default(true).completion() then
-          plan:succeed()                                                        log.d("Plan completed (success)")
-        else
-          plan:fail(Plan.FailReason.ConditionFailed)                            log.d("Plan completed (failure)")
-        end
-      end
-    end
+  function Intention:stepPlan(plan)                                             log.d("Stepping in plan <"..plan.name..">")
+    plan:step()
 
     if plan.status == Plan.Status.Succeeded then
-      self:pop()                                                                log.d("Popping plan (success)")
+      self:pop()
       local goal = self:top()
       goal:succeed()
     elseif plan.status == Plan.Status.Failed then
-      self:pop()                                                                log.d("Popping plan (failure)")
+      self:pop()
       local goal = self:top()
 
       if goal.retry then
@@ -74,7 +61,7 @@ return function(loader)
         self:pop()
       end
     end
-                                                                                log.d("Plan still running...")
+                                                                                log.d("Plan status:"..plan.status)
   end
 
   function Intention:stepGoal(goal)
@@ -88,13 +75,12 @@ return function(loader)
       else
         goal:fail(Goal.FailReason.NoPlansAvailable)                             log.d("Could not find any plan")
       end
-
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self:pop()                                                                log.d("Popping plan (success)")
+      self:pop()                                                                log.d("Popping goal (success)")
     elseif goal.status == Goal.Status.Failed then
-      self:pop()                                                                log.d("Popping plan (failure)")
+      self:pop()                                                                log.d("Popping goal (failure)")
     end
   end
 

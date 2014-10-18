@@ -6,7 +6,7 @@ return function(loader)
         local args = {}
         for _,v in pairs(default_args) do table.insert(args, v) end
         for _,v in pairs({...}) do table.insert(args, v) end
-        return f(unpack(args))
+        return f(table.unpack(args))
       else return f(...) end
     end
   end

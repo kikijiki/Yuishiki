@@ -137,7 +137,7 @@ return function(loader)
     if self.condition then
       local new = event.parameters.new
       local old = event.parameters.old
-      return self.condition(event, new, old, unpack(self.parameters))
+      return self.condition(event, new, old, table.unpack(self.parameters))
     else
       return true
     end
@@ -148,15 +148,15 @@ return function(loader)
     local trigger_type = data[1]
     local args = {select(2, unpack(data))}
 
-    if trigger_type == "event"        then return Trigger             (unpack(args)) end
-    if trigger_type == "goal"         then return Trigger.Goal        (unpack(args)) end
-    if trigger_type == "parametrized" then return Trigger.Parametrized(unpack(args)) end
-    if trigger_type == "custom"       then return Trigger.Custom      (unpack(args)) end
+    if trigger_type == "event"        then return Trigger             (table.unpack(args)) end
+    if trigger_type == "goal"         then return Trigger.Goal        (table.unpack(args)) end
+    if trigger_type == "parametrized" then return Trigger.Parametrized(table.unpack(args)) end
+    if trigger_type == "custom"       then return Trigger.Custom      (table.unpack(args)) end
     if trigger_type == "belief"       then
       local trigger = Trigger.Belief(args[1])
       if args["begins"] then trigger:begins(args["begins"]) end
       if args["ends"] then trigger:ends(args["ends"]) end
-      if args["condition"] then trigger:condition(unpack(args["condition"])) end
+      if args["condition"] then trigger:condition(table.unpack(args["condition"])) end
       return trigger
     end
   end

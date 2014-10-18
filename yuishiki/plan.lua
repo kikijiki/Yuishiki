@@ -2,7 +2,7 @@ local Plan
 
 return function(loader)
   if Plan then return Plan end
-  
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
@@ -13,7 +13,7 @@ return function(loader)
   Plan = class("Plan")
   local plan_class_prefix = "plan_"
 
-  Plan.static.Status = uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed")
+  Plan.static.Status = uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed", "Error")
   Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
   Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
 
@@ -69,7 +69,7 @@ return function(loader)
 
     self.on.step()
     self.step_count = self.step_count + 1
-                                                                                print("STEP")
+
     local ret = {coroutine.resume(self.thread,
       self.agent.interface,
       self,
@@ -81,9 +81,20 @@ return function(loader)
     table.insert(self.results.history, ret)
     self.results.last = ret
 
-    --[[5.2]]-- if err then log.w("Error in plan body.", table.unpack(ret)) end
-    --[[5.1]] if err then log.w("Error in plan body.", unpack(ret)) end
-    return err, ret
+    if err then
+      log.w("Error in plan body.", table.unpack(ret))
+      self:fail(Plan.FailReason.BodyFailed)
+    end
+
+    if self:terminated() and self.status ~= Plan.Status.Failed then
+      if self.condition.default(true).completion() then
+        self:succeed()
+      else
+        self:fail(Plan.FailReason.ConditionFailed)
+      end
+    end
+
+    return ret
   end
 
   -- TODO: refactor

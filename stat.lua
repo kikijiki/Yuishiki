@@ -126,8 +126,12 @@ function TableStat:get(k)
   end
 end
 
-function TableStat:pairs()
+function TableStat:__pairs()
   return pairs(self.value)
+end
+
+function TableStat:__ipairs()
+  return ipairs(self.value)
 end
 
 function TableStat:update(key, new_element, old_element)

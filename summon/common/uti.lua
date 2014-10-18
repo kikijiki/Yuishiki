@@ -34,7 +34,7 @@ function M.shallowCopy(source, dest, MT)
   if type(source) == "table" then
     for k,v in pairs(source) do dest[k] = v end
   else dest = source end
-  
+
   if MT then
     setmetatable(dest, getmetatable(source))
   end
@@ -44,9 +44,7 @@ function M.makeMetaIndex(f, ...)
   local args = {...}
   return setmetatable({}, {
     __index = function(t, k)
-      -- Lua 5.2
-      -- return f(k, table.unpack(args))
-      return f(k, unpack(args))
+      return f(k, table.unpack(args))
     end
   })
 end
@@ -62,7 +60,7 @@ end
 function M.runSandboxed(path, options)
   local data = love.filesystem.load(path)
   if not data then return nil, "Error loading "..path.."." end
-  
+
   return pcall(summon.common.sandbox.run, data, options)
 end
 
