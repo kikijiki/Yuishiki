@@ -5,22 +5,39 @@ local Weapon = class("Weapon", Item)
 
 function Weapon:initialize(data)
   Item.initialize(self, data.name, "weapon", "weapon")
-  self.attack = data.attack
-  self.damage = data.damage
-  self.range = data.range
-  self.cost = data.cost
+
+  self.attack = data.attack or 0
+  self.damage = data.damage or 0
+  self.range = data.range or 0
+  self.cost = data.cost or 0
+
+  self:addTrigger(self.triggers)
+
+  if data.initialize then data.initialize(self) end
 end
 
 function Weapon:getAttack(gm, c, target)
-  return self:attack(gm, c, target)
+  if type(self.attack) == "function" then
+    return self:attack(gm, c, target)
+  else
+    return self.attack
+  end
 end
 
 function Weapon:getDamage(gm, c, target)
-  return self:damage(gm, c, target)
+  if type(self.damage) == "function" then
+    return self:damage(gm, c, target)
+  else
+    return self.damage
+  end
 end
 
 function Weapon:getCost(gm, c, target)
-  return self:cost(gm, c, target)
+  if type(self.cost) == "function" then
+    return self:cost(gm, c, target)
+  else
+    return self.cost
+  end
 end
 
 return Weapon

@@ -2,7 +2,7 @@ local BDIModel
 
 return function(loader)
   if BDIModel then return BDIModel end
-  
+
   local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
@@ -102,7 +102,15 @@ return function(loader)
       log.i("No plans could be selected for the goal <"..goal.name..">.")
       return nil
     else
-      return self.plan_base:instance(plan_schema, goal.parameters, goal)
+      local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
+      plan:bind(
+        self.agent.interface,
+        plan,
+        plan.parameters,
+        self.belief_base.interface,
+        self.agent.actuator.interface
+      )
+      return plan
     end
   end
 
@@ -131,6 +139,13 @@ return function(loader)
 
   function BDIModel:pushGoal(name, parameters, intention)
     local goal = self.goal_base:instance(name, parameters)
+    goal:bind(
+      self.agent.interface,
+      goal,
+      parameters,
+      self.belief_base.interface,
+      self.agent.actuator.interface
+    )
 
     if intention then
       intention:push(goal)

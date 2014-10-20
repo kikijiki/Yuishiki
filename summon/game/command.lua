@@ -141,18 +141,23 @@ export.lookAt = LookAtCommand
 --[[Animation]]----------------------------------------------------------------
 local AnimationCommand = summon.class("AnimationCommand", Command)
 
-function AnimationCommand:initialize(animation, wait, reset, idle)
+function AnimationCommand:initialize(animation, wait, reset, idle, tag)
   Command.initialize(self, "Animation")
   self.animation = animation
-  self.wait = wait or true
-  self.reset = reset or true
-  self.idle = idle or true
+  self.wait = not (wait == false)
+  self.reset = not (wait == false)
+  self.idle = not (idle == false)
+  self.tag = tag
 end
 
 function AnimationCommand:execute()
   Command.execute(self)
   if not self.sprite:setAnimation(self.animation, self.reset) then
     self:finish()
+  end
+
+  if self.tag then
+    self.sprite:callOnceOnTag(self.tag[1], self.tag[2])
   end
 
   if not self.wait then self:finish() end
@@ -278,7 +283,6 @@ end
 
 function WalkCommand:onPop()
   self.character.status.position:set(self.destination)
-  --self.sprite:setAnimation("idle", false)
 end
 
 export.walk = WalkCommand

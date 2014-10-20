@@ -31,18 +31,6 @@ return function(loader)
     G.initialize = function(self, agent, parameters)
       Goal.initialize(self, parameters)
       for _,v in pairs(G.members) do self[v] = G[v] end
-
-      self.on.setDefaultArguments(
-        self.agent.interface,
-        self,
-        self.parameters,
-        self.agent.bdi.belief_base.interface)
-        
-      self.condition.setDefaultArguments(self,
-        self.agent.interface,
-        self,
-        self.parameters,
-        self.agent.bdi.belief_base.interface)
     end
 
     return G
@@ -59,6 +47,11 @@ return function(loader)
 
   function Goal.getYsType()
     return "goal"
+  end
+
+  function Goal:bind(...)
+    self.on.setDefaultArguments(...)
+    self.condition.setDefaultArguments(...)
   end
 
   function Goal:fail(reason, plan)

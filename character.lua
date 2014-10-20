@@ -127,7 +127,7 @@ end
 function Character:kill(callback)
   self.dead = true
   self.sprite:setAnimation("dead")
-  self:appendCommand("animation", {"dead"})
+  self:appendCommand("animation", {"dead", true, true, false})
   self:appendCommand("fade", {}, callback)
   self:bubble("DEAD", {255, 0, 0})
 end
@@ -138,21 +138,24 @@ function Character:move(map, path, callback)
   end
 end
 
-function Character:attack(map, target, callback)
+function Character:attack(map, target, damage, callback)
   self:appendCommand("lookAt", {map, target})
   target:appendCommand("lookAt", {map, self})
-  self:appendCommand("animation", {"attack"}, callback)
+  self:appendCommand("animation", {"attack", true, true, true, {"hit",
+    function() target:hit(damage) end}
+  })
 end
 
-function Character:hit(dmg, callback)
-  self:bubble(dmg, {255, 127, 0})
+function Character:hit(damage, callback)
+  if not damage then return end
+  self:bubble(damage, {255, 127, 0})
   self:appendCommand("animation", {"hit"}, callback)
 end
 
 function Character:equip(item, slot)
   if slot then
     self.equipment[slot] = item
-    self.agent:setBelief("equipment", slot, item)
+    self.agent:setBelief(item, slot, "equipment")
   end
 end
 

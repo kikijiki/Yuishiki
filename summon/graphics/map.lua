@@ -54,7 +54,11 @@ function Tile:draw()
     local cnt = frame.source.center
     local height = frame.source.height
     local quad = frame.source.quad
-    setColor(255, 255, 255, 255)
+    if self.walkable then
+      setColor(255, 255, 255, 255)
+    else
+      setColor(255, 0, 0, 255)
+    end
     draw(self.texture.data,
       quad, pos.x - cnt.x,
       pos.y - cnt.y - height)
@@ -230,6 +234,11 @@ function Map:containsTile(v)
   else return false end
 end
 
+function Map:setWalkable(v, walkable)
+  local tile = self:getTile(v)
+  if tile then tile.walkable = walkable end
+end
+
 function Map:getTilePixelCoordinates(v)
   local tile = self:getTile(v)
   local top = tile.position:clone()
@@ -254,13 +263,12 @@ function Map:getTilePixelCoordinates(v)
   }
 end
 
--- TODO: walkable only
 function Map:pathTo(from, to, out, walkable_only)
   local path = astar(self:getTile(from), self:getTile(to), self.tiles,
     function(tile)
       local ret = {}
       for _,t in pairs(tile.neighbors.all) do
-        if t.walkable then table.insert(ret, t) end
+        if walkable_only == false or t.walkable or t.coordinates == from then table.insert(ret, t) end
       end
       return ret
     end,
@@ -272,24 +280,29 @@ function Map:pathTo(from, to, out, walkable_only)
     end,
     out
   )
+  path = path or {}
   table.remove(path, 1)
   return path
 end
 
-function Map:directionsTo(from, to)
+function Map:directionsTo(from, to, walkable_only)
   return self:pathTo(from, to, function(tile) return tile.coordinates end)
 end
 
-function addTileRecursive(tiles, tile, range)
+function addTileRecursive(tiles, tile, range, walkable_only)
   tiles[tile] = tile.coordinates
   if range == 0 then return end
-  for _,n in pairs(tile.neighbors.all) do addTileRecursive(tiles, n, range - 1) end
+  for _,n in pairs(tile.neighbors.all) do
+    if walkable_only == false or n.walkable then
+      addTileRecursive(tiles, n, range - 1, walkable_only)
+    end
+  end
 end
 
 function Map:getRange(target, range, exclude_target, walkable_only)
   local tiles = {}
   local target_tile = self:getTile(target)
-  addTileRecursive(tiles, target_tile, range)
+  addTileRecursive(tiles, target_tile, range, walkable_only)
   if exclude_target then tiles[target_tile] = nil end
   local ret = {}
   for _,v in pairs(tiles) do table.insert(ret, v) end

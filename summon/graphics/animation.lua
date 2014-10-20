@@ -132,6 +132,13 @@ local function updateState(self, dt, direction)
           index = 1
         end
       end
+      if self.tags and self.callback then
+        local cindex = self.tags[self.callback[1]]
+        if cindex and cindex == index then
+          self.callback[2]()
+          self.callback = nil
+        end
+      end
       nextframe = frames[index].dt
     end
   end
@@ -177,6 +184,7 @@ function Animation.static.parse(name, data, ss, stateless)
   a.loop = data.loop or -1
   a.loops = 0
   a.paused = false
+  a.tags = data.tags
 
   if a.directions then
     parseMultidirectional(a, data, ss)
@@ -213,6 +221,11 @@ function Animation:reset()
   self.elapsed = 0
   self.loops = 0
   self.paused = false
+end
+
+function Animation:callOnceOnTag(tag, callback)
+  if not callback then return end
+  self.callback = {tag, callback}
 end
 
 return Animation

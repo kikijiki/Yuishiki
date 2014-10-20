@@ -103,7 +103,7 @@ function BattleInterface:drawCharacterInfo(char, x, y, w, scrh)
   local border = 2
   local padding = 10
   local p2 = padding / 2
-  local stats = { "str", "dex", "cos", "int", "spd", "mov", "atk", "def", "arm", "matk", "mdef", "marm" }
+  local stats = {}-- "str", "dex", "cos", "int", "spd", "mov"}--, "atk", "def", "arm", "matk", "mdef", "marm" }
   local spacing = fonts.normal:getHeight() + padding
   local h = #stats * spacing + (spacing + 4) * 3 + spacing + padding
   y = scrh - y - h

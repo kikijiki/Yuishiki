@@ -105,6 +105,11 @@ function Sprite:update(dt)
   self:updateAnimation(dt)
 end
 
+function Sprite:callOnceOnTag(tag, callback)
+  if not callback then return end
+  self.current.animation:callOnceOnTag(tag, callback)
+end
+
 function Sprite:draw()
   local frame = self.current.frame
   local scale = self.scale

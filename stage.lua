@@ -113,9 +113,14 @@ function Stage:keypressed(key)
     end
   end
 
-  if key == "z" and ac then
-    ac.agent.bdi:pushGoal("be in range", {target = self.gm.world.characters["char2"], range = 1})
-    ac.agent.bdi.intention_base:dump()
+  if key == "z" then
+    local oni = self.gm.world.characters["oni"]
+    for k,v in pairs(self.gm.world.characters) do
+      if k ~= "oni" then
+        v.agent.bdi:pushGoal("defeat character", {target = oni})
+        oni.agent.bdi:pushGoal("defeat character", {target = v})
+      end
+    end
   end
 
   if key == "x" and ac then

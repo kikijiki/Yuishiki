@@ -43,17 +43,17 @@ return function(loader)
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
-  function Intention:stepPlan(plan)                                             log.d("Stepping in plan <"..plan.name..">")
+  function Intention:stepPlan(plan)                                             log.d("Stepping in plan <"..plan.name.."> ("..plan.status..")")
     plan:step()
 
     if plan.status == Plan.Status.Succeeded then
       self:pop()
       local goal = self:top()
-      goal:succeed()
+      if goal then goal:succeed() end
     elseif plan.status == Plan.Status.Failed then
       self:pop()
       local goal = self:top()
-
+      if not goal then return end
       if goal.retry then
         -- TODO ? or it is managed somewhere else, can't remember.
       else
@@ -79,8 +79,11 @@ return function(loader)
 
     if goal.status == Goal.Status.Succeeded then
       self:pop()                                                                log.d("Popping goal (success)")
+
     elseif goal.status == Goal.Status.Failed then
       self:pop()                                                                log.d("Popping goal (failure)")
+      local plan = self:top()
+      if plan then plan:fail(Plan.FailReason.SubgoalFailed) end
     end
   end
 
@@ -202,7 +205,7 @@ return function(loader)
     if top:getYsType() == "plan" then
       return
         top.condition.default(false).wait() or
-        top.status == Plan.Status.WaitEvent
+        top.status == Plan.Status.Waiting
     else
       return false
     end

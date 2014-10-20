@@ -1,13 +1,10 @@
 return function(loader)
   local null = function() end
   local call = function(f, default_args)
-    return function(...)
+    return function()
       if default_args then
-        local args = {}
-        for _,v in pairs(default_args) do table.insert(args, v) end
-        for _,v in pairs({...}) do table.insert(args, v) end
-        return f(table.unpack(args))
-      else return f(...) end
+        return f(table.unpack(default_args))
+      else return f() end
     end
   end
 

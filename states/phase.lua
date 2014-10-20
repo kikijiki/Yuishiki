@@ -78,12 +78,17 @@ function Phase:draw()
     sg.pop()
   end
 
+  font.description:apply()
   gui.core.draw()
-  --if self.activeStage then drawStageBorder(self.activeStage, {160, 160, 160}) end
 end
 
 function Phase:update(dt)
-  if gui.Button{text = "Next", pos = {self.vp.x - 120 - padding, padding}, size = {120, title_size + description_size}} then Gamestate.pop() end
+  if gui.Button{
+    text = "Next",
+    pos = {self.vp.x - 120 - padding, padding},
+    size = {120, title_size + description_size}} then
+      Gamestate.pop()
+  end
 
   if self.activeStage then
     self.activeStage[1].mouse.x = love.mouse.getX() - self.activeStage[2].x

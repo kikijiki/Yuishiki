@@ -19,7 +19,7 @@ return function(loader)
   Plan = class("Plan")
   local plan_class_prefix = "plan_"
 
-  Plan.static.Status = uti.makeEnum("New", "Active", "WaitEvent", "WaitSubgoal", "Succeeded", "Failed", "Error")
+  Plan.static.Status = uti.makeEnum("New", "Active", "Waiting", "Succeeded", "Failed", "Error")
   Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
   Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
 
@@ -61,15 +61,6 @@ return function(loader)
       Plan.initialize(self, agent, parameters)
       for _,v in pairs(P.members) do self[v] = P[v] end
       self.thread = coroutine.create(self.body)
-      self.exported = {
-        self.agent.interface,
-        self,
-        self.parameters,
-        self.agent.bdi.belief_base.interface,
-        self.agent.actuator.interface
-      }
-      self.on.setDefaultArguments(table.unpack(self.exported))
-      self.condition.setDefaultArguments(table.unpack(self.exported))
       self.step_count = 0
     end
 
@@ -92,7 +83,12 @@ return function(loader)
     return "plan"
   end
 
-  -- TODO: parameter passing
+  function Plan:bind(...)
+    self.exported = {...}
+    self.on.setDefaultArguments(...)
+    self.condition.setDefaultArguments(...)
+  end
+
   function Plan:step()
     if self.status ~= Plan.Status.Active then return end
 
@@ -131,7 +127,7 @@ return function(loader)
     if not trigger then
       return self:yield()
     else
-      self.status = Plan.Status.WaitEvent
+      self.status = Plan.Status.Waiting
       self.wait = { trigger = trigger }
       self:yield()
       local result = self.wait.result
@@ -163,17 +159,8 @@ return function(loader)
   end
 
   function Plan:pushSubGoal(goal, parameters)
-    self.status = Plan.Status.WaitSubgoal
-    local goal_instance = self.agent.bdi:pushGoal(goal, parameters, self.intention)
-
+    self.agent.bdi:pushGoal(goal, parameters, self.intention)
     self:yield()
-
-    if goal_instance.status ~= Goal.Status.Succeeded and not self.manage_subgoal_failure then
-      self:fail(Plan.FailReason.SubgoalFailed)
-      return
-    end
-
-    self.status = Plan.Status.Active
     return goal_instance
   end
 

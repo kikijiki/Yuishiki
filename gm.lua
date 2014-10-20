@@ -2,12 +2,13 @@ local class = require "lib.middleclass"
 local Action = require "action"
 local Item = require "item"
 local Weapon = require "weapon"
+local Armor = require "armor"
 local EventDispatcher = require "event-dispatcher"
 local console = require "lib.console"
 
 local GM = class("GM", EventDispatcher)
 
-local max_steps_per_update = 10
+local max_steps_per_update = 1
 
 function GM:initialize(world)
   EventDispatcher.initialize(self)
@@ -46,7 +47,7 @@ end
 
 function GM:loadItems(items)
   for k,v in pairs(items) do
-    if self.items[k] then summon.log.i("Overriding weapon '"..k.."'.") end
+    if self.items[k] then summon.log.i("Overriding item '"..k.."'.") end
     self.items[k] = v
   end
 end
@@ -109,8 +110,8 @@ function GM:addCharacter(character, id) assert(character)
       end
     end
 
-    if character.items then
-      for slot, name in pairs(character.data.items) do
+    if character.data.equipment then
+      for slot, name in pairs(character.data.equipment) do
         local item = self:instanceItem(name)
         if item then character:equip(item, slot) end
       end
@@ -121,12 +122,18 @@ function GM:addCharacter(character, id) assert(character)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
   self:dispatch("new_character", character)
+
+  character.status.position:addObserver(self, function(new, old)
+    self.world.map:setWalkable(new, false)
+    self.world.map:setWalkable(old, true)
+  end)
 end
 
 function GM:instanceItem(name)
   local item_data = self.items[name]
   if not item_data then return end
   if item_data.item_type == "weapon" then return Weapon(item_data) end
+  if item_data.item_type == "armor" then return Armor(item_data) end
 end
 
 function GM:nextCharacter()
@@ -147,19 +154,21 @@ function GM:update(dt)
   local char = self.activeCharacter
   if not char then return end
 
-  if not char.commands:empty() then return end
+  --if not char.commands:empty() then return end
 
   for i = 1, max_steps_per_update do
+    if not char.commands:empty() then return end
     if not char.agent:step() or char.agent:waiting() then
       if not char.commands:empty() then return end
+                                                                                self:pause()
       if not self:nextCharacter() then
         self:nextTurn()
         self:nextCharacter()
       end
-      self:pause()
       return
     end
   end
+                                                                                --self:pause()
 end
 
 function GM:canPayCost(c, cost, ...)
@@ -225,22 +234,22 @@ function GM:getCharacterDistance(c1, c2)
 end
 
 function GM:kill(character)
-  character:kill(function()
+  character:kill(function() print("FEWFEWFWEFEW")
       self.world:removeCharacter(character)
     end)
 
   local init = self.initiative
-  print(#init.list, #init.results)
 
   for i = 1, #init.list do
     local entry = init.list[i]
-    if entry == character then print("removing "..entry.name)
+    if entry == character then
       table.remove(init.list, i)
       table.remove(init.results, i)
       if init.current > i then init.current = init.current - 1 end
     end
   end
 
+  self.world.map:setWalkable(character.status.position:get(), true)
   self:dispatch("kill_character", character)
 end
 

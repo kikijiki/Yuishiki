@@ -2,7 +2,7 @@ local IntentionBase
 
 return function(loader)
   if IntentionBase then return IntentionBase end
-  
+
   local class = loader.require "middleclass"
   local log = loader.load "log"
   local Plan = loader.load "plan"
@@ -34,7 +34,7 @@ return function(loader)
     for _,intention in pairs(self.intentions) do
       local top = intention:top()
       if not top then return end
-      if top.getYsType() == "plan" and top.status == Plan.Status.WaitEvent then
+      if top.getYsType() == "plan" and top.status == Plan.Status.Waiting then
         local trigger = top.wait.trigger
         if trigger:check(e) then
           top:onEventTriggered(e)
