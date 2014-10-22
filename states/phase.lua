@@ -16,7 +16,7 @@ local font = {
 
 local sg = summon.graphics
 
-function Phase:initialize(data, characters)
+function Phase:initialize(data)
   self.stages = {}
   self.activeStage = nil
   self.title = data.title
@@ -24,7 +24,7 @@ function Phase:initialize(data, characters)
   self.vp = vec(0, 0)
 
   for _,stage_data in pairs(data.stages) do
-    local stage = Stage(stage_data, characters)
+    local stage = Stage(stage_data)
     table.insert(self.stages, {stage, {}})
   end
 end

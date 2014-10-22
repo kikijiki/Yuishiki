@@ -1,16 +1,17 @@
 local class = require "lib.middleclass"
 local vec = summon.vec
-local Stat = require "stat"
+local Value = require "value"
 local Command = summon.game.Command
 local EventDispatcher = require "event-dispatcher"
 local ys = require "yuishiki"()
 
 local Character = class("Character", EventDispatcher)
 
-function Character:initialize(data)
+function Character:initialize(gm, data)
   EventDispatcher.initialize(self)
 
-  self.data = data
+  self.gm = gm
+
   self.name = data.name
   self.modules = data.modules
   self.aimod = data.aimod
@@ -24,16 +25,19 @@ function Character:initialize(data)
   self.equipment = {}
   self.actions   = {}
 
-  self:addStat("position", "basic", vec(1, 1))
+  self:addStat("position", "simple", vec(1, 1))
 
-  for _,v in pairs(self.aimod) do
-    local aimod = summon.AssetLoader.load("aimod", v)
-    self.agent:plug(aimod)
+  if data.ai then
+    for _,v in pairs(data.ai.modules) do
+      local module_data = summon.AssetLoader.load("ai_module", v)
+      self.agent:plugModule(module_data)
+    end
+    for slot,v in pairs(data.ai.sensors) do
+      local sensor_data = summon.AssetLoader.load("ai_sensor", v)
+      if sensor_data then self.agent:plugSensor(slot, ys.Sensor(sensor_data), gm, self) end
+    end
   end
-end
 
-function Character:setGm(gm)
-  self.gm = gm
   self.agent.actuator:setCaller({
     execute = function(a, ...)
       return self.gm:executeAction(self, a, ...)
@@ -42,15 +46,13 @@ function Character:setGm(gm)
       return self.gm:canExecuteAction(self, a, ...)
     end
   })
-end
 
-function Character.static.load(path)
-  local data = summon.AssetLoader.loadRaw(path)
-  return Character(data)
-end
-
-function Character.static.loadAiMod(path)
-  return summon.AssetLoader.loadRaw(path)
+  if data.equipment then
+    for slot, name in pairs(data.equipment) do
+      local item = gm:instanceItem(name)
+      if item then self:equip(item, slot) end
+    end
+  end
 end
 
 function Character:setEnvironment(env, id)
@@ -110,7 +112,7 @@ function Character:bubble(message, color)
 end
 
 function Character:addStat(name, ...)
-  local stat = Stat.fromData(...)
+  local stat = Value.fromData(...)
   if not stat then return end
 
   self.status[name] = stat
@@ -153,10 +155,31 @@ function Character:hit(damage, callback)
 end
 
 function Character:equip(item, slot)
-  if slot then
-    self.equipment[slot] = item
-    self.agent:setBelief(item, slot, "equipment")
+  if not slot then return end
+  self.equipment[slot] = item
+  item:onEquip(self)
+
+  if item.mods then
+    for mod, v in pairs(item.mods) do
+      self.status[mod]:setMod(v[1], v[2])
+    end
   end
+
+  self.agent:setBelief(item, slot, "equipment")
+end
+
+function Character:uneqip(slot)
+  if not slot then return end
+  self.equipment[slot] = nil
+  item:onUnequip(self)
+
+  if item.mods then
+    for mod, v in pairs(item.mods) do
+      self.status[mod]:unsetMod(v[1])
+    end
+  end
+
+  self.agent:unsetBelief(item, slot, "equipment")
 end
 
 return Character

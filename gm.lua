@@ -1,12 +1,14 @@
 local class = require "lib.middleclass"
+local Value = require "value"
+local Character = require "character"
 local Action = require "action"
 local Item = require "item"
 local Weapon = require "weapon"
 local Armor = require "armor"
 local EventDispatcher = require "event-dispatcher"
-local console = require "lib.console"
 
 local GM = class("GM", EventDispatcher)
+GM.uti = {}
 
 local max_steps_per_update = 1
 
@@ -99,26 +101,23 @@ function GM:updateInitiative(character)
   self.activeCharacter = nil
 end
 
-function GM:addCharacter(character, id) assert(character)
-  if not character.gm then -- if not already initialized
-    self:applyRule("initialize_character", character)
+function GM:addCharacter(name, id) assert(name)
+  local char_data = summon.AssetLoader.load("character", name)
+  local character = Character(self, char_data)
 
-    if character.modules then
-      for _,v in pairs(character.modules) do
-        local times = v[2] or 1
-        for i = 1, times do self:applyRule(v[1], character, character.status) end
-      end
-    end
+  self:applyRule("initialize_character", character)
 
-    if character.data.equipment then
-      for slot, name in pairs(character.data.equipment) do
-        local item = self:instanceItem(name)
-        if item then character:equip(item, slot) end
-      end
+  if character.modules then
+    for _,v in pairs(character.modules) do
+      local times = v[2] or 1
+      for i = 1, times do self:applyRule(v[1], character, character.status) end
     end
   end
 
-  character:setGm(self)
+  self:importCharacter(character, id)
+end
+
+function GM:importCharacter(character, id)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
   self:dispatch("new_character", character)
@@ -282,6 +281,10 @@ end
 
 function GM:resume()
   self.paused = false
+end
+
+function GM.uti.newValue(...)
+  return Value.fromData(...)
 end
 
 return GM

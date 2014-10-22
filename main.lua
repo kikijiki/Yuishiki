@@ -17,8 +17,9 @@ summon.log = ys.log
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
 
-summon.AssetLoader.register("character", "characters", require("character").load, false)
-summon.AssetLoader.register("aimod", "aimods", require("character").loadAiMod, false)
+summon.AssetLoader.register("character", "characters", summon.AssetLoader.loadRaw, false)
+summon.AssetLoader.register("ai_module", "ai/modules", summon.AssetLoader.loadRaw, false)
+summon.AssetLoader.register("ai_sensor", "ai/sensors", summon.AssetLoader.loadRaw, false)
 
 function love.load()
   gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })

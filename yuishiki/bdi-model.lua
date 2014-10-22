@@ -139,6 +139,7 @@ return function(loader)
 
   function BDIModel:pushGoal(name, parameters, intention)
     local goal = self.goal_base:instance(name, parameters)
+    if not goal then return end
     goal:bind(
       self.agent.interface,
       goal,

@@ -2,7 +2,7 @@ local GoalBase
 
 return function(loader)
   if GoalBase then return GoalBase end
-  
+
   local class = loader.require "middleclass"
   local log = loader.load "log"
   local Goal = loader.load "goal"

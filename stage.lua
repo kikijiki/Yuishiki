@@ -9,7 +9,7 @@ local vec = summon.vec
 
 local Stage = class("Stage", EventDispatcher)
 
-function Stage:initialize(data, characters)
+function Stage:initialize(data)
   EventDispatcher.initialize(self)
 
   local map = summon.AssetLoader.load("map", data.map)
@@ -29,8 +29,8 @@ function Stage:initialize(data, characters)
     self.gm:loadRuleset(ruleset)
   end)
 
-  for _,char in pairs(data.characters) do
-    self.gm:addCharacter(characters[char], char)
+  for id,char in pairs(data.characters) do
+    self.gm:addCharacter(char, id)
   end
 
   if data.init then data.init(self, self.world, self.world.characters) end
@@ -98,18 +98,12 @@ end
 
 function Stage:keypressed(key)
   local ac = self.gm.activeCharacter
-  if key == "return" then
-    self.gm:resume()
-    --if char then
-    -- self.camera:follow(char.sprite)
-    -- end
-  end
 
-  if key == " " and ac then
-    if ac.name == "Hikoichi" then
-      ac.agent.actuator.interface.attack(self.gm.world.characters["char2"])
-    else
-      ac.agent.actuator.interface.attack(self.gm.world.characters["char1"])
+  if key == " " then self.gm:resume() end
+  if key == "return" then
+    for _,c in pairs(self.gm.world.characters) do
+      print(c.name, c.agent.bdi.goal_base)
+      for k,v in pairs(c.agent.bdi.goal_base.goal_schemas) do print(k, v) end
     end
   end
 
@@ -117,8 +111,8 @@ function Stage:keypressed(key)
     local oni = self.gm.world.characters["oni"]
     for k,v in pairs(self.gm.world.characters) do
       if k ~= "oni" then
-        v.agent.bdi:pushGoal("defeat character", {target = oni})
-        oni.agent.bdi:pushGoal("defeat character", {target = v})
+        v.agent.bdi:pushGoal("defeat character", {target = "oni"})
+        oni.agent.bdi:pushGoal("defeat character", {target = k})
       end
     end
   end

@@ -74,10 +74,8 @@ function AssetLoader.loadDirect(loader, path, base_path, asset_name, ...)
   end
 end
 
-function AssetLoader.loadRaw(path, name, env)
+function AssetLoader.loadRaw(path)
   assert(path, "Path is nil.")
-  local final_path = path
-  if name then final_path = assets_path..assets[path].path.."/"..name end
 
   if AssetLoader.sandboxed then
     local ret, data
@@ -86,15 +84,6 @@ function AssetLoader.loadRaw(path, name, env)
   else
     return love.filesystem.load(path)()
   end
-
-
-  if name then
-    local a = assets[path]
-    ret, data = assert(summon.common.uti.runSandboxed(assets_path..a.path.."/"..name, env))
-  else
-    ret, data = assert(summon.common.uti.runSandboxed(path, env))
-  end
-  return data
 end
 
 --- Clear the cache.

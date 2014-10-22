@@ -55,6 +55,10 @@ return function(loader)
   end
 
   function Agent:step()
+    for _,sensor in pairs(self.sensors) do
+      sensor:update(self.bdi.belief_base.interface)
+    end
+
     self.step_count = self.step_count + 1
     log.i("Step "..self.step_count)
     return self.bdi:step();
@@ -62,12 +66,13 @@ return function(loader)
 
   function Agent:onEvent(event)
     for _,sensor in pairs(self.sensors) do
-      local sensor_event = sensor:onEvent(event)
+      local sensor_event =
+      sensor:onEvent(event, self.bdi.belief_base.interface)
       if sensor_event then self:dispatch(sensor_event) end
     end
   end
 
-  function Agent:plug(mod)
+  function Agent:plugModule(mod)
     if type(mod) ~= "table" then return end
 
     if mod.g then
@@ -97,6 +102,10 @@ return function(loader)
     end
 
     return true
+  end
+
+  function Agent:plugSensor(slot, sensor, ...)
+    self.sensors[slot] = sensor
   end
 
   return Agent

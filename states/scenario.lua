@@ -18,7 +18,6 @@ local font = {
 
 function Scenario:initialize(data)
   assert(data)
-  assert(data.characters, "Character data missing from scenario.")
   assert(data.phases, "Phase data missing from scenario.")
 
   self.name = data.name
@@ -28,11 +27,6 @@ function Scenario:initialize(data)
 end
 
 function Scenario:play()
-  local characters = {}
-  for id,char in pairs(self.data.characters) do
-    characters[id] = summon.AssetLoader.load("character", char, false, id)
-  end
-
   local phases = self.data.phases
   for phase = #phases, 1, -1 do
     local data = phases[phase]
