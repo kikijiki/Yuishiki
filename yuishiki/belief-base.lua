@@ -67,7 +67,6 @@ return function(loader)
 
   -- TODO check for overwrite?
   function BeliefBase:set(data, name, base_path, readonly)
-    assert(data)
     assert(name)
 
     if not base_path then

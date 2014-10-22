@@ -64,10 +64,9 @@ return function(loader)
     return self.bdi:step();
   end
 
-  function Agent:onEvent(event)
+  function Agent:onEvent(...)
     for _,sensor in pairs(self.sensors) do
-      local sensor_event =
-      sensor:onEvent(event, self.bdi.belief_base.interface)
+      local sensor_event = sensor:onEvent(...)
       if sensor_event then self:dispatch(sensor_event) end
     end
   end
@@ -106,6 +105,8 @@ return function(loader)
 
   function Agent:plugSensor(slot, sensor, ...)
     self.sensors[slot] = sensor
+    sensor:bind(self)
+    sensor:onPlug(...)
   end
 
   return Agent

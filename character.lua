@@ -34,7 +34,9 @@ function Character:initialize(gm, data)
     end
     for slot,v in pairs(data.ai.sensors) do
       local sensor_data = summon.AssetLoader.load("ai_sensor", v)
-      if sensor_data then self.agent:plugSensor(slot, ys.Sensor(sensor_data), gm, self) end
+      if sensor_data then
+        self.agent:plugSensor(slot, ys.Sensor(sensor_data), gm, gm.world, self)
+      end
     end
   end
 
@@ -117,7 +119,12 @@ function Character:addStat(name, ...)
 
   self.status[name] = stat
   local belief = self.agent:setBelief(stat, name, "status", true)
-  stat:addObserver(belief, function(new, old, ...) belief:notify(belief, new, old, ...) end)
+  stat:addObserver(belief, function(new, old, ...)
+    belief:notify(belief, new, old, ...)
+  end)
+  stat:addObserver(self.gm.world, function(new, old, ...)
+    self.gm.world:dispatchEvent(self, "status."..name, new, old, ...)
+  end)
   return stat
 end
 

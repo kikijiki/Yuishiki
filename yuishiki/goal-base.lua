@@ -38,24 +38,20 @@ return function(loader)
   end
 
   function GoalBase:canInstance(schema) assert(schema)
-    if self.inhibited[schema.name] then
-      return false, "The goal is inhibited."
-    end
+    if self.inhibited[schema.name] then return false end
+    if not schema.condition.default(true).initial() then return false end
 
-    if not schema.condition.default(true).initial() then
-      return false, "The initial condition is not satisfied."
-    end
-
+    -- TODO refactor
+    --[[
     if schema.limit then
-      local ib = self.agent.intentionBase
+      local ib = self.agent.bdi.intention_base
       local goal_count = 0
       for _, intention in pairs(ib) do
         goal_count = goal_count + intention.goalCount[schema.name] or 0
       end
-      if goal_count > schema.limit then
-        return false, "The limit condition ("..schema.limit..") is not satisfied."
-      end
+      if goal_count > schema.limit then return false end
     end
+    ]]
 
     return true
   end

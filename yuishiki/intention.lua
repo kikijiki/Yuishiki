@@ -193,7 +193,8 @@ return function(loader)
   function Intention:popn(n)
     local ret = {}
     for i = 1, n do
-      table.insert(ret, self:pop())
+      local e = self:pop()
+      if e then table.insert(ret, e) end
     end
     return ret
   end

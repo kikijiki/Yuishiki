@@ -12,16 +12,22 @@ return function(loader)
     if data.initialize then data.initialize(self) end
   end
 
+  function Sensor:bind(agent)
+    self.agent = agent
+    self.belief_base = agent.bdi.belief_base
+    self.beliefs = agent.bdi.belief_base.interface
+  end
+
   function Sensor:onPlug(...)
     if self.data.onPlug then self.data.onPlug(self, ...) end
   end
 
-  function Sensor:onEvent(event, beliefs)
-    if self.data.onPlug then return self.data.onEvent(event, beliefs) end
+  function Sensor:onEvent(...)
+    if self.data.onEvent then return self.data.onEvent(self, ...) end
   end
 
-  function Sensor:update(beliefs)
-    if self.data.update then return self.data.update(beliefs) end
+  function Sensor:update()
+    if self.data.update then return self.data.update(self) end
   end
 
   function Sensor.getYsType()

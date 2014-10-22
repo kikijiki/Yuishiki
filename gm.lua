@@ -87,7 +87,9 @@ function GM:updateInitiative(character)
         flag = true
         table.insert(init.results, j, {i, character})
         table.insert(init.list, j, character)
-        if init.current > 0 and j < init.current then init.current = init.current + 1 end
+        if init.current > 0 and j < init.current then
+          init.current = init.current + 1
+        end
       end
     end
 
@@ -110,7 +112,9 @@ function GM:addCharacter(name, id) assert(name)
   if character.modules then
     for _,v in pairs(character.modules) do
       local times = v[2] or 1
-      for i = 1, times do self:applyRule(v[1], character, character.status) end
+      for i = 1, times do
+        self:applyRule(v[1], character, character.status)
+      end
     end
   end
 
@@ -224,6 +228,10 @@ function GM:canExecuteAction(c, a, ...)
   if not c or not c.actions[a] or not self.actions[a] then return false end
   local action = self.actions[a]
   return action:canExecute(self, c, ...)
+end
+
+function GM:getCharacter(id)
+  return self.world.characters[id]
 end
 
 function GM:getCharacterDistance(c1, c2)

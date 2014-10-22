@@ -54,9 +54,9 @@ function World:update(dt)
   end
 end
 
-function World:dispatchEvent(source, e)
+function World:dispatchEvent(source, name, ...)
   for _,c in pairs(self.characters) do
-    if c ~= source then c.agent:sendEvent(e) end
+    if c ~= source then c.agent:onEvent(name, source, ...) end
   end
 end
 
