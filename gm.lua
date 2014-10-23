@@ -273,6 +273,7 @@ function GM:logcc(c, target, msg)
 end
 
 function GM:roll(v1, v2)
+  local ret
   if not v2 then
     ret = math.random(v1)
     self:log("Roll [1, "..v1.."] -> "..ret)

@@ -182,6 +182,7 @@ end
 
 function Character:uneqip(slot)
   if not slot then return end
+  local item = self.equipment[slot]
   self.equipment[slot] = nil
   item:onUnequip(self)
 

@@ -32,7 +32,7 @@ function Item:onEquip(c)
 end
 
 function Item:onUnequip(c)
-  for mod, _ in pairs(self.mods) do
+  for mod, v in pairs(self.mods) do
     c.status[mod]:unsetMod(v[1])
   end
 end

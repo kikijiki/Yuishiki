@@ -1,4 +1,4 @@
-local gamestate = require "lib.hump.gamestate"
+require "CiderDebugger";local gamestate = require "lib.hump.gamestate"
 local timer = require "lib.hump.timer"
 local console = require "lib.console"
 

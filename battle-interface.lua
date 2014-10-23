@@ -78,7 +78,7 @@ function BattleInterface:drawTurnOrder(x, y)
   end
 end
 
-function drawBar(x, y, w, h, v, max, color)
+local function drawBar(x, y, w, h, v, max, color)
   local barw = w * v / max
   barw = math.max(0, barw)
 

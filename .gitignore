@@ -20,3 +20,6 @@ $RECYCLE.BIN/
 #############
 
 doc/
+
+CiderDebugger.lua
+GliderProperties.proj
