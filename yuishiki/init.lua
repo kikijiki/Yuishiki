@@ -6,7 +6,7 @@ local ys
 
 return function (base_path)
   if ys then return ys end
-  
+
   if not base_path then base_path = module_path end
   base_path = base_path .. "."
 
@@ -29,7 +29,6 @@ return function (base_path)
 
   ys.Agent         = loader.load ("agent")
   ys.Event         = loader.load ("event")
-  ys.Sensor        = loader.load ("sensor")
   ys.Actuator      = loader.load ("actuator")
 
   ys.BDIModel      = loader.load ("bdi-model")

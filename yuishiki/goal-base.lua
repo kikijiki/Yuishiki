@@ -39,7 +39,7 @@ return function(loader)
 
   function GoalBase:canInstance(schema) assert(schema)
     if self.inhibited[schema.name] then return false end
-    if not schema.condition.default(true).initial() then return false end
+    if not schema.conditions.default(true).initial() then return false end
 
     -- TODO refactor
     --[[

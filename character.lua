@@ -20,6 +20,7 @@ function Character:initialize(gm, data)
   self.commands = summon.common.Stack()
 
   self.agent = ys.Agent()
+  self.sensors = {}
 
   self.status    = {}
   self.equipment = {}
@@ -33,10 +34,9 @@ function Character:initialize(gm, data)
       self.agent:plugModule(module_data)
     end
     for slot,v in pairs(data.ai.sensors) do
-      local sensor_data = summon.AssetLoader.load("ai_sensor", v)
-      if sensor_data then
-        self.agent:plugSensor(slot, ys.Sensor(sensor_data), gm, gm.world, self)
-      end
+      local sensor = summon.AssetLoader.load("sensor", v)
+      sensor:link(self, self.agent)
+      table.insert(self.sensors, sensor)
     end
   end
 
@@ -60,6 +60,11 @@ end
 function Character:setEnvironment(env, id)
   self.environment = env
   self.id = id
+  for _,sensor in pairs(self.sensors) do
+    for event, handler in pairs(sensor.events) do
+      env:addObserver(self, event, handler)
+    end
+  end
 end
 
 function Character:draw()
@@ -123,7 +128,7 @@ function Character:addStat(name, ...)
     belief:notify(belief, new, old, ...)
   end)
   stat:addObserver(self.gm.world, function(new, old, ...)
-    self.gm.world:dispatchEvent(self, "status."..name, new, old, ...)
+    self.gm.world:propagateEvent(self, "character status", self, name, new, old, ...)
   end)
   return stat
 end

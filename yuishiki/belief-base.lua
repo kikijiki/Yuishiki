@@ -27,7 +27,10 @@ return function(loader)
     end
 
     -- TODO
-    self.interface = self.beliefs
+    self.interface = {
+      p = self.lookup,
+      d = self.beliefs
+    }
   end
 
   function BeliefBase:resolve(path, create)

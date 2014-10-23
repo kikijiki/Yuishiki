@@ -118,8 +118,8 @@ function Stage:keypressed(key)
   end
 
   if key == "x" and ac then
-    ac.agent.bdi.intention_base:dump()
     ac.agent.bdi.belief_base:dump()
+    ac.agent.bdi.intention_base:dump()
   end
 
   self:dispatch("keypressed", key)

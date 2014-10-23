@@ -30,7 +30,7 @@ return function(loader)
   -- - `meta`: true if the plan is a metaplan (optional, default = false).
   -- - `confidence`: a function returning a value that represents how good this plan is in the current situation (optional).
   -- - `trigger`: definition of the creation trigger of the plan.
-  -- - `condition`: definition of a manual trigger for [completion, context, initial, failure, success].
+  -- - `conditions`: definition of a manual trigger for [completion, context, initial, failure, success].
   -- - `on`: definition of a manual trigger for [success, failure, yield, resume].
   -- - `manage\_subgoal\_failure`: if true, when a subgoal fails the plan must not fail automatically (optional, default = true).
   --
@@ -45,7 +45,7 @@ return function(loader)
 
     P.static.default = data
     P.static.members = {
-      "name", "body", "meta", "confidence", "triggers", "condition",
+      "name", "body", "meta", "confidence", "triggers", "conditions",
       "on", "manage_subgoal_failure" }
 
     P.static.name = name
@@ -53,7 +53,7 @@ return function(loader)
     P.static.meta = data.meta or false
     P.static.confidence = data.confidence
     P.static.trigger = Trigger.fromData(data.trigger)
-    P.static.condition = ManualTrigger(data.condition)
+    P.static.conditions = ManualTrigger(data.conditions)
     P.static.on = ManualTrigger(data.on)
     P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
 
@@ -86,7 +86,7 @@ return function(loader)
   function Plan:bind(...)
     self.exported = {...}
     self.on.setDefaultArguments(...)
-    self.condition.setDefaultArguments(...)
+    self.conditions.setDefaultArguments(...)
   end
 
   function Plan:step()
@@ -107,7 +107,7 @@ return function(loader)
     end
 
     if self:terminated() and self.status ~= Plan.Status.Failed then
-      if self.condition.default(true).completion() then
+      if self.conditions.default(true).completion() then
         self:succeed()
       else
         self:fail(Plan.FailReason.ConditionFailed)
@@ -159,9 +159,9 @@ return function(loader)
   end
 
   function Plan:pushSubGoal(goal, parameters)
-    self.agent.bdi:pushGoal(goal, parameters, self.intention)
+    local goal_instance = self.agent.bdi:pushGoal(goal, parameters, self.intention)
     self:yield()
-    return goal_instance
+    return goal_instance.result
   end
 
   function Plan:fail(reason)

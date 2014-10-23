@@ -1,21 +1,25 @@
 local class = require "lib.middleclass"
 local vec = summon.vec
+local EventObservable = require "event-observable"
 
-local World = class("World")
+local World = class("World", EventObservable)
 
 function World:initialize(map) assert(map)
+  EventObservable.initialize(self)
+  
   self.characters = {}
   self.map = map
 end
 
 function World:addCharacter(character, id) assert(character)
-  character:setEnvironment(self, id)
-
   if id then
     self.characters[id] = character
   else
     table.insert(self.characters, character)
+    id = #self.characters
   end
+
+  character:setEnvironment(self, id)
 end
 
 function World:removeCharacter(char)
@@ -54,10 +58,8 @@ function World:update(dt)
   end
 end
 
-function World:dispatchEvent(source, name, ...)
-  for _,c in pairs(self.characters) do
-    if c ~= source then c.agent:onEvent(name, source, ...) end
-  end
+function World:propagateEvent(source, event, ...)
+  self:notify(source, event, ...)
 end
 
 return World

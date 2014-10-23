@@ -19,7 +19,7 @@ local scenarios = {}
 
 summon.AssetLoader.register("character", "characters", summon.AssetLoader.loadRaw, false)
 summon.AssetLoader.register("ai_module", "ai/modules", summon.AssetLoader.loadRaw, false)
-summon.AssetLoader.register("ai_sensor", "ai/sensors", summon.AssetLoader.loadRaw, false)
+summon.AssetLoader.register("sensor", "ai/sensors", require"sensor".load, false)
 
 function love.load()
   gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })

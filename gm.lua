@@ -10,7 +10,8 @@ local EventDispatcher = require "event-dispatcher"
 local GM = class("GM", EventDispatcher)
 GM.uti = {}
 
-local max_steps_per_update = 1
+local max_steps_per_update = 10
+local max_steps_per_turn = 1000
 
 function GM:initialize(world)
   EventDispatcher.initialize(self)
@@ -171,7 +172,6 @@ function GM:update(dt)
       return
     end
   end
-                                                                                --self:pause()
 end
 
 function GM:canPayCost(c, cost, ...)

@@ -44,12 +44,10 @@ return function(loader)
   end
 
   function Intention:stepPlan(plan)                                             log.d("Stepping in plan <"..plan.name.."> ("..plan.status..")")
-    plan:step()
-
     if plan.status == Plan.Status.Succeeded then
       self:pop()
       local goal = self:top()
-      if goal then goal:succeed() end
+      if goal then goal:succeed(plan.results.last) end
     elseif plan.status == Plan.Status.Failed then
       self:pop()
       local goal = self:top()
@@ -58,10 +56,10 @@ return function(loader)
         -- TODO ? or it is managed somewhere else, can't remember.
       else
         goal:fail(Goal.FailReason.PlanFailed)
-        self:pop()
       end
+    else
+      plan:step()
     end
-                                                                                log.d("Plan status:"..plan.status)
   end
 
   function Intention:stepGoal(goal)
@@ -99,21 +97,21 @@ return function(loader)
 
   function Intention:checkPlanConditions(index, plan)
     -- context condition
-    if not plan.condition.default(true).context() then
+    if not plan.conditions.default(true).context() then
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if plan.condition.default(false).failure() then
+    if plan.conditions.default(false).failure() then
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if plan.condition.default(false).success() then
+    if plan.conditions.default(false).success() then
       self:popn(self.stack.size - index)
       plan:succeed()
       return true
@@ -124,21 +122,21 @@ return function(loader)
 
   function Intention:checkGoalConditions(index, goal)
     -- context condition
-    if not goal.condition.default(true).context() then
+    if not goal.conditions.default(true).context() then
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if goal.condition.default(false).failure() then
+    if goal.conditions.default(false).failure() then
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if goal.condition.default(false).success() then
+    if goal.conditions.default(false).success() then
       self:popn(self.stack.size - index)
       goal:succeed()
       return true
@@ -205,7 +203,7 @@ return function(loader)
 
     if top:getYsType() == "plan" then
       return
-        top.condition.default(false).wait() or
+        top.conditions.default(false).wait() or
         top.status == Plan.Status.Waiting
     else
       return false

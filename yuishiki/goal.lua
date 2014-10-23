@@ -19,11 +19,11 @@ return function(loader)
     local G = class(goal_class_prefix..name, Goal)
 
     G.static.default = data
-    G.static.members = {"name", "creation", "condition", "limit", "on", "retry"}
+    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry"}
 
     G.static.name = name
     G.static.creation = Trigger.fromData(data.creation)
-    G.static.condition = ManualTrigger(data.condition)
+    G.static.conditions = ManualTrigger(data.conditions)
     G.static.limit = data.limit
     G.static.on = ManualTrigger(data.on)
     G.static.retry = data.retry
@@ -51,17 +51,18 @@ return function(loader)
 
   function Goal:bind(...)
     self.on.setDefaultArguments(...)
-    self.condition.setDefaultArguments(...)
+    self.conditions.setDefaultArguments(...)
   end
 
-  function Goal:fail(reason, plan)
+  function Goal:fail(reason)
     self.status = Goal.Status.Failed
     self.failReason = reason or Goal.FailReason.Unknown
     self.on.failure()
   end
 
-  function Goal:succeed()
+  function Goal:succeed(result)
     self.status = Goal.Status.Succeeded
+    self.result = result
     self.on.success()
   end
 

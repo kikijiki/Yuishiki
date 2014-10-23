@@ -22,7 +22,6 @@ return function(loader)
     self.step_count = 0
 
     self.actuator = Actuator()
-    self.sensors = {}
 
     self.modules = {}
     self.custom = {}
@@ -55,20 +54,13 @@ return function(loader)
   end
 
   function Agent:step()
-    for _,sensor in pairs(self.sensors) do
-      sensor:update(self.bdi.belief_base.interface)
-    end
-
     self.step_count = self.step_count + 1
     log.i("Step "..self.step_count)
     return self.bdi:step();
   end
 
   function Agent:onEvent(...)
-    for _,sensor in pairs(self.sensors) do
-      local sensor_event = sensor:onEvent(...)
-      if sensor_event then self:dispatch(sensor_event) end
-    end
+    self.bdi:dispatch(Event(...))
   end
 
   function Agent:plugModule(mod)
@@ -101,12 +93,6 @@ return function(loader)
     end
 
     return true
-  end
-
-  function Agent:plugSensor(slot, sensor, ...)
-    self.sensors[slot] = sensor
-    sensor:bind(self)
-    sensor:onPlug(...)
   end
 
   return Agent
