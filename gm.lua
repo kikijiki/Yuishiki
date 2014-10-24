@@ -78,30 +78,22 @@ end
 function GM:updateInitiative(character)
   local init = self.initiative
 
-  if character then
-    local i = self:applyRule("initiative", character)
-    local flag = false
+  local i = self:applyRule("initiative", character)
 
-    for j = 1, #init.results do
-      local entry = init.results[j]
-      if entry[1] < i then
-        flag = true
-        table.insert(init.results, j, {i, character})
-        table.insert(init.list, j, character)
-        if init.current > 0 and j < init.current then
-          init.current = init.current + 1
-        end
+  for j = 1, #init.results do
+    local entry = init.results[j]
+    if entry[1] < i then
+      table.insert(init.results, j, {i, character})
+      table.insert(init.list, j, character)
+      if init.current > 0 and j < init.current then
+        init.current = init.current + 1
       end
-    end
-
-   if not flag then
-      table.insert(init.results, {i, character})
-      table.insert(init.list, character)
+      return
     end
   end
 
-  --self.initiative.current = 0
-  self.activeCharacter = nil
+  table.insert(init.results, {i, character})
+  table.insert(init.list, character)
 end
 
 function GM:addCharacter(name, id) assert(name)
