@@ -70,6 +70,10 @@ return function(loader)
     self.status = Goal.Status.Active
     self.on.activation()
   end
+  
+  function Goal:dump()
+    return "<"..self.name.."> - "..self.status
+  end
 
   return Goal
 end

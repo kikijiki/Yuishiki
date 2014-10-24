@@ -23,7 +23,7 @@ end
 function Sensor:onEvent()
 end
 
-function Sensor:update()
+function Sensor:update(world)
 end
 
 function Sensor.getYsType()

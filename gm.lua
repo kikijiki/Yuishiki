@@ -158,13 +158,11 @@ function GM:update(dt)
   local char = self.activeCharacter
   if not char then return end
 
-  --if not char.commands:empty() then return end
-
   for i = 1, max_steps_per_update do
     if not char.commands:empty() then return end
-    if not char.agent:step() or char.agent:waiting() then
-      if not char.commands:empty() then return end
-                                                                                self:pause()
+    local idle = char:updateAI(self.world)
+    if idle then
+      if not char.commands:empty() then return end                              --self:pause()
       if not self:nextCharacter() then
         self:nextTurn()
         self:nextCharacter()

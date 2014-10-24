@@ -185,6 +185,10 @@ return function(loader)
     coroutine.yield(...)
     self.on.resume()
   end
+  
+  function Plan:dump()
+    return "<"..self.name.."> - "..self.status
+  end
 
   return Plan
 end

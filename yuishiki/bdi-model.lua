@@ -127,7 +127,7 @@ return function(loader)
     local intention = self:selectIntention()
 
     if intention then
-      log.i("Executing intention <"..intention.id..">.")
+      --log.i("Executing intention <"..intention.id.." - "..intention.name..">.")
       self.intention_base:execute(intention)
     else
       log.i("No active intentions.")
@@ -152,6 +152,7 @@ return function(loader)
       intention:push(goal)
     else
       intention = Intention()
+      intention.name = goal.name
       intention:push(goal)
       self.intention_base:add(intention)
     end

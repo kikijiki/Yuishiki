@@ -76,6 +76,13 @@ function Character:update(dt)
   self.sprite:update(dt)
 end
 
+function Character:updateAI(world)
+  for _,sensor in pairs(self.sensors) do
+    sensor:update(world)
+  end
+  return self.agent:step() or self.agent:waiting()
+end
+
 function Character:updateCommands(dt)
   local cmd = self.commands
 
