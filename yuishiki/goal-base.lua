@@ -41,17 +41,14 @@ return function(loader)
     if self.inhibited[schema.name] then return false end
     if not schema.conditions.default(true).initial() then return false end
 
-    -- TODO refactor
-    --[[
     if schema.limit then
       local ib = self.agent.bdi.intention_base
       local goal_count = 0
       for _, intention in pairs(ib) do
-        goal_count = goal_count + intention.goalCount[schema.name] or 0
+        goal_count = goal_count + intention:getGoalCount(schema.name)
       end
       if goal_count > schema.limit then return false end
     end
-    ]]
 
     return true
   end

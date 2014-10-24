@@ -16,8 +16,6 @@ return function(loader)
 
   function Intention:initialize()
     self.stack = Stack()
-    self.active_goals = {}
-    self.goal_count = {}
     self.id = generateId()
   end
 
@@ -164,15 +162,11 @@ return function(loader)
   function Intention:pushGoal(goal)
     self.stack:push(goal)
     goal:activate()
-    self.active_goals[goal] = goal
-    self.goal_count[goal.name] = (self.goal_count[goal.name] or 0) + 1
   end
 
   function Intention:popGoal()
     local goal = self.stack:pop()
     goal.on.deactivation()
-    self.active_goals[goal] = nil
-    self.goal_count[goal.name] = self.goal_count[goal.name] - 1
   end
 
   function Intention:pushPlan(plan)
@@ -187,7 +181,6 @@ return function(loader)
     plan.on.deactivation()
   end
 
-  -- TODO: this will skip on failure/success callbacks.
   function Intention:popn(n)
     local ret = {}
     for i = 1, n do
@@ -208,6 +201,16 @@ return function(loader)
     else
       return false
     end
+  end
+
+  function Intention:getGoalCount(name)
+    local count = 0
+    for _,v in self.stack:iterator() do
+      if v:getYsType() == "goal" and v.name == name then
+        count = count + 1
+      end
+    end
+    return count
   end
 
   return Intention
