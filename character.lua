@@ -80,7 +80,7 @@ function Character:updateAI(world)
   for _,sensor in pairs(self.sensors) do
     sensor:update(world)
   end
-  return self.agent:step() or self.agent:waiting()
+  return self.agent:step()
 end
 
 function Character:updateCommands(dt)

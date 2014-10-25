@@ -69,10 +69,14 @@ function BattleInterface:drawTurnOrder(x, y)
   sg.setColor(255, 255, 255, 255)
 
   for i = 1, #init.list do
-    local j = (i + init.current) % #init.list + 1
-    local name = init.results[j][2].name
-    local value = init.results[j][1]
-    local text = j..". "..name.."("..value..")"
+    local name = init.list[i].character.name
+    local value = init.list[i].value
+    local text = i..". "..name.."("..value..")"
+    if i == init.current then
+      sg.setColor(255, 0, 0)
+    else
+      sg.setColor(255, 255, 255)
+    end
     sg.print(text, x, y)
     y = y + spacing
   end

@@ -106,7 +106,7 @@ local function updateState(self, dt, direction)
   local elapsed = self.elapsed
   local index = self.index
 
-  if self.paused then
+  if self.paused or length == 1 then
     if direction then return frames[index][direction]
     else return frames[index] end
   end
@@ -139,7 +139,9 @@ local function updateState(self, dt, direction)
           self.callback = nil
         end
       end
-      nextframe = frames[index].dt
+      if index and index <= #frames then
+        nextframe = frames[index].dt
+      end
     end
   end
 

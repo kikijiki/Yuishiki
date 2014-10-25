@@ -10,7 +10,7 @@ local EventDispatcher = require "event-dispatcher"
 local GM = class("GM", EventDispatcher)
 GM.uti = {}
 
-local max_steps_per_update = 10
+local max_steps_per_update = 100
 local max_steps_per_turn = 1000
 
 function GM:initialize(world)
@@ -23,7 +23,7 @@ function GM:initialize(world)
 
   self.turnCount = 0
   self.paused = true
-  self.initiative = {results = {}, list = {}, current = 0}
+  self.initiative = {list = {}, current = 0}
   self.activeCharacter = nil
   self.logger = summon.log.i
 end
@@ -77,23 +77,21 @@ end
 
 function GM:updateInitiative(character)
   local init = self.initiative
-
-  local i = self:applyRule("initiative", character)
-
-  for j = 1, #init.results do
-    local entry = init.results[j]
-    if entry[1] < i then
-      table.insert(init.results, j, {i, character})
-      table.insert(init.list, j, character)
-      if init.current > 0 and j < init.current then
-        init.current = init.current + 1
-      end
-      return
+  local result = self:applyRule("initiative", character)
+  local index = 1
+  
+  for i = 1, #init.list do
+    local entry = init.list[i] print(entry.value, result)
+    if entry.value < result then print("OK")
+      break
     end
+    index = index + 1
   end
-
-  table.insert(init.results, {i, character})
-  table.insert(init.list, character)
+  
+  table.insert(init.list, index, {value = result, character = character})
+  if init.current > 0 and index < init.current then
+    init.current = init.current + 1
+  end
 end
 
 function GM:addCharacter(name, id) assert(name)
@@ -137,7 +135,7 @@ function GM:nextCharacter()
   init.current = init.current + 1
   if init.current > #init.list then return false end
 
-  self.activeCharacter = init.list[init.current]
+  self.activeCharacter = init.list[init.current].character
   self:dispatch("next_character", self.activeCharacter)
   return self.activeCharacter
 end
@@ -150,15 +148,16 @@ function GM:update(dt)
   local char = self.activeCharacter
   if not char then return end
 
+  if not char.commands:empty() then return end
+  
   for i = 1, max_steps_per_update do
+    local busy = char:updateAI(self.world)                                      --self:pause() if busy then return end
     if not char.commands:empty() then return end
-    local idle = char:updateAI(self.world)
-    if idle then
-      if not char.commands:empty() then return end                              --self:pause()
+    if not busy then
       if not self:nextCharacter() then
         self:nextTurn()
         self:nextCharacter()
-      end
+      end                                                                       self:pause()
       return
     end
   end
@@ -231,7 +230,7 @@ function GM:getCharacterDistance(c1, c2)
 end
 
 function GM:kill(character)
-  character:kill(function() print("FEWFEWFWEFEW")
+  character:kill(function()
       self.world:removeCharacter(character)
     end)
 
