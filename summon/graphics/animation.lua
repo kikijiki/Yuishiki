@@ -147,6 +147,8 @@ local function updateState(self, dt, direction)
 
   self.index = index
   self.elapsed = elapsed
+  
+  if index > length then index = length end
 
   if direction then return frames[index][direction]
   else return frames[index] end

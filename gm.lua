@@ -10,8 +10,8 @@ local EventDispatcher = require "event-dispatcher"
 local GM = class("GM", EventDispatcher)
 GM.uti = {}
 
-local max_steps_per_update = 100
-local max_steps_per_turn = 1000
+local max_steps_per_update = 10
+local max_steps_per_turn = 100
 
 function GM:initialize(world)
   EventDispatcher.initialize(self)
@@ -81,8 +81,8 @@ function GM:updateInitiative(character)
   local index = 1
   
   for i = 1, #init.list do
-    local entry = init.list[i] print(entry.value, result)
-    if entry.value < result then print("OK")
+    local entry = init.list[i]
+    if entry.value < result then
       break
     end
     index = index + 1
@@ -137,6 +137,7 @@ function GM:nextCharacter()
 
   self.activeCharacter = init.list[init.current].character
   self:dispatch("next_character", self.activeCharacter)
+  self.activeCharacter.agent:resetStepCounter(max_steps_per_turn)
   return self.activeCharacter
 end
 
@@ -150,7 +151,7 @@ function GM:update(dt)
 
   if not char.commands:empty() then return end
   
-  for i = 1, max_steps_per_update do
+  for _ = 1, max_steps_per_update do
     local busy = char:updateAI(self.world)                                      --self:pause() if busy then return end
     if not char.commands:empty() then return end
     if not busy then
@@ -238,9 +239,8 @@ function GM:kill(character)
 
   for i = 1, #init.list do
     local entry = init.list[i]
-    if entry == character then
+    if entry.character == character then
       table.remove(init.list, i)
-      table.remove(init.results, i)
       if init.current > i then init.current = init.current - 1 end
     end
   end

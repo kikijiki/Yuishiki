@@ -20,6 +20,7 @@ return function(loader)
   function Agent:initialize()
     self.id = generateId()
     self.step_count = 0
+    self.step_limit = 0
 
     self.actuator = Actuator()
 
@@ -52,9 +53,15 @@ return function(loader)
   function Agent:waiting()
     return self.bdi:waiting()
   end
+  
+  function Agent:resetStepCounter(step_limit)
+    self.step_limit = step_limit
+    self.step_count = 0
+  end
 
   function Agent:step()
     self.step_count = self.step_count + 1
+    if self.step_count > self.step_limit then return false end
     log.i("Step "..self.step_count)
     return self.bdi:step();
   end
