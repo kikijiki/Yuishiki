@@ -47,7 +47,7 @@ return function(loader)
     self.intentions[intention.id] = nil
   end
 
-  function IntentionBase:execute(intention)
+  function IntentionBase:execute(intention) self:dump()
     intention:step()
     if intention:empty() then self.intentions[intention.id] = nil end
   end

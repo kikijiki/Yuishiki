@@ -50,9 +50,10 @@ return function(loader)
     local index = start or 1
     return function()
       if index <= self.size then
-        local ret = self.elements[index]
+        local k = index
+        local v = self.elements[index]
         index = index + 1
-        return index, ret
+        return k, v
       end
     end
   end

@@ -95,21 +95,21 @@ return function(loader)
 
   function Intention:checkPlanConditions(index, plan)
     -- context condition
-    if not plan.conditions.default(true).context() then
+    if not plan.conditions.default(true).context() then                         log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if plan.conditions.default(false).failure() then
+    if plan.conditions.default(false).failure() then                            log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if plan.conditions.default(false).success() then
+    if plan.conditions.default(false).success() then                            log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:succeed()
       return true
@@ -120,21 +120,21 @@ return function(loader)
 
   function Intention:checkGoalConditions(index, goal)
     -- context condition
-    if not goal.conditions.default(true).context() then
+    if not goal.conditions.default(true).context() then                         log.d("context condition", goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if goal.conditions.default(false).failure() then
+    if goal.conditions.default(false).failure() then                            log.d("drop condition", goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if goal.conditions.default(false).success() then
+    if goal.conditions.default(false).success() then                            log.d("success condition", goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:succeed()
       return true
