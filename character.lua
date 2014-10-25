@@ -147,8 +147,7 @@ end
 
 function Character:kill(callback)
   self.dead = true
-  self.sprite:setAnimation("dead")
-  self:appendCommand("animation", {"dead", true, true, false})
+  self:appendCommand("animation", {"dead", {idle = false}})
   self:appendCommand("fade", {}, callback)
   self:bubble("DEAD", {255, 0, 0})
 end
@@ -162,9 +161,9 @@ end
 function Character:attack(map, target, damage, callback)
   self:appendCommand("lookAt", {map, target})
   target:appendCommand("lookAt", {map, self})
-  self:appendCommand("animation", {"attack", true, true, true, {"hit",
+  self:appendCommand("animation", {"attack", {tag = {"hit",
     function() target:hit(damage) end}
-  })
+  }}, callback)
 end
 
 function Character:hit(damage, callback)

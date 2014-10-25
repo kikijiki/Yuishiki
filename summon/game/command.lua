@@ -141,13 +141,14 @@ export.lookAt = LookAtCommand
 --[[Animation]]----------------------------------------------------------------
 local AnimationCommand = summon.class("AnimationCommand", Command)
 
-function AnimationCommand:initialize(animation, wait, reset, idle, tag)
+function AnimationCommand:initialize(animation, param)
   Command.initialize(self, "Animation")
+  param = param or {}
   self.animation = animation
-  self.wait = not (wait == false)
-  self.reset = not (wait == false)
-  self.idle = not (idle == false)
-  self.tag = tag
+  self.wait = not (param.wait == false)
+  self.reset = not (param.wait == false)
+  self.idle = not (param.idle == false)
+  self.tag = param.tag
 end
 
 function AnimationCommand:execute()
@@ -276,7 +277,7 @@ function WalkCommand:execute()
 
   self:push("translate", {data.top, data.spriteZ, sprite.speed.movement})
 
-  sprite:setAnimation("walk", false)
+  sprite:setAnimation("walk", {reset = false})
   sprite:setDirection(self.map:getFacingDirection(self.character.status.position:get(), self.destination))
   self:finish()
 end
@@ -402,7 +403,7 @@ function StepCommand:execute()
 end
 
 function StepCommand:onPop()
-  self.sprite:setAnimation("idle", false)
+  self.sprite:setAnimation("idle", {wait = false})
 end
 
 export.step = StepCommand
