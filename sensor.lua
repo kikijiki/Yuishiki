@@ -20,7 +20,10 @@ function Sensor:link(character, agent)
   self.beliefs = agent.bdi.belief_base.interface
 end
 
-function Sensor:onEvent()
+function Sensor:register(env)
+  for event, handler in pairs(self.events) do
+    env:addObserver(self, event, function(...) handler(self, ...) end)
+  end
 end
 
 function Sensor:update(world)

@@ -61,9 +61,7 @@ function Character:setEnvironment(env, id)
   self.environment = env
   self.id = id
   for _,sensor in pairs(self.sensors) do
-    for event, handler in pairs(sensor.events) do
-      env:addObserver(self, event, handler)
-    end
+    sensor:register(env)
   end
 end
 
@@ -135,7 +133,7 @@ function Character:addStat(name, ...)
     belief:notify(belief, new, old, ...)
   end)
   stat:addObserver(self.gm.world, function(new, old, ...)
-    self.gm.world:propagateEvent(self, "character status", self, name, new, old, ...)
+    self.gm.world:propagateEvent(self, "character status changed", self, name, new, old, ...)
   end)
   return stat
 end

@@ -233,6 +233,7 @@ end
 function GM:kill(character)
   character:kill(function()
       self.world:removeCharacter(character)
+      self.world.map:setWalkable(character.status.position:get(), true)
     end)
 
   local init = self.initiative
@@ -242,10 +243,10 @@ function GM:kill(character)
     if entry.character == character then
       table.remove(init.list, i)
       if init.current > i then init.current = init.current - 1 end
+      break
     end
   end
 
-  self.world.map:setWalkable(character.status.position:get(), true)
   self:dispatch("kill_character", character)
 end
 
