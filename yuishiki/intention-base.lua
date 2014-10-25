@@ -63,8 +63,10 @@ return function(loader)
   function IntentionBase:dump()
     for _,intention in pairs(self.intentions) do
       log.i(intention.id)
+      local i = 1
       for _,element in pairs(intention.stack.elements) do
-        log.i(" - "..element.name.." ["..element.status.."]")
+        log.i(string.rep("-", i).." "..tostring(element))
+        i = i + 1
       end
     end
   end

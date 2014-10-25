@@ -46,7 +46,7 @@ return function(loader)
     P.static.default = data
     P.static.members = {
       "name", "body", "meta", "confidence", "triggers", "conditions",
-      "on", "manage_subgoal_failure" }
+      "on", "manage_subgoal_failure", "describe" }
 
     P.static.name = name
     P.static.body = data.body
@@ -56,6 +56,7 @@ return function(loader)
     P.static.conditions = ManualTrigger(data.conditions)
     P.static.on = ManualTrigger(data.on)
     P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
+    P.static.describe = data.describe
 
     P.initialize = function(self, agent, parameters)
       Plan.initialize(self, agent, parameters)
@@ -186,8 +187,12 @@ return function(loader)
     self.on.resume()
   end
   
-  function Plan:dump()
-    return "<"..self.name.."> - "..self.status
+  function Plan:__tostring()
+    if self.describe then
+      return "[P]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"
+    else
+      return "[P]("..self.status..") <"..self.name..">"
+    end
   end
 
   return Plan

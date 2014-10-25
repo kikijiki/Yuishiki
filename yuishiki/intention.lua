@@ -41,7 +41,7 @@ return function(loader)
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
-  function Intention:stepPlan(plan)                                             log.d("Stepping in plan", plan:dump())
+  function Intention:stepPlan(plan)                                             log.d("Stepping in plan", plan)
     if plan.status == Plan.Status.Succeeded then
       self:pop()
       local goal = self:top()
@@ -60,7 +60,7 @@ return function(loader)
     end
   end
 
-  function Intention:stepGoal(goal)                                             log.d("Stepping in goal", goal:dump())
+  function Intention:stepGoal(goal)                                             log.d("Stepping in goal", goal)
     if goal.status == Goal.Status.Active then
       local plan = self.agent.bdi:processGoal(goal)
       if plan then
@@ -74,10 +74,10 @@ return function(loader)
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self:pop()                                                                log.d("Popping goal", goal:dump())
+      self:pop()                                                                log.d("Popping goal", goal)
 
     elseif goal.status == Goal.Status.Failed then
-      self:pop()                                                                log.d("Popping goal", goal:dump())
+      self:pop()                                                                log.d("Popping goal", goal)
       local plan = self:top()
       if plan then plan:fail(Plan.FailReason.SubgoalFailed) end
     end

@@ -247,7 +247,7 @@ function GM:kill(character)
     end
   end
 
-  self:dispatch("kill_character", character)
+  self:dispatch("character death", character)
 end
 
 function GM:log(msg)

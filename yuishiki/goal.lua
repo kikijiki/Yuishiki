@@ -19,7 +19,7 @@ return function(loader)
     local G = class(goal_class_prefix..name, Goal)
 
     G.static.default = data
-    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry"}
+    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry", "describe"}
 
     G.static.name = name
     G.static.creation = Trigger.fromData(data.creation)
@@ -27,6 +27,7 @@ return function(loader)
     G.static.limit = data.limit
     G.static.on = ManualTrigger(data.on)
     G.static.retry = data.retry
+    G.static.describe = data.describe
 
     G.initialize = function(self, agent, parameters)
       Goal.initialize(self, parameters)
@@ -71,8 +72,12 @@ return function(loader)
     self.on.activation()
   end
   
-  function Goal:dump()
-    return "<"..self.name.."> - "..self.status
+  function Goal:__tostring()
+    if self.describe then
+      return "[G]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"
+    else
+      return "[G]("..self.status..") <"..self.name..">"
+    end
   end
 
   return Goal
