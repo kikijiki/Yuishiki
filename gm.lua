@@ -10,7 +10,7 @@ local EventDispatcher = require "event-dispatcher"
 local GM = class("GM", EventDispatcher)
 GM.uti = {}
 
-local max_steps_per_update = 10
+local max_steps_per_update = 1
 local max_steps_per_turn = 100
 
 function GM:initialize(world)
