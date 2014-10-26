@@ -19,7 +19,7 @@ return function(loader)
     local G = class(goal_class_prefix..name, Goal)
 
     G.static.default = data
-    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry", "describe"}
+    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry", "priority", "describe"}
 
     G.static.name = name
     G.static.creation = Trigger.fromData(data.creation)
@@ -27,6 +27,7 @@ return function(loader)
     G.static.limit = data.limit
     G.static.on = ManualTrigger(data.on)
     G.static.retry = data.retry
+    G.static.priority = data.priority
     G.static.describe = data.describe
 
     G.initialize = function(self, agent, parameters)
