@@ -94,7 +94,8 @@ return function(loader)
     end
 
     local plan_schema
-
+    
+    -- TODO: check retry flag and plan history
     if metaplans then plan_schema = self:selectPlan(goal, metaplans) end
     if not plan_schema then plan_schema = self:selectPlan(goal, plans) end
 

@@ -50,9 +50,7 @@ return function(loader)
       self:pop()
       local goal = self:top()
       if not goal then return end
-      if goal.retry then
-        -- TODO ? or it is managed somewhere else, can't remember.
-      else
+      if not goal.retry then
         goal:fail(Goal.FailReason.PlanFailed)
       end
     else
