@@ -37,6 +37,7 @@ return function(loader)
     if not path then return end
 
     local belief = self.beliefs
+    local last
     for token in string.gmatch(path, PATH_TRAVERSER_PATTERN) do
       last = token
       if belief[token] then
@@ -69,14 +70,10 @@ return function(loader)
   end
 
   -- TODO check for overwrite?
-  function BeliefBase:set(data, name, base_path, readonly)
-    assert(name)
-
-    if not base_path then
-      base_path, name = BeliefBase.parsePath(name)
-    end
-
-    local full_path = BeliefBase.appendPath(base_path, name)
+  function BeliefBase:set(data, readonly, ...)
+    local path = {...}
+    local full_path = table.concat(path, ".")
+    local base_path, name = BeliefBase.parsePath(full_path)
 
     local belief = Belief(data, name, full_path, readonly)
     belief:addObserver(self, self.observer)
@@ -93,6 +90,7 @@ return function(loader)
 
   function BeliefBase:unset(path)
     -- TODO
+    local belief = self.lookup[path]
     local event = Event.Belief(belief, Belief.Status.deleted, belief:get())
     self:notify(event)
   end

@@ -126,9 +126,9 @@ end
 function Character:addStat(name, ...)
   local stat = Value.fromData(...)
   if not stat then return end
-
+  
   self.status[name] = stat
-  local belief = self.agent:setBelief(stat, name, "status", true)
+  local belief = self.agent:setBelief(stat, true, "status", name)
   stat:addObserver(belief, function(new, old, ...)
     belief:notify(belief, new, old, ...)
   end)
@@ -181,7 +181,7 @@ function Character:equip(item, slot)
     end
   end
 
-  self.agent:setBelief(item, slot, "equipment")
+  self.agent:setBelief(item, true, "equipment", slot)
 end
 
 function Character:uneqip(slot)
@@ -196,7 +196,7 @@ function Character:uneqip(slot)
     end
   end
 
-  self.agent:unsetBelief(item, slot, "equipment")
+  self.agent:unsetBelief(item, true, "equipment", slot)
 end
 
 return Character
