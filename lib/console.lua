@@ -57,7 +57,7 @@ function console.load( keyCode, fontSize, keyRepeat, inputCallback )
 	console.colors["D"] = {r = 235, g = 197, b =  50, a = 255}
 	console.colors["E"] = {r = 222, g =  69, b =  61, a = 255}
 
-	console.inputCallback = inputCallback or console.defaultInputCallback
+	console.inputCallback = inputCallback or console.dl
 
 	console.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
@@ -76,8 +76,6 @@ function console.keypressed(key)
 			console.input = ""
 		elseif key == "backspace" then
 			console.input = string.sub(console.input, 0, #console.input - 1)
-		--else
-		--	console.input = console.input .. key
 		end
 		return true
 	end
@@ -129,9 +127,6 @@ function console.draw()
 		end
 	end
 
-
-
-
 	-- rollback
 	love.graphics.setFont(font)
 	love.graphics.setColor(r, g, b, a)
@@ -170,28 +165,6 @@ end
 
 function console.e(str)
 	a(str, 'E')
-end
-
-
--- private stuff 
-function console.defaultInputCallback(t)
-  if t == "/help" then
-  	console.d(t)
-    console.i("Available commands are: ")
-    console.i("  /help - show this help")
-    console.i("  /clear - clears console")
-    console.i("  /quit - quits your app")
-  elseif t == "/quit" then
-  	console.d(t)
-  	console.i("Time to quit, emitting love.event.quit()")
-    love.event.quit()
-  elseif t == "/clear" then
-  	console.firstLine = 0
-  	console.lastLine = 0
-  	console.logs = {}
-  elseif t ~= "" then
-    console.e("Command \"" .. t .. "\" not supported, type /help for help.")
-  end
 end
 
 function a(str, level)

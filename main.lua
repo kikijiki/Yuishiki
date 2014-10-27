@@ -1,19 +1,35 @@
-require "CiderDebugger";local gamestate = require "lib.hump.gamestate"
+--require "CiderDebugger";
+
+local gamestate = require "lib.hump.gamestate"
 local timer = require "lib.hump.timer"
 local console = require "lib.console"
 
 local ys = require "yuishiki"()
 require "summon"
 
-local sg = summon.graphics
-
+-- Setup logging and console
 ys.log.showTime = false
 ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
--- log.addRawOutput(console.i, false)
+ys.log.addRawOutput(console.i, false)
+local luaprint = print
+print = function(...)
+  luaprint(...)
+  local str = {...}
+  for i=1, #str do str[i] = tostring(str[i]) end
+  console.d(table.concat(str, ", "))
+end
+console.load(nil, nil, nil, function(t)
+  console.i("Evaluating "..t)
+  local f = loadstring(t)
+  local ret = {pcall(f)}
+  for i=1, #ret do ret[i] = tostring(ret[i]) end
+  console.i("Returned:"..table.concat(ret, ", "))
+end)
 
 summon.log = ys.log
 
+-- Setup assets
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
 
@@ -29,21 +45,8 @@ function love.load()
     table.insert(scenarios, scenario)
   end)
 
-  table.sort(scenarios, function(a, b) return a.name < b.title end)
+  table.sort(scenarios, function(a, b) return a.name < b.name end)
   gamestate.switch(require "states.menu", scenarios)
-
-  -- execute lua in the console
-  --console.load(nil, nil, nil, function(t)
-  --  local f = loadstring(t)
-  --  print(pcall(f))
-  --end)
-  local luaprint = print
-  print = function(...)
-    local out = ""
-    for _,v in pairs({...}) do out = out.."  "..tostring(v) end
-    console.i(out)
-    luaprint(...)
-  end
 end
 
 function love.update(dt)
@@ -52,7 +55,11 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-  if key == '`' then console.visible = not console.visible end
+  if key == '`' then
+    console.visible = not console.visible
+  else
+    if console.visible then console.keypressed(key) end
+  end
 
   if key == "escape" then
     love.event.quit()
@@ -65,7 +72,7 @@ function love.keypressed(key)
 end
 
 function love.textinput(t)
-    --if t ~= '`' then console.input = console.input .. t end
+  if t ~= '`' then console.input = console.input .. t end
 end
 
 function love.mousepressed(x, y, button)
