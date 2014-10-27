@@ -127,28 +127,26 @@ return function(loader)
     table.insert(outputs.full, out)
   end
 
-  function log.i(...)
-    writeToLog("INF", ...)
-  end
+  function log.i(...)       writeToLog("INF", ...) end
+  function log.fi(fmt, ...) writeToLog("INF", string.format(fmt, ...)) end
 
-  function log.d(...)
-    writeToLog("DBG", ...)
-  end
+  function log.d(...)       writeToLog("DBG", ...) end
+  function log.fd(fmt, ...) writeToLog("DBG", string.format(fmt, ...)) end
 
-  function log.w(...)
-    writeToLog("WRN", ...)
-  end
+  function log.w(...)       writeToLog("WRN", ...) end
+  function log.fw(fmt, ...) writeToLog("WRN", string.format(fmt, ...)) end
 
-  function log.e(...)
-    writeToLog("ERR", ...)
-  end
+  function log.e(...)       writeToLog("ERR", ...) end
+  function log.fe(fmt, ...) writeToLog("ERR", string.format(fmt, ...)) end
 
-  function log.inspect(x)
-    log.i(inspect(x))
-  end
+  function log.inspect(x) log.i(inspect(x)) end
 
   function log.check(value, ...)
     if not value then writeToLog("ERR", 1, true, ...) end
+  end
+  
+  function log.fcheck(value, fmt, ...)
+    if not value then writeToLog("ERR", 1, true, string.format(fmt, ...)) end
   end
 
   return log
