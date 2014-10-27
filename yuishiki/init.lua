@@ -4,6 +4,8 @@ local module_path = ...
 
 local ys
 
+if not table.unpack then table.unpack = unpack end
+
 return function (base_path)
   if ys then return ys end
 
