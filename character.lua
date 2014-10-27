@@ -27,6 +27,7 @@ function Character:initialize(gm, data)
   self.actions   = {}
 
   self:addStat("position", "simple", vec(1, 1))
+  self:addStat("alive", "simple", true)
 
   if data.ai then
     for _,v in pairs(data.ai.modules) do
@@ -115,7 +116,9 @@ function Character:appendCommand(command, args, callback)
 end
 
 function Character:speak(message, duration)
-  local position = function(s) return self.sprite:getTag("head") + vec(5, -5) * self.sprite.scale end
+  local position = function(s)
+    return self.sprite:getTag("head") + vec(5, -5) * self.sprite.scale
+  end
   self:dispatch("speak", self, message, duration, position)
 end
 
@@ -133,7 +136,8 @@ function Character:addStat(name, ...)
     belief:notify(belief, new, old, ...)
   end)
   stat:addObserver(self.gm.world, function(new, old, ...)
-    self.gm.world:propagateEvent(self, "character status changed", self, name, new, old, ...)
+    self.gm.world:propagateEvent(
+      self, "character status changed", self, name, new, old, ...)
   end)
   return stat
 end
@@ -144,7 +148,7 @@ function Character:addAction(name)
 end
 
 function Character:kill(callback)
-  self.dead = true
+  self.status["alive"]:set(false)
   self:appendCommand("animation", {"dead", {idle = false}})
   self:appendCommand("fade", {}, callback)
   self:bubble("DEAD", {255, 0, 0})
@@ -172,16 +176,21 @@ end
 
 function Character:equip(item, slot)
   if not slot then return end
+  local old = self.equipment[slot]
   self.equipment[slot] = item
   item:onEquip(self)
 
   if item.mods then
     for mod, v in pairs(item.mods) do
-      self.status[mod]:setMod(v[1], v[2])
+      if self.status[mod] then
+        self.status[mod]:setMod(v[1], v[2])
+      end
     end
   end
 
   self.agent:setBelief(item, true, "equipment", slot)
+  self.gm.world:propagateEvent(
+      self, "character equipment changed", self, slot, item, old)
 end
 
 function Character:uneqip(slot)
@@ -198,5 +207,7 @@ function Character:uneqip(slot)
 
   self.agent:unsetBelief(item, true, "equipment", slot)
 end
+
+function Character.log(...) print("CHAR", ...) end
 
 return Character
