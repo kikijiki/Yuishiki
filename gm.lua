@@ -72,8 +72,8 @@ function GM:nextTurn()
   self.turnCount = self.turnCount + 1
   self.initiative.current = 0
   self.activeCharacter = nil
-  self:applyRule("turn_start")
-  self:dispatch("turn_start")
+  self:applyRule("turn start")
+  self:dispatch("turn start")
 end
 
 function GM:updateInitiative(character)
@@ -99,7 +99,7 @@ function GM:addCharacter(name, id) assert(name)
   local char_data = summon.AssetLoader.load("character", name)
   local character = Character(self, char_data)
 
-  self:applyRule("initialize_character", character)
+  self:applyRule("initialize character", character)
 
   if character.modules then
     for _,v in pairs(character.modules) do
@@ -116,7 +116,7 @@ end
 function GM:importCharacter(character, id)
   self.world:addCharacter(character, id)
   self:updateInitiative(character)
-  self:dispatch("new_character", character)
+  self:dispatch("new character", character)
 
   character.status.position:addObserver(self, function(new, old)
     self.world.map:setWalkable(new, false)
@@ -137,7 +137,7 @@ function GM:nextCharacter()
   if init.current > #init.list then return false end
 
   self.activeCharacter = init.list[init.current].character
-  self:dispatch("next_character", self.activeCharacter)
+  self:dispatch("next character", self.activeCharacter)
   self.activeCharacter.agent:resetStepCounter(max_steps_per_turn)
   return self.activeCharacter
 end

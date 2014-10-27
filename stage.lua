@@ -40,11 +40,11 @@ function Stage:initialize(data)
 end
 
 function Stage:listenToGM(gm)
-  self.gm:listen(self, "next_character", function(c)
+  self.gm:listen(self, "next character", function(c)
     self.camera:follow(c.sprite)
     self.interface:setCursor(c.sprite.position)
   end)
-  self.gm:listen(self, "new_character",
+  self.gm:listen(self, "new character",
     function(c)
       c:listen(self, "speak",
         function(character, message, duration, position)
