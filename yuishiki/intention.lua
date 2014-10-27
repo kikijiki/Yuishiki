@@ -210,6 +210,10 @@ return function(loader)
     end
     return count
   end
+  
+  function Intention:__tostring()
+    return "[I] "..self.id.."("..self.stack.size..")"
+  end
 
   return Intention
 end

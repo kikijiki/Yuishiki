@@ -61,14 +61,19 @@ return function(loader)
   end
 
   function IntentionBase:dump()
+    log.i("--[[INTENTION BASE DUMP START]]--")
+    
     for _,intention in pairs(self.intentions) do
-      log.i(intention.id)
+      log.i(intention)
       local i = 1
       for _,element in pairs(intention.stack.elements) do
-        log.i(string.rep("-", i).." "..tostring(element))
+        local indent = string.rep("-", i)
+        log.fi("%s %s", indent, tostring(element))
         i = i + 1
       end
     end
+    
+    log.i("--[[INTENTION BASE DUMP END]]--")
   end
 
   return IntentionBase

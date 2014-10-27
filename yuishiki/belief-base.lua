@@ -18,8 +18,8 @@ return function(loader)
   function BeliefBase:initialize()
     Observable.initialize(self)
 
-    self.lookup = {}
-    self.beliefs = {}
+    self.lookup  = {} -- path  -> belief
+    self.beliefs = {} -- table -> belief
 
     self.observer = function(belief, new, old, ...)
       local event = Event.Belief(belief, Belief.Status.changed, new, old, ...)
@@ -81,7 +81,7 @@ return function(loader)
     self.lookup[full_path] = belief
     local root = self:resolve(base_path, true)
     root[name] = belief
-
+    
     local event = Event.Belief(belief, Belief.Status.new, belief:get())
     self:notify(event)
 
@@ -100,9 +100,27 @@ return function(loader)
   end
 
   function BeliefBase:dump()
-    for k,v in pairs(self.lookup) do
-      log.i("Belief ["..k.."] = ", v)
+    local paths = {}
+    local lengths = {}
+    local longest = 0
+    
+    for path,_ in pairs(self.lookup) do
+      table.insert(paths, path)
+      local length = string.len(path)
+      lengths[path] = length
+      if length > longest then longest = length end
     end
+    
+    table.sort(paths)
+    
+    log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
+    
+    for _,path in pairs(paths) do
+      local skip = longest - lengths[path]
+      log.fi("[%s] %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
+    end
+    
+    log.i("--[[BELIEF BASE DUMP END]]--")
   end
 
   return BeliefBase
