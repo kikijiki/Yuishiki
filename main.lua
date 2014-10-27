@@ -38,7 +38,7 @@ summon.AssetLoader.register("ai_module", "ai/modules", summon.AssetLoader.loadRa
 summon.AssetLoader.register("sensor", "ai/sensors", require"sensor".load, false)
 
 function love.load()
-  gamestate.registerEvents({'keypressed', 'keyreleased', 'mousepressed', 'mousereleased', 'quit', 'resize', 'textinput', 'update' })
+  gamestate.registerEvents({'keyreleased', 'mousereleased', 'quit', 'resize', 'update' })
 
   summon.fs.getDirectoryItems(scenarios_path, function(file)
     local scenario = summon.fs.load(scenarios_path..file)()
@@ -55,11 +55,7 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-  if key == '`' then
-    console.visible = not console.visible
-  else
-    if console.visible then console.keypressed(key) end
-  end
+  if console.keypressed(key) then return end
 
   if key == "escape" then
     love.event.quit()
@@ -69,10 +65,16 @@ function love.keypressed(key)
     local ss = love.graphics.newScreenshot()
     ss:encode("ss"..os.date("%Y%m%d%H%M%S")..".bmp", "bmp")
   end
+
+  gamestate.keypressed(key)
 end
 
 function love.textinput(t)
-  if t ~= '`' then console.input = console.input .. t end
+  if console.visible then
+    if t ~= '`' then console.input = console.input .. t end
+  else
+    gamestate.textinput(t)
+  end
 end
 
 function love.mousepressed(x, y, button)
