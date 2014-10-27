@@ -64,6 +64,7 @@ function GM:applyRule(rule, ...)
 end
 
 function GM:start()
+  self.world:start()
   self:applyRule("start")
 end
 

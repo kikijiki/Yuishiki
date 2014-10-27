@@ -9,6 +9,8 @@ function World:initialize(map) assert(map)
   
   self.characters = {}
   self.map = map
+  
+  self.events_enanbled = false
 end
 
 function World:addCharacter(character, id) assert(character)
@@ -28,6 +30,10 @@ function World:removeCharacter(char)
   else
     self.characters[char] = nil
   end
+end
+
+function World:start()
+  self.events_enabled = true
 end
 
 function World:placeCharacter(char, x, y)
@@ -59,7 +65,9 @@ function World:update(dt)
 end
 
 function World:propagateEvent(source, event, ...)
-  self:notify(source, event, ...)
+  if self.events_enanbled then
+    self:notify(source, event, ...)
+  end
 end
 
 return World
