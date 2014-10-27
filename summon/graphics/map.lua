@@ -54,11 +54,7 @@ function Tile:draw()
     local cnt = frame.source.center
     local height = frame.source.height
     local quad = frame.source.quad
-    if self.walkable then
-      setColor(255, 255, 255, 255)
-    else
-      setColor(255, 0, 0, 255)
-    end
+    setColor(255, 255, 255, 255)
     draw(self.texture.data,
       quad, pos.x - cnt.x,
       pos.y - cnt.y - height)
