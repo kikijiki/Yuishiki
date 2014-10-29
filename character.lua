@@ -1,9 +1,9 @@
 local class = require "lib.middleclass"
+local ys = require "yuishiki"()
 local vec = summon.vec
 local Value = require "value"
 local Command = summon.game.Command
 local EventDispatcher = require "event-dispatcher"
-local ys = require "yuishiki"()
 
 local Character = class("Character", EventDispatcher)
 
