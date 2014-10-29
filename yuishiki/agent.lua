@@ -42,8 +42,7 @@ return function(loader)
     })
   end
 
-  function Agent:setBelief(...) return self.bdi.belief_base:set(...) end
-  function Agent:unsetBelief(...) return self.bdi.belief_base:unset(...) end
+  function Agent:importBelief(...) return self.bdi.belief_base:import(...) end
   function Agent:addAction(...) return self.actuator:addAction(...) end
 
   function Agent:dispatch(event)
@@ -53,7 +52,7 @@ return function(loader)
   function Agent:waiting()
     return self.bdi:waiting()
   end
-  
+
   function Agent:resetStepCounter(step_limit)
     self.step_limit = step_limit
     self.step_count = 0
@@ -89,7 +88,7 @@ return function(loader)
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        self.bdi.belief_base:set(v, false, k)
+        self.bdi.belief_base:set(v, k)
       end
     end
 

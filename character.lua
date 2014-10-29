@@ -129,9 +129,9 @@ end
 function Character:addStat(name, ...)
   local stat = Value.fromData(...)
   if not stat then return end
-  
+
   self.status[name] = stat
-  local belief = self.agent:setBelief(stat, true, "status", name)
+  local belief = self.agent:importBelief(stat, "status", name)
   stat:addObserver(belief, function(new, old, ...)
     belief:notify(belief, new, old, ...)
   end)
@@ -188,7 +188,7 @@ function Character:equip(item, slot)
     end
   end
 
-  self.agent:setBelief(item, true, "equipment", slot)
+  self.agent:importBelief(item, "equipment", slot)
   self.gm.world:propagateEvent(
       self, "character equipment changed", self, slot, item, old)
 end
@@ -205,7 +205,7 @@ function Character:uneqip(slot)
     end
   end
 
-  self.agent:unsetBelief(item, true, "equipment", slot)
+  self.agent:importBelief(item, "equipment", slot)
 end
 
 function Character.log(...) print("CHAR", ...) end

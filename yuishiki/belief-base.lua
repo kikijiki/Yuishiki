@@ -69,23 +69,31 @@ return function(loader)
     return a..PATH_SEPARATOR..b
   end
 
-  -- TODO check for overwrite?
-  function BeliefBase:set(data, readonly, ...)
+  function set(bb, source, data, ...)
     local path = {...}
     local full_path = table.concat(path, ".")
     local base_path, name = BeliefBase.parsePath(full_path)
 
-    local belief = Belief(data, name, full_path, readonly)
-    belief:addObserver(self, self.observer)
+    local belief = Belief(data, name, full_path, source)
+    belief:addObserver(bb, bb.observer)
 
-    self.lookup[full_path] = belief
-    local root = self:resolve(base_path, true)
+    bb.lookup[full_path] = belief
+    local root = bb:resolve(base_path, true)
     root[name] = belief
-    
+
     local event = Event.Belief(belief, Belief.Status.new, belief:get())
-    self:notify(event)
+    bb:notify(event)
 
     return belief
+  end
+
+  -- TODO check for overwrite?
+  function BeliefBase:set(...)
+    return set(self, "internal", ...)
+  end
+
+  function BeliefBase:import(...)
+    return set(self, "external", ...)
   end
 
   function BeliefBase:unset(path)
@@ -108,16 +116,16 @@ return function(loader)
     local paths = {}
     local lengths = {}
     local longest = 0
-    
+
     for path,_ in pairs(self.lookup) do
       table.insert(paths, path)
       local length = string.len(path)
       lengths[path] = length
       if length > longest then longest = length end
     end
-    
+
     table.sort(paths)
-    
+
     log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
     log.i()
     for _,path in pairs(paths) do

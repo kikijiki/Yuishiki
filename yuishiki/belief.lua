@@ -1,5 +1,6 @@
 return function(loader)
   local class = loader.require "middleclass"
+  local log = loader.require "log"
   local uti = loader.load "uti"
   local Event = loader.load "event"
   local Observable = loader.load "observable"
@@ -8,17 +9,16 @@ return function(loader)
 
   Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 
-  function Belief:initialize(value, name, path, readonly)
+  function Belief:initialize(value, name, path, source)
     Observable.initialize(self)
 
     self.name = name
     self.path = path
 
     self.value  = value
-    self.readonly = readonly or false
 
-    self.source  = nil -- TODO
-    self.history = nil -- TODO
+    self.source  = source or "internal"
+    self.history = nil -- TODO: save past values.
   end
 
   function Belief.getYsType()
@@ -34,7 +34,11 @@ return function(loader)
   end
 
   function Belief:set(value)
-    if self.readonly then return end
+    if self.source == "external" then
+      log.fw("Trying to write the external belief [%s].", self.path)
+      return
+    end
+
     local old = self:get()
 
     if type(self.value) == "table" and self.value.set then
