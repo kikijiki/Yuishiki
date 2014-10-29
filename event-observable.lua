@@ -9,9 +9,11 @@ end
 function EventObservable:addObserver(observer, event, handler)
   local target = self.events
 
-  for _,v in pairs(event) do
-    if not target.nodes[v] then target.nodes[v] = {nodes = {}, leafs = setmetatable({}, {__mode="k"})} end
-    target = target.nodes[v]
+  if type(event) == "table" then
+    for _,v in pairs(event) do
+      if not target.nodes[v] then target.nodes[v] = {nodes = {}, leafs = setmetatable({}, {__mode="k"})} end
+      target = target.nodes[v]
+    end
   end
 
   target.leafs[observer] = handler

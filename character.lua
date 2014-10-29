@@ -147,7 +147,7 @@ function Character:addValue(data, ...) assert(data)
   table.insert(path, 1, "character")
   path.n = path.n + 1
   value:addObserver(self.gm.world, function(...)
-    self.gm.world:propagateEvent(self, path, ...)
+    self.gm.world:propagateEvent(self, path, value, ...)
   end)
 
   return value

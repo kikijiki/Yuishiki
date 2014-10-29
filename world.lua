@@ -6,11 +6,11 @@ local World = class("World", EventObservable)
 
 function World:initialize(map) assert(map)
   EventObservable.initialize(self)
-  
+
   self.characters = {}
   self.map = map
-  
-  self.events_enanbled = false
+
+  self.events_enabled = false
 end
 
 function World:addCharacter(character, id) assert(character)
@@ -65,7 +65,7 @@ function World:update(dt)
 end
 
 function World:propagateEvent(source, event, ...)
-  if self.events_enanbled then
+  if self.events_enabled then
     self:notify(source, event, ...)
   end
 end
