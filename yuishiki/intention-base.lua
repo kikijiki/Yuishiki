@@ -61,8 +61,12 @@ return function(loader)
   end
 
   function IntentionBase:dump()
+    if not next(self.intentions) then
+      log.i("--[[INTENTION BASE EMPTY]]--")
+      return
+    end
     log.i("--[[INTENTION BASE DUMP START]]--")
-    
+    log.i()
     for _,intention in pairs(self.intentions) do
       log.i(intention)
       local i = 1
@@ -72,7 +76,7 @@ return function(loader)
         i = i + 1
       end
     end
-    
+    log.i()
     log.i("--[[INTENTION BASE DUMP END]]--")
   end
 

@@ -2,7 +2,7 @@
 
 local gamestate = require "lib.hump.gamestate"
 local timer = require "lib.hump.timer"
-local console = require "lib.console"
+local console = require "console".new()
 
 local ys = require "yuishiki"()
 require "summon"
@@ -11,21 +11,7 @@ require "summon"
 ys.log.showTime = false
 ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
-ys.log.addRawOutput(console.i, false)
-local luaprint = print
-print = function(...)
-  luaprint(...)
-  local str = {...}
-  for i=1, #str do str[i] = tostring(str[i]) end
-  console.d(table.concat(str, ", "))
-end
-console.load(nil, nil, nil, function(t)
-  console.i("Evaluating "..t)
-  local f = loadstring(t)
-  local ret = {pcall(f)}
-  for i=1, #ret do ret[i] = tostring(ret[i]) end
-  console.i("Returned:"..table.concat(ret, ", "))
-end)
+ys.log.addOutput(function(data) console[data.tag](console, data.msg) end)
 
 summon.log = ys.log
 
@@ -47,15 +33,19 @@ function love.load()
 
   table.sort(scenarios, function(a, b) return a.name < b.name end)
   gamestate.switch(require "states.menu", scenarios)
+  console:resize(love.graphics.getDimensions())
 end
 
 function love.update(dt)
   timer.update(dt)
-  console.update(dt)
+end
+
+function love.resize(w, h)
+  console:resize(w, h)
 end
 
 function love.keypressed(key)
-  if console.keypressed(key) then return end
+  console:keypressed(key)
 
   if key == "escape" then
     love.event.quit()
@@ -70,21 +60,15 @@ function love.keypressed(key)
 end
 
 function love.textinput(t)
-  if console.visible then
-    if t ~= '`' then console.input = console.input .. t end
-  else
-    gamestate.textinput(t)
-  end
+  gamestate.textinput(t)
 end
 
 function love.mousepressed(x, y, button)
-  if console.mousepressed(x, y, button) then
-    return false
-  end
+  if console:mousepressed(x, y, button) then return false end
   gamestate.mousepressed(x, y, button)
 end
 
 function love.draw()
   gamestate.draw()
-  console.draw()
+  console:draw()
 end

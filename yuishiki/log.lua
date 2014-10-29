@@ -29,22 +29,27 @@ return function(loader)
   }
 
   local tags = {
-    INF = {
+    p = {
+      normal = "",
+      color = "",
+      level = 3,
+      die = false},
+    i = {
       normal = "[INF]",
       color = ansicolors("%{bright green}[INF]%{reset}"),
       level = 3,
       die = false},
-    DBG = {
+    d = {
       normal = "[DBG]",
       color = ansicolors("%{bright black}[DBG]%{reset}"),
       level = 2,
       die = false},
-    WRN = {
+    w = {
       normal = "[WRN]",
       color = ansicolors("%{bright yellow}[WRN]%{reset}"),
       level = 2,
       die = false},
-    ERR = {
+    e = {
       normal = "[ERR]",
       color = ansicolors("%{bright red}[ERR]%{reset}"),
       level = 1,
@@ -85,7 +90,9 @@ return function(loader)
     buildBuffer(msg, ...)
     local t = os.date("*t", os.time())
     local info = debug.getinfo(3)
+    msg = table.concat(msg)
 
+    data.tag = tag_name
     data.debug_info = info
     data.time = t
     data.msg = msg
@@ -111,12 +118,12 @@ return function(loader)
       table.insert(meta.color, table.concat(loginfoColor))
     end
 
-    local buffer = tag.normal.." "..table.concat(meta.normal)..table.concat(msg)
-    local buffer_color = tag.color.." "..table.concat(meta.color)..table.concat(msg)
+    local buffer = tag.normal.." "..table.concat(meta.normal)..msg
+    local buffer_color = tag.color.." "..table.concat(meta.color)..msg
 
     sendOutput(data)
     sendRawOutput(buffer, buffer_color)
-    if tag.die then error(table.concat(msg), 3) end
+    if tag.die then error(msg, 3) end
   end
 
   function log.addRawOutput(out, useAnsiColor)
@@ -127,26 +134,29 @@ return function(loader)
     table.insert(outputs.full, out)
   end
 
-  function log.i(...)       writeToLog("INF", ...) end
-  function log.fi(fmt, ...) writeToLog("INF", string.format(fmt, ...)) end
+  function log.p(...)       writeToLog("p", ...) end
+  function log.fp(fmt, ...) writeToLog("p", string.format(fmt, ...)) end
 
-  function log.d(...)       writeToLog("DBG", ...) end
-  function log.fd(fmt, ...) writeToLog("DBG", string.format(fmt, ...)) end
+  function log.i(...)       writeToLog("i", ...) end
+  function log.fi(fmt, ...) writeToLog("i", string.format(fmt, ...)) end
 
-  function log.w(...)       writeToLog("WRN", ...) end
-  function log.fw(fmt, ...) writeToLog("WRN", string.format(fmt, ...)) end
+  function log.d(...)       writeToLog("d", ...) end
+  function log.fd(fmt, ...) writeToLog("d", string.format(fmt, ...)) end
 
-  function log.e(...)       writeToLog("ERR", ...) end
-  function log.fe(fmt, ...) writeToLog("ERR", string.format(fmt, ...)) end
+  function log.w(...)       writeToLog("w", ...) end
+  function log.fw(fmt, ...) writeToLog("w", string.format(fmt, ...)) end
+
+  function log.e(...)       writeToLog("e", ...) end
+  function log.fe(fmt, ...) writeToLog("e", string.format(fmt, ...)) end
 
   function log.inspect(x) log.i(inspect(x)) end
 
   function log.check(value, ...)
-    if not value then writeToLog("ERR", 1, true, ...) end
+    if not value then writeToLog("e", 1, true, ...) end
   end
   
   function log.fcheck(value, fmt, ...)
-    if not value then writeToLog("ERR", 1, true, string.format(fmt, ...)) end
+    if not value then writeToLog("e", 1, true, string.format(fmt, ...)) end
   end
 
   return log

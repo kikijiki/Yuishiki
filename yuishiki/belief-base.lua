@@ -100,6 +100,11 @@ return function(loader)
   end
 
   function BeliefBase:dump()
+    if not next(self.lookup) then
+      log.i("--[[BELIEF BASE EMPTY]]--")
+      return
+    end
+
     local paths = {}
     local lengths = {}
     local longest = 0
@@ -114,12 +119,12 @@ return function(loader)
     table.sort(paths)
     
     log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
-    
+    log.i()
     for _,path in pairs(paths) do
       local skip = longest - lengths[path]
       log.fi("[%s] %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
     end
-    
+    log.i()
     log.i("--[[BELIEF BASE DUMP END]]--")
   end
 

@@ -151,16 +151,11 @@ function TableValue:update(key, new_element, old_element)
 end
 
 function TableValue:__tostring()
-  local out = {"{"}
+  local out = {}
   for k,v in pairs(self.value) do
-    table.insert(out, "[")
-    table.insert(out, tostring(k))
-    table.insert(out, "] = ")
-    table.insert(out, tostring(v))
-    table.insert(out, ", ")
+    table.insert(out, "  ["..tostring(k).."] = "..tostring(v))
   end
-  table.remove(out)
-  return table.concat(out)
+  return "{\n"..table.concat(out, ", \n").."\n}"
 end
 
 -- TODO
