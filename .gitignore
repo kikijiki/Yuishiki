@@ -19,7 +19,5 @@ $RECYCLE.BIN/
 #CUSTOM
 #############
 
-doc/
-
 CiderDebugger.lua
 GliderProperties.proj
