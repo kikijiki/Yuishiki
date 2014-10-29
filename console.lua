@@ -8,7 +8,7 @@ function console.new(rw, rh, x, y)
   c.buffer = {}
   c.buffer_length = 0
   c.font_size = 20
-  c.font = love.graphics.newFont(c.font_size)
+  c.font = love.graphics.newFont("assets/fonts/msmincho.ttc", c.font_size)
   c.current_line = 1
   c.padding = 5
   c.margin = 10
@@ -33,7 +33,7 @@ function console.resize(self, w, h)
   self.height = self.rh * h
 end
 
-function console.keypressed(self, key) 
+function console.keypressed(self, key)
 	if key == self.enable_key then self.visible = not self.visible end
 end
 
@@ -93,7 +93,7 @@ function console.mousepressed(self, x, y, button )
 end
 
 local function log(self, level, msg)
-  table.insert(self.buffer, {level, " - "..msg})
+  table.insert(self.buffer, {level, string.format("[%05d]> %s", (self.buffer_length + 1), msg)})
   self.buffer_length = self.buffer_length + 1
   if self.current_line > 1 then self.current_line = self.current_line + 1 end
 end
