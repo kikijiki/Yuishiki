@@ -138,6 +138,10 @@ function TableValue:get(k)
   end
 end
 
+function TableValue:isset(k)
+  return self.value[k] ~= nil
+end
+
 function TableValue:__pairs()
   return pairs(self.value)
 end

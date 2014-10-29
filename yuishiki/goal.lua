@@ -72,7 +72,7 @@ return function(loader)
     self.status = Goal.Status.Active
     self.on.activation()
   end
-  
+
   function Goal:__tostring()
     if self.describe then
       return "[G]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"

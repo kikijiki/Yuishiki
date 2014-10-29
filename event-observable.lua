@@ -3,32 +3,33 @@ local class = require "lib.middleclass"
 local EventObservable = class("EventObservable")
 
 function EventObservable:initialize()
-  self.events = {}
-  self.all = setmetatable({}, {__mode="k"})
+  self.events = {nodes = {}, leafs = setmetatable({}, {__mode="k"})}
 end
 
 function EventObservable:addObserver(observer, event, handler)
-  local target
-  if event == nil or event == "*" then
-    target = self.all
-  else
-    if not self.events[event] then
-      self.events[event] = setmetatable({}, {__mode="k"})
-    end
-    target = self.events[event]
+  local target = self.events
+
+  for _,v in pairs(event) do
+    if not target.nodes[v] then target.nodes[v] = {nodes = {}, leafs = setmetatable({}, {__mode="k"})} end
+    target = target.nodes[v]
   end
 
-  target[observer] = handler
+  target.leafs[observer] = handler
 end
 
 function EventObservable:notify(source, event, ...)
-  if self.events[event] then
-    for observer,handler in pairs(self.events[event]) do
-      if observer ~= source then handler(...) end
-    end
+  local target = self.events
+  -- catch all
+  for observer, handler in pairs(target.leafs) do
+    if observer ~= source then handler(source, event, ...) end
   end
-  for observer,handler in pairs(self.all) do
-    if observer ~= source then handler(...) end
+
+  -- match
+  for _,v in pairs(event) do
+    if target.nodes[v] then target = target.nodes[v] end
+    for observer, handler in pairs(target.leafs) do
+      if observer ~= source then handler(source, event, ...) end
+    end
   end
 end
 

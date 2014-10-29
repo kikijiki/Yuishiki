@@ -8,7 +8,7 @@ end
 function Sensor.static.load(path)
   local data = summon.AssetLoader.loadRaw(path)
   local s = Sensor()
-  if data.events then s.events = data.events end
+  if data.triggers then s.triggers = data.triggers end
   if data.update then s.update = data.update end
   return s
 end
@@ -21,8 +21,11 @@ function Sensor:link(character, agent)
 end
 
 function Sensor:register(env)
-  for event, handler in pairs(self.events) do
-    env:addObserver(self, event, function(...) handler(self, ...) end)
+  for _, trigger in pairs(self.triggers) do
+    env:addObserver(
+      self,
+      trigger.event,
+      function(...) trigger.body(self, ...) end)
   end
 end
 

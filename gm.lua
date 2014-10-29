@@ -80,7 +80,7 @@ function GM:updateInitiative(character)
   local init = self.initiative
   local result = self:applyRule("initiative", character)
   local index = 1
-  
+
   for i = 1, #init.list do
     local entry = init.list[i]
     if entry.value < result then
@@ -88,7 +88,7 @@ function GM:updateInitiative(character)
     end
     index = index + 1
   end
-  
+
   table.insert(init.list, index, {value = result, character = character})
   if init.current > 0 and index < init.current then
     init.current = init.current + 1
@@ -151,7 +151,7 @@ function GM:update(dt)
   if not char then return end
 
   if not char.commands:empty() then return end
-  
+
   for _ = 1, max_steps_per_update do
     local busy = char:updateAI(self.world)                                      --self:pause() if busy then return end
     if not char.commands:empty() then return end
@@ -209,8 +209,17 @@ function GM:tryToPayCost(c, cost, ...)
   end
 end
 
-function GM:executeAction(c, a, ...)
-  if not c or not c.actions[a] or not self.actions[a] then return false end
+function GM:executeAction(c, a, ...) assert(c and a)
+  if not c.actions:isset(a) then
+    log.fw("Character %s is trying to use the action [%s] which cannot use.",
+      c.id, a)
+    return false
+  end
+  if not self.actions[a] then
+    log.fw("Character %s is trying to use the action [%s] which not defined.",
+      c.id, a)
+    return false
+  end
   local action = self.actions[a]
   return action:execute(self, c, ...)
 end

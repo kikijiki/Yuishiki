@@ -22,12 +22,10 @@ function Character:initialize(gm, data)
   self.agent = ys.Agent()
   self.sensors = {}
 
-  self.status    = {}
-  self.equipment = {}
-  self.actions   = {}
-
-  self:addStat("position", "simple", vec(1, 1))
-  self:addStat("alive", "simple", true)
+  self:addValue({"simple", vec(1, 1)},    "status", "position")
+  self:addValue({"simple",      true},    "status",    "alive")
+  self:addValue({ "table"           },   "actions"            )
+  self:addValue({ "table"           }, "equipment"            )
 
   if data.ai then
     for _,v in pairs(data.ai.modules) do
@@ -126,24 +124,37 @@ function Character:bubble(message, color)
   self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
 end
 
-function Character:addStat(name, ...)
-  local stat = Value.fromData(...)
-  if not stat then return end
+function Character:addValue(data, ...) assert(data)
+  local value = Value.fromData(table.unpack(data))
+  if not value then return end
 
-  self.status[name] = stat
-  local belief = self.agent:importBelief(stat, "self.status", name)
-  stat:addObserver(belief, function(new, old, ...)
+  local base = self
+  local path = table.pack(...)
+  for i = 1, path.n - 1 do
+    local subpath = path[i]
+    if not base[subpath] then base[subpath] = {} end
+    base = base[subpath]
+  end
+
+  base[path[path.n]] = value
+
+  local belief = self.agent:importBelief(value, "self", ...)
+
+  value:addObserver(belief, function(new, old, ...)
     belief:notify(belief, new, old, ...)
   end)
-  stat:addObserver(self.gm.world, function(new, old, ...)
-    self.gm.world:propagateEvent(
-      self, "character status changed", self, name, new, old, ...)
+
+  table.insert(path, 1, "character")
+  path.n = path.n + 1
+  value:addObserver(self.gm.world, function(...)
+    self.gm.world:propagateEvent(self, path, ...)
   end)
-  return stat
+
+  return value
 end
 
 function Character:addAction(name)
-  self.actions[name] = true
+  self.actions:set(name, true)
   self.agent:addAction(name)
 end
 
@@ -176,9 +187,10 @@ end
 
 function Character:equip(item, slot)
   if not slot then return end
-  local old = self.equipment[slot]
-  self.equipment[slot] = item
+  local old = self.equipment:get(slot)
+
   item:onEquip(self)
+  self.equipment:set(slot, item)
 
   if item.mods then
     for mod, v in pairs(item.mods) do
@@ -188,15 +200,14 @@ function Character:equip(item, slot)
     end
   end
 
-  self.agent:importBelief(item, "self.equipment", slot)
   self.gm.world:propagateEvent(
       self, "character equipment changed", self, slot, item, old)
 end
 
 function Character:uneqip(slot)
   if not slot then return end
-  local item = self.equipment[slot]
-  self.equipment[slot] = nil
+  local item = self.equipment:get(slot)
+  self.equipment:set(slot, nil)
   item:onUnequip(self)
 
   if item.mods then
@@ -204,8 +215,6 @@ function Character:uneqip(slot)
       self.status[mod]:unsetMod(v[1])
     end
   end
-
-  self.agent:importBelief(nil, "self.equipment", slot)
 end
 
 function Character.log(...) print("CHAR", ...) end
