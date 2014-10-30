@@ -60,10 +60,9 @@ function console.draw(self)
     local width, lines = self.font:getWrap(data[2], lw)
     lines = math.max(1, lines)
     ly = ly - lines * (self.font_size + self.padding)
-    if ly < self.y then return end
-
     love.graphics.setColor(self.colors[data[1]])
     love.graphics.printf(data[2], lx, ly, lw, "left")
+    if ly < self.y then return end
     index = index + 1
   end
 
@@ -93,6 +92,8 @@ function console.mousepressed(self, x, y, button )
 end
 
 local function log(self, level, msg)
+  --local NBSP = "\194\160"
+  --msg = msg:gsub(" ", NBSP)
   table.insert(self.buffer, {level, string.format("[%05d]> %s", (self.buffer_length + 1), msg)})
   self.buffer_length = self.buffer_length + 1
   if self.current_line > 1 then self.current_line = self.current_line + 1 end

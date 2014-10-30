@@ -157,7 +157,7 @@ end
 function TableValue:__tostring()
   local out = {}
   for k,v in pairs(self.value) do
-    table.insert(out, "  ["..tostring(k).."] = "..tostring(v))
+    table.insert(out, " - "..tostring(k).." = "..tostring(v))
   end
   return "{\n"..table.concat(out, ", \n").."\n}"
 end

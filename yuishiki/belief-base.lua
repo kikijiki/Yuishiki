@@ -129,7 +129,7 @@ return function(loader)
     log.i()
     for _,path in pairs(paths) do
       local skip = longest - lengths[path]
-      log.fi("[%s] %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
+      log.fi("%s %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
     end
     log.i()
     log.i("--[[BELIEF BASE DUMP END]]--")
