@@ -24,9 +24,9 @@ function Weapon:getAttack(gm, c, target)
   end
 end
 
-function Weapon:getDamage(gm, c, target)
+function Weapon:getDamage(gm, c, target, dmg)
   if type(self.damage) == "function" then
-    return self:damage(gm, c, target)
+    return self:damage(gm, c, target, dmg)
   else
     return self.damage
   end

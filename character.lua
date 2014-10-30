@@ -171,18 +171,22 @@ function Character:move(map, path, callback)
   end
 end
 
-function Character:attack(map, target, damage, callback)
+function Character:attack(map, target, hit, damage, callback)
   self:appendCommand("lookAt", {map, target})
   target:appendCommand("lookAt", {map, self})
   self:appendCommand("animation", {"attack", {tag = {"hit",
-    function() target:hit(damage) end}
+    function()
+      if not hit then self:bubble("Miss") end
+      target:hit(hit, damage)
+    end}
   }}, callback)
 end
 
-function Character:hit(damage, callback)
-  if not damage then return end
-  self:bubble(damage, {255, 127, 0})
-  self:appendCommand("animation", {"hit"}, callback)
+function Character:hit(hit, damage, callback)
+  if damage then
+    self:bubble(damage, {255, 127, 0})
+    self:appendCommand("animation", {"hit"}, callback)
+  end
 end
 
 function Character:equip(item, slot)

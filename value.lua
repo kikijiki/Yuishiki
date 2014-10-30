@@ -42,15 +42,12 @@ local CompositeValue = class("CompositeValue", SimpleValue)
 Value.Composite = CompositeValue
 
 function CompositeValue:initialize(value)
+  SimpleValue.initialize(self)
+
   self.modifiers = {}
 
-  if type(value) == "table" then
-    SimpleValue.initialize(self)
-    self:setMods(value)
-  else
-    SimpleValue.initialize(self, value)
-    self.base = self.value
-  end
+  if type(value) == "table" then self:setMods(value)
+  else self:setMod("base", value) end
 end
 
 function CompositeValue:setMods(mods)
@@ -62,16 +59,18 @@ function CompositeValue:setMod(name, value)
   return self:update()
 end
 
-function CompositeValue:addMod(name, value)
+function CompositeValue:addMod(name, value, max)
   local mod = self.modifiers[name] or 0
   mod = mod + value
+  if max then mod = math.min(max, mod) end
   self.modifiers[name] = mod
   return self:update()
 end
 
-function CompositeValue:subMod(name, value)
+function CompositeValue:subMod(name, value, min)
   local mod = self.modifiers[name] or 0
   mod = mod - value
+  if min then mod = math.max(min, mod) end
   self.modifiers[name] = mod
   return self:update()
 end
@@ -82,7 +81,7 @@ function CompositeValue:unsetMod(name)
 end
 
 function CompositeValue:update()
-  local v = self.base
+  local v = 0
   for _,mod in pairs(self.modifiers) do
     v = v + mod
   end
@@ -90,18 +89,26 @@ function CompositeValue:update()
 end
 
 function CompositeValue:set(v)
-  self.base = v
+  self:setMod("base", v)
   return self:update()
 end
 
 function CompositeValue:add(v)
-  self.base = self.base + v
+  self:addMod("base", v)
   return self:update()
 end
 
 function CompositeValue:sub(v)
-  self.base = self.base - v
+  self:subMod("base", v)
   return self:update()
+end
+
+function CompositeValue:__pairs()
+  return pairs(self.modifiers)
+end
+
+function CompositeValue:__ipairs()
+  return ipairs(self.modifiers)
 end
 
 local TableValue = class("TableValue", SimpleValue)
