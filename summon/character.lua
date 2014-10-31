@@ -63,11 +63,11 @@ return function(loader)
     end
   end
 
-  function Character:setEnvironment(env, id)
-    self.environment = env
+  function Character:setWorld(world, id)
+    self.world = world
     self.id = id
     for _,sensor in pairs(self.sensors) do
-      sensor:register(env)
+      sensor:register(world)
     end
   end
 
@@ -88,36 +88,26 @@ return function(loader)
   end
 
   function Character:updateCommands(dt)
-    local cmd = self.commands
+    while not self.commands:empty() do
+      local cmd = self.commands:top()
 
-    while not cmd:empty() do
-      local c = self.commands:top()
-
-      if c.status == "inactive" then c:execute()
-      elseif c.status == "finished" then
-        c:onPop()
-        cmd:pop()
+      if coroutine.status(cmd) == "dead" then
+        self.commands:pop()
       else
-        dt = c:update(dt) or 0
-        if c.status == "executing" then return end
+        return coroutine.resume(cmd, dt, self)
       end
-    end
   end
 
   function Character:popCommand()
     return self.commands:pop()
   end
 
-  function Character:pushCommand(command, args, callback)
-    command = Command[command](table.unpack(args))
-    command:bind(self, callback)
-    self.commands:push(command)
+  function Character:pushCommand(f)
+    self.commands:push(coroutine.create(f))
   end
 
-  function Character:appendCommand(command, args, callback)
-    command = Command[command](table.unpack(args))
-    command:bind(self, callback)
-    self.commands:insert(command, 1)
+  function Character:appendCommand(f)
+    self.commands:insert(coroutine.create(f))
   end
 
   function Character:speak(message, duration)
@@ -172,14 +162,14 @@ return function(loader)
     self:bubble("DEAD", {255, 0, 0})
   end
 
-  function Character:move(map, path, callback)
+  function Character:move(path, callback)
     for _,v in pairs(path) do
-      self:appendCommand("step", {v, map}, callback)
+      -- TODO self:appendCommand("step", {v, map}, callback)
     end
   end
 
-  function Character:attack(map, target, hit, damage, callback)
-    self:appendCommand("lookAt", {map, target})
+  function Character:attack(target, hit, damage, callback)
+    -- TODO self:appendCommand("lookAt", {map, target})
     target:appendCommand("lookAt", {map, self})
     self:appendCommand("animation", {"attack", {tag = {"hit",
       function()
