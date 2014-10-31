@@ -44,7 +44,7 @@ return function(loader)
       local direction = char.world.map:getFacingDirection(
         char.status.position:get(),
         target.status.position:get())
-      self.sprite:setDirection(direction)
+        char.sprite:setDirection(direction)
     end
   end
 

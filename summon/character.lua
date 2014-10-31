@@ -5,6 +5,7 @@ return function(loader)
 
   local ys = require "yuishiki"()
   local vec = loader.require "vector"
+  local log = loader.load "log"
   local Value = loader.load "value"
   local Commands = loader.load "commands"
   local EventDispatcher = loader.load "event-dispatcher"
@@ -88,14 +89,18 @@ return function(loader)
   end
 
   function Character:updateCommands(dt)
-    while not self.commands:empty() or (not dt) or (dt <= 0) do                 print(self.id, "COMMANDS", #self.commands)
+    while not self.commands:empty() and type(dt) == "number" and dt > 0 do
       local cmd = self.commands:top()
 
-      if coroutine.status(cmd) == "dead" then                                   print(self.id, "COMMAND POPPED")
+      if coroutine.status(cmd) == "dead" then
         self.commands:pop()
       else
-        dt = coroutine.resume(cmd, dt, self)
-        if type(dt) ~= "number" then return end
+        local ok
+        ok, dt = coroutine.resume(cmd, dt, self)
+        if not ok then
+          log.d("Error in command:"..dt)
+          self.commands:pop()
+        end
       end
     end
   end
@@ -171,6 +176,8 @@ return function(loader)
   end
 
   function Character:attack(target, hit, damage)
+    self:appendCommand(Commands.lookAt(target))                                 print("CMD face target")
+    target:appendCommand(Commands.lookAt(self))                                 print("CMD face self")
     self:appendCommand(Commands.animation("attack", {
       tags = {
         ["hit"] = function()
@@ -178,8 +185,6 @@ return function(loader)
           target:hit(hit, damage)
         end
       }}))                                                                      print("CMD attack")
-    self:appendCommand(Commands.lookAt(target))                                 print("CMD face target")
-    target:appendCommand(Commands.lookAt(self))                                 print("CMD face self")
   end
 
   function Character:hit(hit, damage)
