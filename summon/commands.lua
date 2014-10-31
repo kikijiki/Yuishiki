@@ -93,16 +93,15 @@ return function(loader)
 
       if z then char.sprite.z = math.min(z, char.sprite.z) end
 
-      local d = dt * self.speed
-      progress = progress + d
-
-      if progress > distance then
-        char.sprite:setPosition(destination, z)
-        return (progress - distance) / speed
-      else
+      while progress < distance do
+        local d = dt * speed
+        progress = progress + d
         char.sprite:move(versor * d)
         dt = coroutine.yield()
       end
+
+      char.sprite:setPosition(destination, z)
+      return (progress - distance) / speed
     end
   end
 
@@ -170,7 +169,7 @@ return function(loader)
   end
 
   Commands.step = function(destination, duration, jumpFactor)
-    return function(dt, char)
+    return function(dt, char) print("STEP", destination)
       local map = char.world.map
 
       if type(destination) == "string" then
@@ -182,10 +181,10 @@ return function(loader)
       local to = map:getTilePixelCoordinates(destination)
 
       if from.heightM == to.heightM then
-        dt = char:pushCommand(command.walk(destination))
+        dt = char:pushCommand(Commands.walk(destination))
       else
         dt = char:pushCommand(
-          command.jump(destination,
+          Commands.jump(destination,
           duration or 0.5,
           jumpFactor or 0.8))
       end
