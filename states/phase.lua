@@ -1,9 +1,12 @@
-local Phase = summon.class("state.Phase")
+local class = require "lib.middleclass"
 
-local Stage = require "stage"
-local Gamestate = require "lib.hump.gamestate"
 local gui = require "lib.quickie"
-local vec = summon.vec
+local summon = require "summon"()
+local Gamestate = require "lib.hump.gamestate"
+local Stage = summon.Stage
+local vec = summon.Vector
+
+local Phase = class("state.Phase")
 
 local padding = 10
 local title_size = 80

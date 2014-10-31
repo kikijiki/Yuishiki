@@ -1,11 +1,10 @@
 return function(loader)
-  local class = loader.require "middleclass"
-  local log = loader.require "log"
+  local log = loader.load "log"
   local uti = loader.load "uti"
   local Event = loader.load "event"
   local Observable = loader.load "observable"
 
-  local Belief = class("BDI.Belief", Observable)
+  local Belief = loader.class("BDI.Belief", Observable)
 
   Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 

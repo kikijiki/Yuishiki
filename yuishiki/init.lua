@@ -19,6 +19,7 @@ return function (base_path)
   loader.require = function(lib)
     return require(base_path..lib)
   end
+  loader.class = loader.require "middleclass"
 
   ys = {}
 

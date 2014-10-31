@@ -9,14 +9,13 @@ local Plan
 return function(loader)
   if Plan then return Plan end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
   local Event = loader.load "event"
 
-  Plan = class("Plan")
+  Plan = loader.class("Plan")
   local plan_class_prefix = "plan_"
 
   Plan.static.Status = uti.makeEnum("New", "Active", "Waiting", "Succeeded", "Failed", "Error")
@@ -41,7 +40,7 @@ return function(loader)
   -- @usage this is used when including a module.
   -- @see Trigger
   function Plan.static.define(name, data)
-    local P = class(plan_class_prefix..name, Plan)
+    local P = loader.class(plan_class_prefix..name, Plan)
 
     P.static.default = data
     P.static.members = {
@@ -69,7 +68,7 @@ return function(loader)
   end
 
   function Plan.static.extend(name)
-    return class(plan_class_prefix..name, Plan)
+    return loader.class(plan_class_prefix..name, Plan)
   end
 
   function Plan:initialize(agent, parameters, goal) assert(agent)
@@ -186,7 +185,7 @@ return function(loader)
     coroutine.yield(...)
     self.on.resume()
   end
-  
+
   function Plan:__tostring()
     if self.describe then
       return "[P]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"

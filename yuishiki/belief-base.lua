@@ -3,7 +3,6 @@ local BeliefBase
 return function(loader)
   if BeliefBase then return BeliefBase end
 
-  local class = loader.require "middleclass"
   local log = loader.load "log"
   local Event = loader.load "event"
   local Belief = loader.load "belief"
@@ -13,7 +12,7 @@ return function(loader)
   local PATH_TRAVERSER_PATTERN = '([^'..PATH_SEPARATOR..']+)'
   local PATH_SPLITTER_PATTERN = '%'..PATH_SEPARATOR..'([^%'..PATH_SEPARATOR..']*)$'
 
-  BeliefBase = class("BeliefBase", Observable)
+  BeliefBase = loader.class("BeliefBase", Observable)
 
   function BeliefBase:initialize()
     Observable.initialize(self)

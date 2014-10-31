@@ -3,12 +3,11 @@ local Event
 return function(loader)
   if Event then return Event end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
 
   --[[ Base ]]--
 
-  Event = class("Event")
+  Event = loader.class("Event")
   Event.static.Type = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
 
   function Event:initialize(event_type, name, parameters) assert(event_type)
@@ -19,7 +18,7 @@ return function(loader)
 
   --[[ Goal ]]--
 
-  local GoalEvent = class("GoalEvent", Event)
+  local GoalEvent = loader.class("GoalEvent", Event)
   Event.Goal = GoalEvent
 
   function GoalEvent:initialize(goal) assert(goal)
@@ -31,7 +30,7 @@ return function(loader)
 
   --[[ Message ]]--
 
-  local MessageEvent = class("MessageEvent", Event)
+  local MessageEvent = loader.class("MessageEvent", Event)
   Event.Message = MessageEvent
 
   function MessageEvent:initialize(message) assert(message)
@@ -43,7 +42,7 @@ return function(loader)
 
   --[[ Belief ]]--
 
-  local BeliefEvent = class("BeliefEvent", Event)
+  local BeliefEvent = loader.class("BeliefEvent", Event)
   Event.Belief = BeliefEvent
 
   function BeliefEvent:initialize(belief, status, new, old, ...) assert(belief)
@@ -61,7 +60,7 @@ return function(loader)
 
   --[[ System ]]--
 
-  local SystemEvent = class("SystemEvent", Event)
+  local SystemEvent = loader.class("SystemEvent", Event)
   Event.System = SystemEvent
 
   function SystemEvent:initialize(name, ...) assert(name)

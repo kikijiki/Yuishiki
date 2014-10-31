@@ -1,5 +1,6 @@
-local Scenario = require "states.scenario"
 local gui = require "lib.quickie"
+local summon = require "summon"()
+local Scenario = require "states.scenario"
 local Gamestate = require "lib.hump.gamestate"
 
 local state = {}

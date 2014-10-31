@@ -3,7 +3,6 @@ local BDIModel
 return function(loader)
   if BDIModel then return BDIModel end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
   local Observable = loader.load "observable"
@@ -14,7 +13,7 @@ return function(loader)
   local PlanBase = loader.load "plan-base"
   local IntentionBase = loader.load "intention-base"
 
-  BDIModel = class("BDIModel", Observable)
+  BDIModel = loader.class("BDIModel", Observable)
 
   function BDIModel:initialize(agent)
     Observable.initialize(self)
@@ -94,7 +93,7 @@ return function(loader)
     end
 
     local plan_schema
-    
+
     -- TODO: check retry flag and plan history
     if metaplans then plan_schema = self:selectPlan(goal, metaplans) end
     if not plan_schema then plan_schema = self:selectPlan(goal, plans) end

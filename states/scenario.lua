@@ -1,15 +1,16 @@
-local Scenario = summon.class("Scenario")
-
-local summon = require "summon"
+local class = require "lib.middleclass"
+local summon = require "summon"()
 local Gamestate = require "lib.hump.gamestate"
-local Character = require "character"
-local Stage = require "stage"
+local Character = summon.Character
+local Stage = summon.Stage
 local Phase = require "states.phase"
 local Message = require "states.message"
 local gui = require "lib.quickie"
 
-local vec = summon.vec
+local vec = summon.Vector
 local sg = summon.graphics
+
+local Scenario = class("Scenario")
 
 local font = {
   normal = summon.AssetLoader.load("font", "ipamp.ttf@60"),

@@ -3,12 +3,11 @@ local Goal
 return function(loader)
   if Goal then return Goal end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
 
-  Goal = class("Goal")
+  Goal = loader.class("Goal")
 
   local goal_class_prefix = "goal_"
 
@@ -16,7 +15,7 @@ return function(loader)
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
-    local G = class(goal_class_prefix..name, Goal)
+    local G = loader.class(goal_class_prefix..name, Goal)
 
     G.static.default = data
     G.static.members = {"name", "creation", "conditions", "limit", "on", "retry", "priority", "describe"}
@@ -39,7 +38,7 @@ return function(loader)
   end
 
   function Goal.static.extend(name)
-    return class(goal_class_prefix..name, Goal)
+    return loader.class(goal_class_prefix..name, Goal)
   end
 
   function Goal:initialize(parameters)

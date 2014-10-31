@@ -2,7 +2,6 @@ local PriorityQueue
 
 return function(loader)
   if PriorityQueue then return PriorityQueue end
-  
   PriorityQueue = loader.class("PriorityQueue")
 
   function PriorityQueue:initialize(compare, content)
@@ -13,15 +12,13 @@ return function(loader)
     if content then
       for _,v in pairs(content) do self:push(v) end
     end
+
+    return pq;
   end
 
   function PriorityQueue:push(element)
-    assert(self, [[Use ":" not "."!]])
-
     local data, cmp = self.data, self.cmp
-
     table.insert(data, element)
-
     if #data == 1 then
       self.size = self.size + 1
       return
@@ -41,18 +38,13 @@ return function(loader)
   end
 
   function PriorityQueue:pop()
-    assert(self, [[Use ":" not "."!]])
-
     if(self.size > 0) then
       self.size = self.size - 1
     end
-
     return table.remove(self.data)
   end
 
   function PriorityQueue:isEmpty()
-    assert(self, [[Use ":" not "."!]])
-
     return self.size == 0
   end
 

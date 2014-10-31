@@ -2,9 +2,8 @@ local log
 
 return function(loader)
   if log then return log end
-  
+
   local ansicolors = loader.require "ansicolors".noReset
-  local inspect = loader.require "inspect"
 
   log = {
     Verbosity = {verbose = 3, normal = 2, minimal = 1, none = 0},
@@ -149,12 +148,10 @@ return function(loader)
   function log.e(...)       writeToLog("e", ...) end
   function log.fe(fmt, ...) writeToLog("e", string.format(fmt, ...)) end
 
-  function log.inspect(x) log.i(inspect(x)) end
-
   function log.check(value, ...)
     if not value then writeToLog("e", 1, true, ...) end
   end
-  
+
   function log.fcheck(value, fmt, ...)
     if not value then writeToLog("e", 1, true, string.format(fmt, ...)) end
   end

@@ -9,11 +9,10 @@ local Trigger
 return function(loader)
   if Trigger then return Trigger end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local Event = loader.load "event"
 
-  Trigger = class("Trigger")
+  Trigger = loader.class("Trigger")
 
   --[[ Trigger ]]--
 
@@ -34,7 +33,7 @@ return function(loader)
 
   --[[ Parametrized Trigger ]]--
 
-  local ParametrizedTrigger = class("ParametrizedTrigger", Trigger)
+  local ParametrizedTrigger = loader.class("ParametrizedTrigger", Trigger)
   Trigger.Parametrized = ParametrizedTrigger
 
   function ParametrizedTrigger:initialize(event_type, event_name, parameters)
@@ -61,7 +60,7 @@ return function(loader)
 
   --[[ Goal Trigger ]]--
 
-  local GoalTrigger = class("GoalTrigger", ParametrizedTrigger)
+  local GoalTrigger = loader.class("GoalTrigger", ParametrizedTrigger)
   Trigger.Goal = GoalTrigger
 
   function GoalTrigger:initialize(goal_name, goal_parameters)
@@ -70,7 +69,7 @@ return function(loader)
 
   --[[ Custom Trigger ]]--
 
-  local CustomTrigger = class("CustomTrigger", Trigger)
+  local CustomTrigger = loader.class("CustomTrigger", Trigger)
   Trigger.Custom = CustomTrigger
 
   function CustomTrigger:initialize(event_type, event_name, f, parameters)
@@ -88,7 +87,7 @@ return function(loader)
 
   --[[ Belief Trigger ]]--
 
-  local BeliefTrigger = class("BeliefTrigger", Trigger)
+  local BeliefTrigger = loader.class("BeliefTrigger", Trigger)
   Trigger.Belief = BeliefTrigger
 
   BeliefTrigger.static.conditions = {

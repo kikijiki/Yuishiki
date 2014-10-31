@@ -3,14 +3,13 @@ local Intention
 return function(loader)
   if Intention then return Intention end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
   local Goal = loader.load "goal"
   local Plan = loader.load "plan"
   local Stack = loader.load "stack"
 
-  local Intention = class("Intention")
+  local Intention = loader.class("Intention")
 
   local generateId = uti.makeIdGenerator("intention")
 
@@ -210,7 +209,7 @@ return function(loader)
     end
     return count
   end
-  
+
   function Intention:__tostring()
     return "[I] "..self.id.."("..self.stack.size..")"
   end

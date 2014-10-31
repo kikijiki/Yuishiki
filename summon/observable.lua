@@ -2,7 +2,6 @@ local Observable
 
 return function(loader)
   if Observable then return Observable end
-
   Observable = loader.class("Observable")
 
   function Observable:initialize()

@@ -1,11 +1,8 @@
---require "CiderDebugger";
+local ys = require "yuishiki"()
+local summon = require "summon"()
 
 local gamestate = require "lib.hump.gamestate"
-local timer = require "lib.hump.timer"
-local console = require "console".new()
-
-local ys = require "yuishiki"()
-require "summon"
+local console = summon.Console()
 
 -- Setup logging and console
 ys.log.showTime = false
@@ -13,15 +10,9 @@ ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
 ys.log.addOutput(function(data) console[data.tag](console, data.msg) end)
 
-summon.log = ys.log
-
 -- Setup assets
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
-
-summon.AssetLoader.register("character", "characters", summon.AssetLoader.loadRaw, false)
-summon.AssetLoader.register("ai_module", "ai/modules", summon.AssetLoader.loadRaw, false)
-summon.AssetLoader.register("sensor", "ai/sensors", require"sensor".load, false)
 
 function love.load()
   gamestate.registerEvents({'keyreleased', 'mousereleased', 'quit', 'resize', 'update' })
@@ -33,11 +24,10 @@ function love.load()
 
   table.sort(scenarios, function(a, b) return a.name < b.name end)
   gamestate.switch(require "states.menu", scenarios)
-  console:resize(love.graphics.getDimensions())
+  console:resize(summon.graphics.getDimensions())
 end
 
 function love.update(dt)
-  timer.update(dt)
 end
 
 function love.resize(w, h)

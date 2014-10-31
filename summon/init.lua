@@ -1,75 +1,81 @@
 --[[SUMMON ENGINE - 鎖門円陣]]--
 
-local path = ... .. "."
+local module_path = ...
 
-summon = {}
+local summon
 
---[[Core and common]]--
---[[]] summon.common = {}
+if not table.unpack then table.unpack = unpack end
 
---[[]] summon.common.Vector        = require (path.."common.vector")
---[[]] summon.common.log           = require (path.."common.log")
---[[]] summon.common.class         = require (path.."lib.middleclass")
---[[]] summon.common.astar         = require (path.."lib.a-star")
+return function (base_path)
+  if summon then return summon end
 
---[[Shortcuts]]
---[[]] summon.vec   = summon.common.Vector
---[[]] summon.log   = summon.common.log
---[[]] summon.class = summon.common.class
+  if not base_path then base_path = module_path end
+  base_path = base_path .. "."
 
---[[]] summon.common.inspect       = require (path.."lib.inspect")
---[[]] summon.common.sandbox       = require (path.."lib.sandbox")
---[[]] summon.common.uti           = require (path.."common.uti")
---[[]] summon.common.Stack         = require (path.."common.stack")
---[[]] summon.common.PriorityQueue = require (path.."common.priority-queue")
---[[]] summon.uti = summon.common.uti
+  local loader = {}
+  loader.load = function(lib, ...)
+    return require(base_path..lib)(loader, ...)
+  end
+  loader.require = function(lib)
+    return require(base_path..lib)
+  end
+  loader.class = loader.require "middleclass"
 
---[[]] summon.common.AssetLoader   = require (path.."common.asset-loader")
---[[]] summon.AssetLoader = summon.common.AssetLoader
+  summon = {}
 
---[[Graphics]]--
---[[]] summon.graphics = love.graphics
---[[]]
---[[]] summon.graphics.Camera  = require (path.."graphics.camera")
---[[]] summon.graphics.Texture = require (path.."graphics.texture")
---[[]] summon.graphics.Font    = require (path.."graphics.font")
+  summon.astar           = loader.load "a-star"
+  summon.sandbox         = loader.require "sandbox"
 
---[[Filesystem]]--
---[[]] summon.fs = love.filesystem
+  summon.log             = loader.load "log"
+  summon.uti             = loader.load "uti"
+  summon.Vector          = loader.require "vector"
+  summon.Stack           = loader.load "stack"
+  summon.PriorityQueue   = loader.load "priority-queue"
+  summon.observable      = loader.load "observable"
+  summon.EventDispatcher = loader.load "event-dispatcher"
+  summon.EventObservable = loader.load "event-observable"
 
---[[Sprite]]--
---[[]] summon.graphics.sprite = {}
---[[]] summon.graphics.sprite.Animation   = require (path.."graphics.animation")
---[[]] summon.graphics.sprite.SpriteSheet = require (path.."graphics.spritesheet")
---[[]] summon.graphics.sprite.SpriteBatch = require (path.."graphics.spritebatch")
---[[]]
---[[]] summon.graphics.Sprite             = require (path.."graphics.sprite")
---[[]] summon.graphics.SpriteBatch        = summon.graphics.sprite.SpriteBatch
---[[]] summon.graphics.MessageRenderer    = require (path.."graphics.message-renderer")
+  summon.fs          = loader.require "filesystem"
+  summon.AssetLoader = loader.load "asset-loader"
 
---[[Map]]--
---[[]] summon.graphics.Map = require (path.."graphics.map")
+  summon.graphics        = loader.require "graphics"
+  summon.Console         = loader.load "console"
+  summon.Camera          = loader.load "camera"
+  summon.Texture         = loader.load "texture"
+  summon.Font            = loader.load "font"
+  summon.Animation       = loader.load "animation"
+  summon.SpriteSheet     = loader.load "spritesheet"
+  summon.SpriteBatch     = loader.load "spritebatch"
+  summon.Sprite          = loader.load "sprite"
+  summon.MessageRenderer = loader.load "message-renderer"
+  summon.Map             = loader.load "map"
 
---[[Game]]--
---[[]] summon.game = {}
---[[]] summon.game.Ruleset        = require (path.."game.ruleset")
---[[]] summon.game.Entity         = require (path.."game.entity")
---[[]] summon.game.Unit           = require (path.."game.unit")
---[[]] summon.game.World          = require (path.."game.world")
---[[]] summon.game.WorldInterface = require (path.."game.world-interface")
---[[]] summon.game.Parameter      = require (path.."game.parameter")
---[[]] summon.game.RuleHandler    = require (path.."game.rule-handler")
---[[]] summon.game.Command        = require (path.."game.command")
---[[]]
---[[]] summon.Game = require (path.."game.game")
+  summon.Command   = loader.load "command"
+  summon.Action    = loader.load "action"
+  summon.Armor     = loader.load "armor"
+  summon.Character = loader.load "character"
+  summon.GM        = loader.load "gm"
+  summon.Item      = loader.load "item"
+  summon.Sensor    = loader.load "sensor"
+  summon.Stage     = loader.load "stage"
+  summon.Value     = loader.load "value"
+  summon.Weapon    = loader.load "weapon"
+  summon.World     = loader.load "world"
 
---[[Supported assets]]--
---[[]] summon.AssetLoader.register("texture",     "textures", summon.graphics.Texture.load,            true)
---[[]] summon.AssetLoader.register("spritesheet", "textures", summon.graphics.sprite.SpriteSheet.load, true)
---[[]] summon.AssetLoader.register("sprite",      "sprites",  summon.graphics.Sprite.load,             false)
---[[]] summon.AssetLoader.register("font",        "fonts",    summon.graphics.Font.load,               true)
---[[]] summon.AssetLoader.register("map",         "maps",     summon.graphics.Map.load,                false)
---[[]] summon.AssetLoader.register("ruleset",     "rulesets", summon.game.Ruleset.load,                false)
---[[]] summon.AssetLoader.register("unit",        "units",    summon.game.Unit.load,                   false)
+  summon.AssetLoader.register("texture",     "textures",   summon.Texture.load,         true)
+  summon.AssetLoader.register("spritesheet", "textures",   summon.SpriteSheet.load,     true)
+  summon.AssetLoader.register("sprite",      "sprites",    summon.Sprite.load,         false)
+  summon.AssetLoader.register("font",        "fonts",      summon.Font.load,            true)
+  summon.AssetLoader.register("map",         "maps",       summon.Map.load,            false)
+  summon.AssetLoader.register("character",   "characters", summon.AssetLoader.loadRaw, false)
+  summon.AssetLoader.register("ruleset",     "rulesets"                                     )
+  summon.AssetLoader.register("ai_module",   "ai/modules", summon.AssetLoader.loadRaw, false)
+  summon.AssetLoader.register("sensor",      "ai/sensors", summon.Sensor.load,         false)
 
-return summon
+  summon._VERSION = "0.0.1"
+  summon._DESCRIPTION = "Support game engine."
+  summon._AUTHOR = "Matteo Bernacchia <kikijikispaccaspecchi@gmail.com>"
+  summon._COPYRIGHT = "Copyright (c) 2013-2014 Matteo Bernacchia"
+
+  return summon
+end

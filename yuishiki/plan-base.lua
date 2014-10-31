@@ -3,13 +3,12 @@ local PlanBase
 return function(loader)
   if PlanBase then return PlanBase end
 
-  local class = loader.require "middleclass"
   local Plan = loader.load "plan"
   local Trigger = loader.load "trigger"
   local Observable = loader.load "observable"
   local Event = loader.load "event"
 
-  PlanBase = class("PlanBase", Observable)
+  PlanBase = loader.class("PlanBase", Observable)
 
   function PlanBase:initialize(agent) assert(agent)
     Observable.initialize(self)

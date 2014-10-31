@@ -3,7 +3,6 @@ local Agent
 return function(loader)
   if Agent then return Agent end
 
-  local class = loader.require "middleclass"
   local uti = loader.load "uti"
   local log = loader.load "log"
   local Event = loader.load "event"
@@ -13,7 +12,7 @@ return function(loader)
   local Belief = loader.load "belief"
   local Actuator = loader.load "actuator"
 
-  Agent = class("Agent")
+  Agent = loader.class("Agent")
 
   local generateId = uti.makeIdGenerator("agent")
 

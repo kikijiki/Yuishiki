@@ -2,10 +2,8 @@ local Actuator
 
 return function(loader)
   if Actuator then return Actuator end
-  
-  local class = loader.require "middleclass"
 
-  Actuator = class("Actuator")
+  Actuator = loader.class("Actuator")
 
   function Actuator:initialize()
     self.actions = {}

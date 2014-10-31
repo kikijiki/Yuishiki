@@ -3,7 +3,6 @@ local GoalBase
 return function(loader)
   if GoalBase then return GoalBase end
 
-  local class = loader.require "middleclass"
   local log = loader.load "log"
   local Goal = loader.load "goal"
   local Plan = loader.load "plan"
@@ -11,7 +10,7 @@ return function(loader)
   local Trigger = loader.load "trigger"
   local Observable = loader.load "observable"
 
-  GoalBase = class("GoalBase", Observable)
+  GoalBase = loader.class("GoalBase", Observable)
 
   function GoalBase:initialize(agent) assert(agent)
     Observable.initialize(self)

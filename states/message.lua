@@ -1,8 +1,10 @@
-local Message = summon.class("state.Message")
-
+local class = require "lib.middleclass"
+local summon = require "summon"()
 local Gamestate = require "lib.hump.gamestate"
-
 local sg = summon.graphics
+
+local Message = class("state.Message")
+
 local fadeout = 0.2
 
 local margin = 100

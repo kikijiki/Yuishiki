@@ -2,7 +2,6 @@ local Stack
 
 return function(loader)
   if Stack then return Stack end
-  
   Stack = loader.class("Stack")
 
   function Stack:initialize()
@@ -17,18 +16,9 @@ return function(loader)
   end
 
   function Stack:pop()
-    if self.size > 0 then
-      self.size = self.size - 1
-      return table.remove(self.elements)
-    end
-  end
-
-  function Stack:popn(n)
-    local ret = {}
-    for i = 1, n do
-      table.insert(self:pop())
-    end
-    return ret
+    if self.size == 0 then return nil end
+    self.size = self.size - 1
+    return table.remove(self.elements)
   end
 
   function Stack:top()
@@ -42,18 +32,6 @@ return function(loader)
 
   function Stack:empty()
     return self.size == 0
-  end
-
-  function Stack:iterator(start)
-    local index = start or 1
-    return function()
-      if index <= self.size then
-        local k = index
-        local v = self.elements[index]
-        index = index + 1
-        return k, v
-      end
-    end
   end
 
   return Stack
