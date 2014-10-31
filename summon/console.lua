@@ -94,7 +94,7 @@ return function(loader)
   	return consumed
   end
 
-  local function log(self, level, msg) print(self, self.buffer_length)
+  local function log(self, level, msg)
     --local NBSP = "\194\160"
     --msg = msg:gsub(" ", NBSP)
     table.insert(self.buffer, {level, string.format("[%05d]> %s", (self.buffer_length + 1), msg)})

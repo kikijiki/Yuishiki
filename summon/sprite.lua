@@ -50,14 +50,14 @@ return function(loader)
     if not self.animations[name] then return false end
 
     local a = self.current.animation
-    if a.name == name and a.loop <= 0 then
+    if a.name == name and a.loops < 0 then
       if reset then a:reset() end
-      return true
+      return a
     end
 
     self.current.animation = self.animations[name]
     if not reset == false then self.current.animation:reset() end
-    return true
+    return self.current.animation
   end
 
   function Sprite:setDirection(dir)

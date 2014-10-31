@@ -88,14 +88,16 @@ return function(loader)
   end
 
   function Character:updateCommands(dt)
-    while not self.commands:empty() or not dt or dt <= 0 do
+    while not self.commands:empty() or (not dt) or (dt <= 0) do                 print(self.id, "COMMANDS", #self.commands)
       local cmd = self.commands:top()
 
-      if coroutine.status(cmd) == "dead" then
+      if coroutine.status(cmd) == "dead" then                                   print(self.id, "COMMAND POPPED")
         self.commands:pop()
       else
         dt = coroutine.resume(cmd, dt, self)
+        if type(dt) ~= "number" then return end
       end
+    end
   end
 
   function Character:popCommand()
@@ -157,32 +159,33 @@ return function(loader)
 
   function Character:kill(callback)
     self.status["alive"]:set(false)
-    self:appendCommand(Commands.animation("dead", {idle = false}))
-    self:appendCommand(Commands.fade())
+    self:appendCommand(Commands.animation("dead", {idle = false}))              print("CMD dead animation")
+    self:appendCommand(Commands.fade())                                         print("CMD fade")
     self:bubble("DEAD", {255, 0, 0})
   end
 
   function Character:move(path)
-    for _,v in pairs(path) do self:appendCommand(Commands.step(v)) end
+    for _,v in pairs(path) do
+      self:appendCommand(Commands.step(v))                                      print("CMD move")
+    end
   end
 
   function Character:attack(target, hit, damage)
-    self:appendCommand(Commands.lookAt(target))
-    target:appendCommand(Commands.lookAt(self))
     self:appendCommand(Commands.animation("attack", {
-      tag = {
-        hit = function()
+      tags = {
+        ["hit"] = function()
           if not hit then self:bubble("Miss") end
           target:hit(hit, damage)
         end
-      }
-    }))
+      }}))                                                                      print("CMD attack")
+    self:appendCommand(Commands.lookAt(target))                                 print("CMD face target")
+    target:appendCommand(Commands.lookAt(self))                                 print("CMD face self")
   end
 
   function Character:hit(hit, damage)
     if damage then
       self:bubble(damage, {255, 127, 0})
-      self:appendCommand(Commands.animation("hit"))
+      self:appendCommand(Commands.animation("hit"))                             print("CMD hit")
     end
   end
 

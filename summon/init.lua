@@ -50,7 +50,7 @@ return function (base_path)
   summon.MessageRenderer = loader.load "message-renderer"
   summon.Map             = loader.load "map"
 
-  summon.Command   = loader.load "command"
+  summon.Commands   = loader.load "commands"
   summon.Action    = loader.load "action"
   summon.Armor     = loader.load "armor"
   summon.Character = loader.load "character"

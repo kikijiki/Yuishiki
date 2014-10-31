@@ -14,6 +14,8 @@ return function(loader)
 
     self.agent = agent
     self.intentions = {}
+
+    self.verbose = false
   end
 
   function IntentionBase:add(intention)
@@ -46,7 +48,8 @@ return function(loader)
     self.intentions[intention.id] = nil
   end
 
-  function IntentionBase:execute(intention) self:dump()
+  function IntentionBase:execute(intention)
+    if self.verbose then self:dump() end
     intention:step()
     if intention:empty() then self.intentions[intention.id] = nil end
   end

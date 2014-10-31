@@ -26,12 +26,16 @@ return function(loader)
   end
 
   function Stack:insert(e, index)
-    table.insert(self.elements, index, e)
+    table.insert(self.elements, index or 1, e)
     self.size = self.size + 1
   end
 
   function Stack:empty()
     return self.size == 0
+  end
+
+  function Stack:__len()
+    return self.size
   end
 
   return Stack

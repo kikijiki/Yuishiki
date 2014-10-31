@@ -16,6 +16,7 @@ return function(loader)
   function Intention:initialize()
     self.stack = Stack()
     self.id = generateId()
+    self.verbose = false
   end
 
   function Intention.getYsType()
@@ -30,6 +31,10 @@ return function(loader)
     return self.stack:empty()
   end
 
+  function Intention:log(...)
+    if self.verbose then log.d(...) end
+  end
+
   function Intention:step()
     self:checkConditions()
 
@@ -40,7 +45,8 @@ return function(loader)
     if top.getYsType() == "plan" then self:stepPlan(top) end
   end
 
-  function Intention:stepPlan(plan)                                             log.d("Stepping in plan", plan)
+  function Intention:stepPlan(plan)
+    if self.verbose then log.d("Stepping in plan", plan) end
     if plan.status == Plan.Status.Succeeded then
       self:pop()
       local goal = self:top()
@@ -57,24 +63,28 @@ return function(loader)
     end
   end
 
-  function Intention:stepGoal(goal)                                             log.d("Stepping in goal", goal)
+  function Intention:stepGoal(goal)
+    self:log("Stepping in goal", goal)
     if goal.status == Goal.Status.Active then
       local plan = self.agent.bdi:processGoal(goal)
       if plan then
-        self:push(plan)                                                         log.d("Pushing new plan <"..plan.name..">")
+        self:log("Pushing new plan <"..plan.name..">")
+        self:push(plan)
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
         goal.past.last = plan
       else
-        goal:fail(Goal.FailReason.NoPlansAvailable)                             log.d("Could not find any plan")
+        self:log("Could not find any plan")
+        goal:fail(Goal.FailReason.NoPlansAvailable)
       end
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self:pop()                                                                log.d("Popping goal", goal)
-
+      self:log("Popping goal", goal)
+      self:pop()
     elseif goal.status == Goal.Status.Failed then
-      self:pop()                                                                log.d("Popping goal", goal)
+      self:log("Popping goal", goal)
+      self:pop()
       local plan = self:top()
       if plan then plan:fail(Plan.FailReason.SubgoalFailed) end
     end
@@ -92,21 +102,27 @@ return function(loader)
 
   function Intention:checkPlanConditions(index, plan)
     -- context condition
-    if not plan.conditions.default(true).context() then                         log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
+    if not plan.conditions.default(true).context() then
+      self:log("context condition",
+        plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if plan.conditions.default(false).failure() then                            log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
+    if plan.conditions.default(false).failure() then
+      self:log("context condition",
+        plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if plan.conditions.default(false).success() then                            log.d("context condition", plan.name, "popping "..(self.stack.size - index).." elements")
+    if plan.conditions.default(false).success() then
+      self:log("context condition",
+        plan.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       plan:succeed()
       return true
@@ -117,21 +133,27 @@ return function(loader)
 
   function Intention:checkGoalConditions(index, goal)
     -- context condition
-    if not goal.conditions.default(true).context() then                         log.d("context condition", goal.name, "popping "..(self.stack.size - index).." elements")
+    if not goal.conditions.default(true).context() then
+      self:log("context condition",
+        goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
-    if goal.conditions.default(false).failure() then                            log.d("drop condition", goal.name, "popping "..(self.stack.size - index).." elements")
+    if goal.conditions.default(false).failure() then
+      self:log("drop condition",
+        goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
-    if goal.conditions.default(false).success() then                            log.d("success condition", goal.name, "popping "..(self.stack.size - index).." elements")
+    if goal.conditions.default(false).success() then
+      self:log("success condition",
+      goal.name, "popping "..(self.stack.size - index).." elements")
       self:popn(self.stack.size - index)
       goal:succeed()
       return true

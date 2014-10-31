@@ -119,42 +119,39 @@ return function(loader)
     elapsed = elapsed + dt
     local nextframe = frames[index].dt
 
-    if nextframe > 0 then
-      while elapsed > nextframe do
-        elapsed = elapsed - nextframe
-        index = index + 1
-        if index > length then
-          if self.loop > 0 then
-            if self.loops < self.loop then
-              index = 1
-              self.loops = self.loops + 1
-              if self.loops == self.loop then
-                index = length
-                self.paused = true
-              end
-            end
-          else
+    while elapsed > nextframe do
+      elapsed = elapsed - nextframe
+      index = index + 1
+      if index > length then
+        if self.loops > 0 then
+          if self.loop_count < self.loops then
             index = 1
+            self.loop_count = self.loop_count + 1
           end
-        end
-        if self.tags and self.callback then
-          for tag, callback in pairs(self.callbacks) do
-            local cindex = self.tags[tag]
-            if cindex and cindex == index then
-              callback()
-            end
+          if self.loop_count >= self.loops then
+            index = length
+            self.paused = true
           end
-        end
-        if index and index <= #frames then
-          nextframe = frames[index].dt
+        else
+          self.loop_count = self.loop_count + 1
+          index = 1
         end
       end
+
+      if self.tags and self.callbacks then
+        for tag, callback in pairs(self.callbacks) do
+          local cindex = self.tags[tag]
+          if cindex and cindex == index then
+            callback()
+          end
+        end
+      end
+
+      nextframe = frames[index].dt
     end
 
     self.index = index
     self.elapsed = elapsed
-
-    if index > length then index = length end
 
     if direction then return frames[index][direction]
     else return frames[index] end
@@ -183,6 +180,7 @@ return function(loader)
   function Animation:initialize(directions)
     self.directions = directions or false
     self.frames = {}
+    self.callbacks = {}
   end
 
   function Animation.static.parse(name, data, ss, stateless)
@@ -191,8 +189,8 @@ return function(loader)
     a.name = name
     a.height = data.height
     a.mirror = data.mirror
-    a.loop = data.loop or -1
-    a.loops = 0
+    a.loops = data.loops or -1
+    a.loop_count = 0
     a.paused = false
     a.tags = data.tags
 
@@ -229,7 +227,7 @@ return function(loader)
   function Animation:reset()
     self.index = 1
     self.elapsed = 0
-    self.loops = 0
+    self.loop_count = 0
     self.paused = false
   end
 

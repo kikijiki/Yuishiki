@@ -23,11 +23,10 @@ return function(loader)
 
   Commands.wait = function(delay, f)
     return function(dt, char)
-      local elapsed = 0
-      repeat
-        elapsed = elapsed + dt
-        dt = coroutine.yield()
-      until elapsed <= delay
+      local elapsed = dt
+      while elapsed < delay do
+        elapsed = elapsed + coroutine.yield()
+      end
       if f then f() end
       return elapsed - delay
     end
@@ -51,24 +50,28 @@ return function(loader)
 
   Commands.animation = function(animation, param)
     return function(dt, char)
-      if not char.sprite:setAnimation(animation, param.reset) then
-        return dt
-      end
+      local ani = char.sprite:setAnimation(animation, reset)
 
-      if param.tags then
+      local reset = not param or param.reset ~= false
+      local skip = (param and param.skip) or ani.loops < 0
+      local idle = not (param and param.idle == false)
+
+      if not ani then return dt end
+
+      if param and param.tags then
         for tag, callback in pairs(param.tags) do
           char.sprite:callOnTag(tag, callback)
         end
       end
 
-      if param.skip then return end
+      if skip then return dt end
 
-      while char.sprite:paused() do
+      while not char.sprite:paused() do
         coroutine.yield()
       end
 
       char.sprite:clearTags()
-      if param.idle then char.sprite:setAnimation("idle") end
+      if idle then char.sprite:setAnimation("idle") end
     end
   end
 

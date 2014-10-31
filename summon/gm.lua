@@ -214,7 +214,7 @@ return function(loader)
     end
   end
 
-  function GM:executeAction(c, a, ...) assert(c and a)
+  function GM:executeAction(c, a, ...) assert(c and a)                          print("ACTION", a)
     if not c.actions:isset(a) then
       log.fw("Character %s is trying to use the action [%s] which cannot use.",
         c.id, a)
@@ -247,10 +247,9 @@ return function(loader)
   end
 
   function GM:kill(character)
-    character:kill(function()
-        self.world:removeCharacter(character)
-        self.world.map:setWalkable(character.status.position:get(), true)
-      end)
+    character:kill()
+    self.world:removeCharacter(character)
+    self.world.map:setWalkable(character.status.position:get(), true)
 
     local init = self.initiative
 
