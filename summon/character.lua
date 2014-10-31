@@ -6,7 +6,7 @@ return function(loader)
   local ys = require "yuishiki"()
   local vec = loader.require "vector"
   local Value = loader.load "value"
-  local Command = loader.load "command"
+  local Commands = loader.load "commands"
   local EventDispatcher = loader.load "event-dispatcher"
   local AssetLoader = loader.load "asset-loader"
   local Stack = loader.load "stack"
@@ -88,13 +88,13 @@ return function(loader)
   end
 
   function Character:updateCommands(dt)
-    while not self.commands:empty() do
+    while not self.commands:empty() or not dt or dt <= 0 do
       local cmd = self.commands:top()
 
       if coroutine.status(cmd) == "dead" then
         self.commands:pop()
       else
-        return coroutine.resume(cmd, dt, self)
+        dt = coroutine.resume(cmd, dt, self)
       end
   end
 
@@ -157,32 +157,32 @@ return function(loader)
 
   function Character:kill(callback)
     self.status["alive"]:set(false)
-    self:appendCommand("animation", {"dead", {idle = false}})
-    self:appendCommand("fade", {}, callback)
+    self:appendCommand(Commands.animation("dead", {idle = false}))
+    self:appendCommand(Commands.fade())
     self:bubble("DEAD", {255, 0, 0})
   end
 
-  function Character:move(path, callback)
-    for _,v in pairs(path) do
-      -- TODO self:appendCommand("step", {v, map}, callback)
-    end
+  function Character:move(path)
+    for _,v in pairs(path) do self:appendCommand(Commands.step(v)) end
   end
 
-  function Character:attack(target, hit, damage, callback)
-    -- TODO self:appendCommand("lookAt", {map, target})
-    target:appendCommand("lookAt", {map, self})
-    self:appendCommand("animation", {"attack", {tag = {"hit",
-      function()
-        if not hit then self:bubble("Miss") end
-        target:hit(hit, damage)
-      end}
-    }}, callback)
+  function Character:attack(target, hit, damage)
+    self:appendCommand(Commands.lookAt(target))
+    target:appendCommand(Commands.lookAt(self))
+    self:appendCommand(Commands.animation("attack", {
+      tag = {
+        hit = function()
+          if not hit then self:bubble("Miss") end
+          target:hit(hit, damage)
+        end
+      }
+    }))
   end
 
-  function Character:hit(hit, damage, callback)
+  function Character:hit(hit, damage)
     if damage then
       self:bubble(damage, {255, 127, 0})
-      self:appendCommand("animation", {"hit"}, callback)
+      self:appendCommand(Commands.animation("hit"))
     end
   end
 
