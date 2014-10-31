@@ -50,11 +50,11 @@ return function(loader)
 
   Commands.animation = function(animation, param)
     return function(dt, char)
-      local ani = char.sprite:setAnimation(animation, reset)
-
       local reset = not param or param.reset ~= false
-      local skip = (param and param.skip) or ani.loops < 0
       local idle = not (param and param.idle == false)
+
+      local ani = char.sprite:setAnimation(animation, reset)
+      local skip = (param and param.skip) or ani.loops < 0
 
       if not ani then return dt end
 
