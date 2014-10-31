@@ -25,7 +25,7 @@ return function(loader)
       id = #self.characters
     end
 
-    character:setEnvironment(self, id)
+    character:setWorld(self, id)
   end
 
   function World:removeCharacter(char)

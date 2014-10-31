@@ -138,10 +138,11 @@ return function(loader)
           end
         end
         if self.tags and self.callback then
-          local cindex = self.tags[self.callback[1]]
-          if cindex and cindex == index then
-            self.callback[2]()
-            self.callback = nil
+          for tag, callback in pairs(self.callbacks) do
+            local cindex = self.tags[tag]
+            if cindex and cindex == index then
+              callback()
+            end
           end
         end
         if index and index <= #frames then
@@ -232,9 +233,13 @@ return function(loader)
     self.paused = false
   end
 
-  function Animation:callOnceOnTag(tag, callback)
+  function Animation:callOnTag(tag, callback)
     if not callback then return end
-    self.callback = {tag, callback}
+    self.callbacks[tag] = callback
+  end
+
+  function Animation:clearTags()
+    self.callbacks = {}
   end
 
   return Animation

@@ -111,9 +111,13 @@ return function(loader)
     self:updateAnimation(dt)
   end
 
-  function Sprite:callOnceOnTag(tag, callback)
+  function Sprite:callOnTag(tag, callback)
     if not callback then return end
-    self.current.animation:callOnceOnTag(tag, callback)
+    self.current.animation:callOnTag(tag, callback)
+  end
+
+  function Sprite:clearTags()
+    self.current.animation:clearTags()
   end
 
   function Sprite:draw()
