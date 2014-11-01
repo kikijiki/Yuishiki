@@ -10,21 +10,21 @@ ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
 ys.log.addOutput(function(data) console[data.tag](console, data.msg) end)
 
--- Setup assets
+-- Load scenarios data
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
+summon.fs.getDirectoryItems(scenarios_path, function(file)
+  local scenario = summon.fs.load(scenarios_path..file)()
+  table.insert(scenarios, scenario)
+end)
+table.sort(scenarios, function(a, b) return a.name < b.name end)
 
 function love.load()
-  gamestate.registerEvents({'keyreleased', 'mousereleased', 'quit', 'resize', 'update' })
-
-  summon.fs.getDirectoryItems(scenarios_path, function(file)
-    local scenario = summon.fs.load(scenarios_path..file)()
-    table.insert(scenarios, scenario)
-  end)
-
-  table.sort(scenarios, function(a, b) return a.name < b.name end)
-  gamestate.switch(require "states.menu", scenarios)
   console:resize(summon.graphics.getDimensions())
+
+  gamestate.registerEvents(
+    {'keyreleased', 'mousereleased', 'quit', 'resize', 'update', 'textinput' })
+  gamestate.switch(require "states.menu", scenarios)
 end
 
 function love.update(dt)
@@ -37,9 +37,7 @@ end
 function love.keypressed(key)
   console:keypressed(key)
 
-  if key == "escape" then
-    love.event.quit()
-  end
+  if key == "escape" then love.event.quit() end
 
   if key == "f12" then
     local ss = love.graphics.newScreenshot()
@@ -49,13 +47,10 @@ function love.keypressed(key)
   gamestate.keypressed(key)
 end
 
-function love.textinput(t)
-  gamestate.textinput(t)
-end
-
 function love.mousepressed(x, y, button)
-  if console:mousepressed(x, y, button) then return false end
-  gamestate.mousepressed(x, y, button)
+  if not console:mousepressed(x, y, button) then
+    gamestate.mousepressed(x, y, button)
+  end
 end
 
 function love.draw()

@@ -10,12 +10,12 @@ return function(loader)
     showInfo = true,
     showTime = true,
     useAnsiColors = false,
-    verbosity = 2
+    verbosity = 3
   }
 
   local outputs = {
     full = {},
-    raw = {{f = print, color = true}}
+    raw = {print}
   }
 
   local colors = {
@@ -52,13 +52,17 @@ return function(loader)
       normal = "[ERR]",
       color = ansicolors("%{bright red}[ERR]%{reset}"),
       level = 1,
+      die = false},
+    f = {
+      normal = "[FAT]",
+      color = ansicolors("%{bright red}[FAT]%{reset}"),
+      level = 0,
       die = true}
   }
 
-  local function sendRawOutput(normal, colored)
+  local function sendRawOutput(data)
     for _,out in pairs(outputs.raw) do
-      if out.color then out.f(colored)
-      else out.f(normal) end
+      out(data)
     end
   end
 
@@ -68,60 +72,59 @@ return function(loader)
     end
   end
 
-  local function buildBuffer(buf, ...)
-    local n = select("#", ...)
-    for i=1, n do
-      local s = tostring(select(i, ...))
-      table.insert(buf, s)
-      if i ~= n then table.insert(buf, "\t") end
-    end
+  local function buildBuffer(...)
+    local buffer = {}
+    for _,data in pairs({...}) do table.insert(buffer, tostring(data)) end
+    return table.concat(buffer, " ")
   end
 
   local function writeToLog(tag_name, ...)
     local tag = tags[tag_name]
     if tag.level > log.verbosity then return end
 
-    local msg = {}
-    local meta = {color = {}, normal = {}}
     local data = {}
-
-
-    buildBuffer(msg, ...)
-    local t = os.date("*t", os.time())
-    local info = debug.getinfo(3)
-    msg = table.concat(msg)
-
     data.tag = tag_name
-    data.debug_info = info
-    data.time = t
-    data.msg = msg
+    data.msg = buildBuffer(...)
+    data.time = os.date("*t", os.time())
+    data.info = debug.getinfo(3)
 
+    local timestamp
     if log.showTime then
-      table.insert(meta, "["..t.hour..":"..t.min..":"..t.sec.."]")
+      timestamp = "["..data.time.hour..":"..data.time.min..":"..data.time.sec.."]"
+    else
+      timestamp = ""
     end
 
-    if log.showInfo then
-      local loginfoColor = {
-        colors.source, (info.source or "[unknown]"), colors.reset,
+    if log.useAnsiColors then
+      tag = tag.color
+      data.meta = {
+        timestamp,
+        colors.source, (data.info.source or "[unknown]"), colors.reset,
         colors.arrow, "->", colors.reset,
-        colors.name, (info.name or "[unknown]"), colors.reset,
-        "(", colors.line, tostring(info.currentline), colors.reset, ") ",
+        colors.name, (data.info.name or "[unknown]"), colors.reset,
+        "(", colors.line, tostring(data.info.currentline), colors.reset, ") ",
         colors.message}
-
-      local loginfo = {
-        (info.source or "[unknown]"),
-        "->", (info.name or "[unknown]"),
-        "(", tostring(info.currentline), ") "}
-
-      table.insert(meta.normal, table.concat(loginfo))
-      table.insert(meta.color, table.concat(loginfoColor))
+    else
+      tag = tag.normal
+      data.meta = {
+        timestamp,
+        (data.info.source or "[unknown]"),
+        "->", (data.info.name or "[unknown]"),
+        "(", tostring(data.info.currentline), ") "}
     end
 
-    local buffer = tag.normal.." "..table.concat(meta.normal)..msg
-    local buffer_color = tag.color.." "..table.concat(meta.color)..msg
+    data.meta = table.concat(data.meta)
+
+    local buffer
+    if log.showInfo then
+      buffer = tag..data.info..data.msg
+    else
+      buffer = tag..data.msg
+    end
 
     sendOutput(data)
-    sendRawOutput(buffer, buffer_color)
+    sendRawOutput(buffer)
+
     if tag.die then error(msg, 3) end
   end
 
@@ -147,6 +150,9 @@ return function(loader)
 
   function log.e(...)       writeToLog("e", ...) end
   function log.fe(fmt, ...) writeToLog("e", string.format(fmt, ...)) end
+
+  function log.f(...)       writeToLog("f", ...) end
+  function log.ff(fmt, ...) writeToLog("f", string.format(fmt, ...)) end
 
   function log.check(value, ...)
     if not value then writeToLog("e", 1, true, ...) end
