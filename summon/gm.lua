@@ -27,10 +27,11 @@ return function(loader)
     self.actions = {}
     self.items = {}
 
-    self.turnCount = 0
+    self.turn_count = 0
     self.paused = true
     self.initiative = {list = {}, current = 0}
     self.activeCharacter = nil
+    self.auto_pause = true
   end
 
   function GM:loadRuleset(ruleset)
@@ -74,7 +75,7 @@ return function(loader)
   end
 
   function GM:nextTurn()
-    self.turnCount = self.turnCount + 1
+    self.turn_count = self.turn_count + 1
     self.initiative.current = 0
     self.activeCharacter = nil
     self:applyRule("turn start")
@@ -158,13 +159,14 @@ return function(loader)
     if not char.commands:empty() then return end
 
     for _ = 1, max_steps_per_update do
-      local busy = char:updateAI(self.world)                                      --self:pause() if busy then return end
+      local busy = char:updateAI(self.world)
       if not char.commands:empty() then return end
       if not busy then
+        if self.auto_pause then self:pause() end
         if not self:nextCharacter() then
           self:nextTurn()
           self:nextCharacter()
-        end                                                                       self:pause()
+        end
         return
       end
     end
@@ -214,7 +216,11 @@ return function(loader)
     end
   end
 
-  function GM:executeAction(c, a, ...) assert(c and a)                          print("ACTION", a)
+  function GM:isActionAsync(a)
+    return self.actions[a].async
+  end
+
+  function GM:executeAction(c, a, ...) assert(c and a)
     if not c.actions:isset(a) then
       log.fw("Character %s is trying to use the action [%s] which cannot use.",
         c.id, a)

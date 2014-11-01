@@ -49,7 +49,21 @@ return function(loader)
 
     self.agent.actuator:setCaller({
       execute = function(a, ...)
-        return self.gm:executeAction(self, a, ...)
+        if self.gm:isActionAsync(a) then
+          if not coroutine.running() then
+            log.e("Cannot run an async action from outside a coroutine.")
+            return
+          end
+          local data
+          local args = {...}
+          self:pushCommand(function()
+            data = self.gm:executeAction(self, a, table.unpack(args))
+          end)
+          coroutine.yield()
+          return data
+        else
+          return self.gm:executeAction(self, a, ...)
+        end
       end,
       canExecute = function(a, ...)
         return self.gm:canExecuteAction(self, a, ...)
