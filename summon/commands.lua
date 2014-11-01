@@ -8,17 +8,17 @@ return function(loader)
 
 --[[Commands list
 
-- Wait       Wait.
-- Turn       Change direction.
-- LookAt     Change direction.
-- Animation  Change animation.
-- Wait       Let time pass.
-- Speak      Produce a speech bubble.
-- Translate  Move linearly.
-- Walk       Look towards the destination, use the walk animation and move.
-- Jump       Look to the destination and jump using the jump animation.
-- Step       Walk to an adjacent tile in a certain direction.
-- Fade       Lerp on alpha.
+  - wait       Let time pass.
+  - turn       Change direction.
+  - lookAt     Change direction.
+  - animation  Change animation.
+  - speak      Produce a speech bubble.
+  - translate  Move linearly.
+  - walk       Look towards the destination, use the walk animation and move.
+  - jump       Look to the destination and jump using the jump animation.
+  - step       Walk to an adjacent tile in a certain direction.
+  - fade       Lerp on alpha.
+
 ]]
 
   Commands.wait = function(delay, f)
@@ -116,7 +116,7 @@ return function(loader)
       sprite:setAnimation("walk", {reset = false})
       sprite:setDirection(map:getFacingDirection(char.status.position:get(), destination))
 
-      dt = char:pushCommand(Commands.translate(data.top, data.spriteZ, sprite.speed.movement))
+      dt = char:pushCommand("translate", data.top, data.spriteZ, sprite.speed.movement)
       coroutine.yield()
 
       char.status.position:set(destination)
@@ -169,7 +169,7 @@ return function(loader)
   end
 
   Commands.step = function(destination, duration, jumpFactor)
-    return function(dt, char) print("STEP", destination)
+    return function(dt, char)
       local map = char.world.map
 
       if type(destination) == "string" then
@@ -181,12 +181,12 @@ return function(loader)
       local to = map:getTilePixelCoordinates(destination)
 
       if from.heightM == to.heightM then
-        dt = char:pushCommand(Commands.walk(destination))
+        dt = char:pushCommand("walk", destination)
       else
-        dt = char:pushCommand(
-          Commands.jump(destination,
+        dt = char:pushCommand("jump",
+          destination,
           duration or 0.5,
-          jumpFactor or 0.8))
+          jumpFactor or 0.8)
       end
 
       char.sprite:setAnimation("idle", {wait = false})

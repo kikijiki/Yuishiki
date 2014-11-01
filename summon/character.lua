@@ -56,7 +56,7 @@ return function(loader)
           end
           local data
           local args = {...}
-          self:pushCommand(function()
+          self:push(function()
             data = self.gm:executeAction(self, a, table.unpack(args))
           end)
           coroutine.yield()
@@ -90,11 +90,6 @@ return function(loader)
     SpriteBatch.add(self.sprite)
   end
 
-  function Character:update(dt)
-    self:updateCommands(dt)
-    self.sprite:update(dt)
-  end
-
   function Character:updateAI(world)
     for _,sensor in pairs(self.sensors) do
       sensor:update(world)
@@ -102,7 +97,9 @@ return function(loader)
     return self.agent:step()
   end
 
-  function Character:updateCommands(dt)
+  function Character:update(dt)
+    self.sprite:update(dt)
+
     while not self.commands:empty() and type(dt) == "number" and dt > 0 do
       local cmd = self.commands:top()
 
@@ -112,24 +109,18 @@ return function(loader)
         local ok
         ok, dt = coroutine.resume(cmd, dt, self)
         if not ok then
-          log.d("Error in command:"..dt)
+          log.e("Error in command:"..dt)
           self.commands:pop()
         end
       end
     end
   end
 
-  function Character:popCommand()
-    return self.commands:pop()
-  end
-
-  function Character:pushCommand(f)
-    self.commands:push(coroutine.create(f))
-  end
-
-  function Character:appendCommand(f)
-    self.commands:insert(coroutine.create(f))
-  end
+  function Character:pop() return self.commands:pop() end
+  function Character:push(f) self.commands:push(coroutine.create(f)) end
+  function Character:append(f) self.commands:insert(coroutine.create(f)) end
+  function Character:pushCommand(cmd, ...) self:push(Commands[cmd](...)) end
+  function Character:appendCommand(cmd, ...) self:append(Commands[cmd](...)) end
 
   function Character:speak(message, duration)
     local position = function(s)
@@ -178,33 +169,21 @@ return function(loader)
 
   function Character:kill(callback)
     self.status["alive"]:set(false)
-    self:appendCommand(Commands.animation("dead", {idle = false}))              print("CMD dead animation")
-    self:appendCommand(Commands.fade())                                         print("CMD fade")
+    self:pushCommand("fade")
+    self:pushCommand("animation", "dead", {idle = false})
     self:bubble("DEAD", {255, 0, 0})
   end
 
   function Character:move(path)
-    for _,v in pairs(path) do
-      self:appendCommand(Commands.step(v))                                      print("CMD move")
+    for i = #path, 1, -1 do
+      self:pushCommand("step", path[i])
     end
-  end
-
-  function Character:attack(target, hit, damage)
-    self:appendCommand(Commands.lookAt(target))                                 print("CMD face target")
-    target:appendCommand(Commands.lookAt(self))                                 print("CMD face self")
-    self:appendCommand(Commands.animation("attack", {
-      tags = {
-        ["hit"] = function()
-          if not hit then self:bubble("Miss") end
-          target:hit(hit, damage)
-        end
-      }}))                                                                      print("CMD attack")
   end
 
   function Character:hit(hit, damage)
     if damage then
       self:bubble(damage, {255, 127, 0})
-      self:appendCommand(Commands.animation("hit"))                             print("CMD hit")
+      self:pushCommand("animation", "hit")
     end
   end
 
