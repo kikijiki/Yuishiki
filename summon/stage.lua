@@ -119,7 +119,7 @@ return function(loader)
       local oni = self.gm.world.characters["oni"]
       for k,v in pairs(self.gm.world.characters) do
         if k ~= "oni" then
-          v.agent.bdi:pushGoal("defeat character", {target = "oni"})
+          --v.agent.bdi:pushGoal("defeat character", {target = "oni"})
           oni.agent.bdi:pushGoal("defeat character", {target = k})
         end
       end
