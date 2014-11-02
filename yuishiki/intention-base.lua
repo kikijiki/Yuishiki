@@ -18,12 +18,17 @@ return function(loader)
     self.verbose = false
   end
 
+  function IntentionBase:log(...)
+    if self.verbose then log.d(...) end
+  end
+
   function IntentionBase:add(intention)
     self.intentions[intention.id] = intention
     intention.agent = self.agent
   end
 
   function IntentionBase:drop(intention)
+    self:log("Dropping intention", intention)
     if type(intention) == "string" then
       self.intentions[intention] = nil
     else
@@ -44,14 +49,10 @@ return function(loader)
     end
   end
 
-  function IntentionBase:removeIntention(intention)
-    self.intentions[intention.id] = nil
-  end
-
   function IntentionBase:execute(intention)
     if self.verbose then self:dump() end
     intention:step()
-    if intention:empty() then self.intentions[intention.id] = nil end
+    if intention:empty() then self:drop(intention) end
   end
 
   function IntentionBase:waiting()
