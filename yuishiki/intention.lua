@@ -132,29 +132,27 @@ return function(loader)
   end
 
   function Intention:checkGoalConditions(index, goal)
+    local sub_count = self.stack.size - index
     -- context condition
     if not goal.conditions.default(true).context() then
-      self:log("context condition",
-        goal.name, "popping "..(self.stack.size - index).." elements")
-      self:popn(self.stack.size - index)
+      self:log("context condition", goal.name, "popping "..sub_count.." elements")
+      self:popn(sub_count)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- drop condition
     if goal.conditions.default(false).failure() then
-      self:log("drop condition",
-        goal.name, "popping "..(self.stack.size - index).." elements")
-      self:popn(self.stack.size - index)
+      self:log("drop condition", goal.name, "popping "..sub_count.." elements")
+      self:popn(sub_count)
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
 
     -- success condition
     if goal.conditions.default(false).success() then
-      self:log("success condition",
-      goal.name, "popping "..(self.stack.size - index).." elements")
-      self:popn(self.stack.size - index)
+      self:log("success condition", goal.name, "popping "..sub_count.." elements")
+      self:popn(sub_count)
       goal:succeed()
       return true
     end
