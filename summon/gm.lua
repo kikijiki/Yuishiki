@@ -253,12 +253,7 @@ return function(loader)
   end
 
   function GM:kill(character)
-    character:kill()
-    self.world:removeCharacter(character)
-    self.world.map:setWalkable(character.status.position:get(), true)
-
     local init = self.initiative
-
     for i = 1, #init.list do
       local entry = init.list[i]
       if entry.character == character then
@@ -268,7 +263,15 @@ return function(loader)
       end
     end
 
-    self:dispatch("character death", character)
+    character:push(function()
+      self.world:removeCharacter(character)
+      self.world.map:setWalkable(character.status.position:get(), true)
+      self:dispatch("character death", character)
+    end)
+
+    character:push(function()
+      character:kill()
+    end)
   end
 
   GM.log = log

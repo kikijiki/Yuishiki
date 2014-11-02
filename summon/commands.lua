@@ -54,9 +54,9 @@ return function(loader)
       local idle = not (param and param.idle == false)
 
       local ani = char.sprite:setAnimation(animation, reset)
-      local skip = (param and param.skip) or ani.loops < 0
-
       if not ani then return dt end
+
+      local skip = (param and param.skip) or ani.loops < 0
 
       if param and param.tags then
         for tag, callback in pairs(param.tags) do
