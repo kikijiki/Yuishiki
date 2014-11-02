@@ -16,7 +16,6 @@ return function(loader)
   local Event = loader.load "event"
 
   Plan = loader.class("Plan")
-  local plan_class_prefix = "plan_"
 
   Plan.static.Status = uti.makeEnum("New", "Active", "Waiting", "Succeeded", "Failed", "Error")
   Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
@@ -40,31 +39,28 @@ return function(loader)
   -- @usage this is used when including a module.
   -- @see Trigger
   function Plan.static.define(name, data)
-    local P = loader.class(plan_class_prefix..name, Plan)
+    local PlanClass = loader.class("plan_"..name, Plan)
 
-    P.static.default = data
-    P.static.members = {
-      "name", "body", "meta", "confidence", "triggers", "conditions",
-      "on", "manage_subgoal_failure", "describe" }
+    PlanClass.static.default = data
+    PlanClass.static.name = name
 
-    P.static.name = name
-    P.static.body = data.body
-    P.static.meta = data.meta or false
-    P.static.confidence = data.confidence
-    P.static.trigger = Trigger.fromData(data.trigger)
-    P.static.conditions = ManualTrigger(data.conditions)
-    P.static.on = ManualTrigger(data.on)
-    P.static.manage_subgoal_failure = data.manage_subgoal_failure or false
-    P.static.describe = data.describe
-
-    P.initialize = function(self, agent, parameters)
+    PlanClass.initialize = function(self, agent, parameters)
       Plan.initialize(self, agent, parameters)
-      for _,v in pairs(P.members) do self[v] = P[v] end
+      self.name = name
       self.thread = coroutine.create(self.body)
       self.step_count = 0
     end
 
-    return P
+    PlanClass.body = data.body
+    PlanClass.meta = data.meta or false
+    PlanClass.confidence = data.confidence
+    PlanClass.trigger = Trigger.fromData(data.trigger)
+    PlanClass.conditions = ManualTrigger(data.conditions)
+    PlanClass.on = ManualTrigger(data.on)
+    PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false
+    PlanClass.describe = data.describe
+
+    return PlanClass
   end
 
   function Plan.static.extend(name)

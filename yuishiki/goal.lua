@@ -9,36 +9,28 @@ return function(loader)
 
   Goal = loader.class("Goal")
 
-  local goal_class_prefix = "goal_"
-
   Goal.static.Status = uti.makeEnum("New", "Active", "Succeeded", "Failed")
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
-    local G = loader.class(goal_class_prefix..name, Goal)
+    local GoalClass = loader.class("goal_"..name, Goal)
+    GoalClass.static.name = name
+    GoalClass.static.default = data
 
-    G.static.default = data
-    G.static.members = {"name", "creation", "conditions", "limit", "on", "retry", "priority", "describe"}
-
-    G.static.name = name
-    G.static.creation = Trigger.fromData(data.creation)
-    G.static.conditions = ManualTrigger(data.conditions)
-    G.static.limit = data.limit
-    G.static.on = ManualTrigger(data.on)
-    G.static.retry = data.retry
-    G.static.priority = data.priority
-    G.static.describe = data.describe
-
-    G.initialize = function(self, agent, parameters)
-      Goal.initialize(self, parameters)
-      for _,v in pairs(G.members) do self[v] = G[v] end
+    GoalClass.initialize = function(self, ...)
+      Goal.initialize(self, ...)
+      self.name = name
     end
 
-    return G
-  end
+    GoalClass.creation = Trigger.fromData(data.creation)
+    GoalClass.conditions = ManualTrigger(data.conditions)
+    GoalClass.limit = data.limit
+    GoalClass.on = ManualTrigger(data.on)
+    GoalClass.retry = data.retry
+    GoalClass.priority = data.priority
+    GoalClass.describe = data.describe
 
-  function Goal.static.extend(name)
-    return loader.class(goal_class_prefix..name, Goal)
+    return GoalClass
   end
 
   function Goal:initialize(parameters)

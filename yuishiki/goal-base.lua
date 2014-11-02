@@ -29,7 +29,7 @@ return function(loader)
   function GoalBase:instance(name, parameters) assert(name)
     local schema = self.goal_schemas[name]
     if schema then
-      local goal = schema(self.agent, parameters)
+      local goal = schema(parameters)
       return goal
     else
       log.w("Could not find the goal <"..name..">.")
