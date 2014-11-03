@@ -180,7 +180,7 @@ return function(loader)
     end
   end
 
-  function Character:hit(hit, damage)
+  function Character:hit(damage)
     if damage then
       self:bubble(damage, {255, 127, 0})
       self:pushCommand("animation", "hit")

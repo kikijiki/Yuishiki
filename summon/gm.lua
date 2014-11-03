@@ -277,12 +277,12 @@ return function(loader)
 
   GM.log = log
 
-  function GM:logc(c, msg)
-    log.i("["..c.name.."] "..msg)
+  function GM:logc(c, ...)
+    log.i("["..c.name.."] ", ...)
   end
 
-  function GM:logcc(c, target, msg)
-    log.i("["..c.name.."]->["..target.name.."] "..msg)
+  function GM:logcc(c, target, ...)
+    log.i("["..c.name.."]->["..target.name.."] ", ...)
   end
 
   function GM:roll(v1, v2)
