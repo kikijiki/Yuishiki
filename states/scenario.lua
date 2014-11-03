@@ -25,6 +25,7 @@ function Scenario:initialize(data)
   self.description = data.description
   self.vp = vec(sg.getDimensions())
   self.data = data
+  gui.keyboard.clearFocus()
 end
 
 function Scenario:play()
@@ -65,6 +66,7 @@ function Scenario:update(dt)
 end
 
 function Scenario:keypressed(key)
+  gui.keyboard.pressed(key)
 end
 
 function Scenario:mousepressed(x, y, button)

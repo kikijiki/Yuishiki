@@ -16,7 +16,7 @@ return function(loader)
   function Intention:initialize()
     self.stack = Stack()
     self.id = generateId()
-    self.verbose = true
+    self.verbose = false
   end
 
   function Intention.getYsType()

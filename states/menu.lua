@@ -22,6 +22,7 @@ end
 
 function state:enter(previous, s)
   scenarios = s
+  gui.keyboard.clearFocus()
 end
 
 function state:leave()
@@ -50,9 +51,7 @@ function state:update(dt)
   local width, height = sg.getDimensions()
   gui.group{grow = "down", pos = {0, 320}, spacing = 20, function()
     font.normal:apply()
-    for _,data in pairs(scenarios) do
-      addScenario(data, width)
-    end
+    for _,data in pairs(scenarios) do addScenario(data, width) end
   end}
 end
 
@@ -67,7 +66,7 @@ function state:drawLogo()
  end
 
 function state:keypressed(key)
-
+  gui.keyboard.pressed(key)
 end
 
 function state:mousepressed(x, y, button)

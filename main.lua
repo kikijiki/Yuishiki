@@ -10,6 +10,11 @@ ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
 ys.log.addOutput(function(data) console[data.tag](console, data.msg) end)
 
+summon.log.showTime = false
+summon.log.showInfo = false
+summon.log.verbosity = summon.log.Verbosity.verbose
+summon.log.addOutput(function(data) console[data.tag](console, data.msg) end)
+
 -- Load scenarios data
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}

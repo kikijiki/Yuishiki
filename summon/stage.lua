@@ -4,6 +4,7 @@ return function(loader)
   if Stage then return Stage end
 
   local vec = loader.require "vector"
+  local log = loader.load "log"
   local sg = loader.require "graphics"
   local fs = loader.require "filesystem"
   local BattleInterface = loader.load "battle-interface"
@@ -33,6 +34,7 @@ return function(loader)
 
     local path = AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
     fs.getDirectoryItems(path, function(file)
+      log.i("Loading ruleset "..file)
       local ruleset = fs.load(path..file)()
       self.gm:loadRuleset(ruleset)
     end)
@@ -119,7 +121,7 @@ return function(loader)
       local oni = self.gm.world.characters["oni"]
       for k,v in pairs(self.gm.world.characters) do
         if k ~= "oni" then
-          --v.agent.bdi:pushGoal("defeat character", {target = "oni"})
+          v.agent.bdi:pushGoal("defeat character", {target = "oni"})
           oni.agent.bdi:pushGoal("defeat character", {target = k})
         end
       end

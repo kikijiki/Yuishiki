@@ -91,9 +91,8 @@ return function(loader)
     self.on.step()
     self.step_count = self.step_count + 1
 
-    local ret = {coroutine.resume(self.thread, table.unpack(self.exported))}
+    local ok, ret = coroutine.resume(self.thread, table.unpack(self.exported))
 
-    local err = table.remove(ret, 1) == false
     table.insert(self.results.history, ret)
     self.results.last = ret
 

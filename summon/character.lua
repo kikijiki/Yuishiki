@@ -51,7 +51,7 @@ return function(loader)
       execute = function(a, ...)
         if self.gm:isActionAsync(a) then
           if not coroutine.running() then
-            log.e("Cannot run an async action from outside a coroutine.")
+            log.e("Cannot run an async action <"..a.."> from outside a coroutine.")
             return
           end
           local data

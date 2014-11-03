@@ -53,7 +53,7 @@ return function(loader)
     self.on.failure()
   end
 
-  function Goal:succeed(result) print(self.parameters) if self.parameters.target then print(self.parameters.target) end
+  function Goal:succeed(result)
     self.status = Goal.Status.Succeeded
     self.result = result
     self.on.success()
