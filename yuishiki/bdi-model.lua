@@ -32,16 +32,10 @@ return function(loader)
     self.plan_base     :addObserver(self, dispatcher)
     self.intention_base:addObserver(self, dispatcher)
 
-    self.interface = setmetatable({}, {
+    self.export = {
       beliefs = self.belief_base.interface,
-      actuator = agent.actuator.interface,
-      internal = agent,
-      external = setmetatable({},{}),
-      __newindex = function(t, k)
-        log.w("Trying to modify an interface.")
-        return uti.null_interface
-      end
-    })
+      actuator = self.agent.actuator.interface
+    }
   end
 
   function BDIModel:dispatch(event)
@@ -105,7 +99,6 @@ return function(loader)
     else
       local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
       plan:bind(
-        self.agent.interface,
         plan,
         plan.parameters,
         self.belief_base.interface,
@@ -142,7 +135,6 @@ return function(loader)
     local goal = self.goal_base:instance(name, parameters)
     if not goal then return end
     goal:bind(
-      self.agent.interface,
       goal,
       parameters,
       self.belief_base.interface,

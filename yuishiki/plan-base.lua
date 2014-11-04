@@ -34,8 +34,8 @@ return function(loader)
       if event.event_type == Event.Type.Goal then parameters = event.parameters.goal.parameters
       else parameters = event.parameters end
     end
+
     return schema.conditions.default(true).initial(
-      self.agent.interface,
       schema,
       parameters,
       self.agent.bdi.belief_base.interface,

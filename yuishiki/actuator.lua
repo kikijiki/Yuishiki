@@ -12,7 +12,8 @@ return function(loader)
       __index = function(_, k)
         return setmetatable(
         {
-          available = function(...) return self:canExecute(k, ...) end,
+          available = function() return self:available(k) end,
+          canExecute = function(...) return self:canExecute(k, ...) end,
           execute = function(...) return self:execute(k, ...) end,
           cost = function(...) return self:getCost(k, ...)end,
         },
@@ -30,6 +31,10 @@ return function(loader)
 
   function Actuator:addAction(action)
     self.actions[action] = action
+  end
+
+  function Actuator:available(action)
+    return self.actions[action] ~= nil
   end
 
   function Actuator:execute(action, ...)

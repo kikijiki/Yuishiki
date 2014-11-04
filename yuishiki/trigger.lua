@@ -91,18 +91,18 @@ return function(loader)
   Trigger.Belief = BeliefTrigger
 
   BeliefTrigger.static.conditions = {
-    equal         = function(e, new, old, p)      return new == p                end,
-    changed       = function(e, new, old)         return new ~= old              end,
-    at_least      = function(e, new, old, p)      return new >= p                end,
-    at_most       = function(e, new, old, p)      return new <= p                end,
-    more_than     = function(e, new, old, p)      return new >  p                end,
-    less_than     = function(e, new, old, p)      return new <  p                end,
-    increased     = function(e, new, old)         return new >  old              end,
-    decreased     = function(e, new, old)         return old >  new              end,
-    not_increased = function(e, new, old)         return new <= old              end,
-    not_decreased = function(e, new, old)         return old >= new              end,
-    in_range      = function(e, new, old, p1, p2) return new <= p2 and new >= p1 end,
-    in_range_ex   = function(e, new, old, p1, p2) return new <  p2 and new >  p1 end,
+    ["equal"]         = function(e, new, old, p)      return new == p                end,
+    ["changed"]       = function(e, new, old)         return new ~= old              end,
+    ["at least"]      = function(e, new, old, p)      return new >= p                end,
+    ["at most"]       = function(e, new, old, p)      return new <= p                end,
+    ["more than"]     = function(e, new, old, p)      return new >  p                end,
+    ["less than"]     = function(e, new, old, p)      return new <  p                end,
+    ["increased"]     = function(e, new, old)         return new >  old              end,
+    ["decreased"]     = function(e, new, old)         return old >  new              end,
+    ["not increased"] = function(e, new, old)         return new <= old              end,
+    ["not decreased"] = function(e, new, old)         return old >= new              end,
+    ["range"]         = function(e, new, old, p1, p2) return new <= p2 and new >= p1 end,
+    ["range ex"]      = function(e, new, old, p1, p2) return new <  p2 and new >  p1 end,
   }
 
   function BeliefTrigger:initialize(path, condition, ...)

@@ -181,6 +181,8 @@ return function(loader)
     self.on.resume()
   end
 
+  Plan.log = log
+
   function Plan:__tostring()
     if self.describe then
       return "[P]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"
