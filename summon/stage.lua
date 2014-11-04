@@ -81,15 +81,16 @@ return function(loader)
     self.camera:begin()
     self.canvas:clear()
     sg.setCanvas(self.canvas)
+    
     SpriteBatch.clear()
-
     self.world:draw()
     SpriteBatch.draw()
+
+    self.messageRenderer:draw()
     self.interface:drawCursor()
 
     self.camera:finish()
     self.interface:draw()
-    self.messageRenderer:draw()
     sg.setCanvas()
     sg.pop()
     sg.draw(self.canvas)

@@ -53,7 +53,8 @@ return function(loader)
       local reset = not param or param.reset ~= false
       local idle = not (param and param.idle == false)
 
-      local ani = char.sprite:setAnimation(animation, reset)
+      local flag = true
+      local ani = char.sprite:setAnimation(animation, reset, function() flag = false end)
       if not ani then return dt end
 
       local skip = (param and param.skip) or ani.loops < 0
@@ -66,9 +67,7 @@ return function(loader)
 
       if skip then return dt end
 
-      while not char.sprite:paused() do
-        coroutine.yield()
-      end
+      while flag do coroutine.yield() end
 
       char.sprite:clearTags()
       if idle then char.sprite:setAnimation("idle") end

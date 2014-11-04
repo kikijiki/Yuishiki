@@ -104,7 +104,7 @@ return function(loader)
   function GM:addCharacter(id, data) assert(id and data)
     local source = data[1]
     local character
-    
+
     if source == "file" then
       local char_data = AssetLoader.load("character", data[2])
       character = Character(self, char_data)
@@ -164,11 +164,10 @@ return function(loader)
   function GM:update(dt)
     self.world:update(dt)
 
-    if self.paused then return end
-
     local char = self.activeCharacter
     if not char then return end
 
+    if self.paused then return end
     if not char.commands:empty() then return end
 
     for _ = 1, max_steps_per_update do

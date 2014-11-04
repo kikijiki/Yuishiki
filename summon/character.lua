@@ -85,7 +85,7 @@ return function(loader)
   function Character:setWorld(world, id)
     self.world = world
     self.id = id
-    
+
     for _,sensor in pairs(self.sensors) do
       sensor:register(world)
     end

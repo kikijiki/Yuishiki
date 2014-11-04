@@ -52,7 +52,7 @@ return function(loader)
 
     if self.buffer_length == 0 then return end
 
-  	sg.setFont(self.font)
+  	self.font:apply()
 
     local index = self.current_line
     local lx = self.margin

@@ -157,15 +157,17 @@ return function(loader)
     end
   end
 
-  function MessageRenderer:bubble(sprite, message, position, color)
+  function MessageRenderer:bubble(id, message, position, color)
     local b = self.bubbling
     local width = b.font:getWidth(message)
-    if not b.bubbles[sprite] then b.bubbles[sprite] = {} end
+    if not b.bubbles[id] then b.bubbles[id] = {} end
     local col = color or {255, 255, 255, 255}
     if not col[4] then col[4] = 255 end
-    position.y = position.y - b.fontsize
+
     position.x = position.x - width / 2
-    table.insert(b.bubbles[sprite], {
+    position.y = position.y - b.fontsize
+
+    table.insert(b.bubbles[id], 1, {
       message = message,
       size = {width, b.fontsize},
       position = position,
@@ -175,23 +177,22 @@ return function(loader)
       alpha = 1})
   end
 
+  local function updateBubble(bubble, s, b, dt)
+    bubble.offset.y = bubble.offset.y + b.speed * dt
+    if bubble.offset.y > b.top then table.remove(s) end
+    local remaining = b.top - bubble.offset.y
+    if remaining < b.fadeout then
+      bubble.alpha = remaining / b.fadeout
+    end
+    if bubble.offset.y < b.fontsize then return false
+    else return true end
+  end
+
   function MessageRenderer:updateBubbles(dt)
     local b = self.bubbling
-    for _,s in pairs(b.bubbles) do
-      for i = 1, #s do
-        local bubble = s[i]
-        if not bubble then return end
-        bubble.offset.y = bubble.offset.y + b.speed * dt
-        if bubble.offset.y > b.top then
-          table.remove(s, i)
-          i = i - 1
-        end
-        local remaining = b.top - bubble.offset.y
-        if remaining < b.fadeout then
-          bubble.alpha = remaining / b.fadeout
-        end
-        if bubble.offset.y < b.fontsize then return end
-      end
+    for id,s in pairs(b.bubbles) do
+      local i = #s
+      while i > 0 and updateBubble(s[i], s, b, dt) do i = i - 1 end
     end
   end
 
@@ -203,14 +204,13 @@ return function(loader)
         end
       end
     end
-
   end
 
   function MessageRenderer:drawBubble(b)
     local c = b.color
     self.bubbling.font:apply()
-    local pos = self.transform(b.position) - b.offset
-    sg.setColor(0, 0, 0, 255)
+    local pos = b.position - b.offset
+    sg.setColor(0, 0, 0, c[4] * b.alpha)
     local d = 3
     sg.print(b.message, pos.x, pos.y + d)
     sg.print(b.message, pos.x, pos.y - d)

@@ -46,7 +46,7 @@ return function(loader)
     return sprite
   end
 
-  function Sprite:setAnimation(name, reset)
+  function Sprite:setAnimation(name, reset, callback)
     if not self.animations[name] then return false end
 
     local a = self.current.animation
@@ -56,6 +56,8 @@ return function(loader)
     end
 
     self.current.animation = self.animations[name]
+    if self.callback then self.callback() end
+    if self.current.animation.loops > 0 then self.callback = callback end
     if not reset == false then self.current.animation:reset() end
     return self.current.animation
   end
@@ -109,6 +111,10 @@ return function(loader)
 
   function Sprite:update(dt)
     self:updateAnimation(dt)
+    if self:paused() and self.callback then
+      self.callback()
+      self.callback = nil
+    end
   end
 
   function Sprite:callOnTag(tag, callback)
