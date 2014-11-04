@@ -40,7 +40,7 @@ return function(loader)
     end)
 
     for id,char in pairs(data.characters) do
-      self.gm:addCharacter(char, id)
+      self.gm:addCharacter(id, char)
     end
 
     if data.init then data.init(self, self.world, self.world.characters) end

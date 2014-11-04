@@ -29,6 +29,7 @@ return function(loader)
 
     self.agent = ys.Agent()
     self.sensors = {}
+    self.values = {}
 
     self:addValue({"simple", vec(1, 1)},    "status", "position")
     self:addValue({"simple",      true},    "status",    "alive")
@@ -84,8 +85,15 @@ return function(loader)
   function Character:setWorld(world, id)
     self.world = world
     self.id = id
+    
     for _,sensor in pairs(self.sensors) do
       sensor:register(world)
+    end
+
+    for path,value in pairs(self.values) do
+      value:addObserver(self, function(...)
+        self.world:propagateEvent(self, path, value, ...)
+      end)
     end
   end
 
@@ -93,9 +101,9 @@ return function(loader)
     SpriteBatch.add(self.sprite)
   end
 
-  function Character:updateAI(world)
+  function Character:updateAI()
     for _,sensor in pairs(self.sensors) do
-      sensor:update(world)
+      sensor:update(self.world)
     end
     return self.agent:step()
   end
@@ -158,9 +166,13 @@ return function(loader)
 
     table.insert(path, 1, "character")
     path.n = path.n + 1
-    value:addObserver(self.gm.world, function(...)
-      self.gm.world:propagateEvent(self, path, value, ...)
-    end)
+    if self.world then
+      value:addObserver(self, function(...)
+        self.world:propagateEvent(self, path, value, ...)
+      end)
+    end
+
+    self.values[path] = value
 
     return value
   end
@@ -205,8 +217,10 @@ return function(loader)
       end
     end
 
-    self.gm.world:propagateEvent(
+    if self.world then
+      self.world:propagateEvent(
         self, "character equipment changed", self, slot, item, old)
+    end
   end
 
   function Character:uneqip(slot)

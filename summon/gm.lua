@@ -101,10 +101,25 @@ return function(loader)
     end
   end
 
-  function GM:addCharacter(name, id) assert(name)
-    local char_data = AssetLoader.load("character", name)
-    local character = Character(self, char_data)
+  function GM:addCharacter(id, data) assert(id and data)
+    local source = data[1]
+    local character
+    
+    if source == "file" then
+      local char_data = AssetLoader.load("character", data[2])
+      character = Character(self, char_data)
+      self:initializeCharacter(character)
+    elseif source == "data" then
+      character = Character(self, data[2])
+      self:initializeCharacter(character)
+    elseif source == "instance" then
+      character = data[2]
+    end
 
+    self:importCharacter(character, id)
+  end
+
+  function GM:initializeCharacter(character)
     self:applyRule("initialize character", character)
 
     if character.modules then
@@ -115,8 +130,6 @@ return function(loader)
         end
       end
     end
-
-    self:importCharacter(character, id)
   end
 
   function GM:importCharacter(character, id)
