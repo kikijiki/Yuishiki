@@ -4,6 +4,7 @@ return function(loader)
   if Console then return Console end
 
   local sg = loader.require "graphics"
+  local AssetLoader = loader.load "asset-loader"
 
   Console = loader.class("Console")
 
@@ -13,7 +14,7 @@ return function(loader)
     self.buffer = {}
     self.buffer_length = 0
     self.font_size = 20
-    self.font = sg.newFont("assets/fonts/msmincho.ttc", self.font_size) -- TODO
+    self.font = AssetLoader.load("font", "msmincho.ttc@"..self.font_size)
     self.current_line = 1
     self.padding = 5
     self.margin = 10

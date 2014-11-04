@@ -29,5 +29,9 @@ return function(loader)
     return self.data:getWidth(s)
   end
 
+  function Font:getWrap(s, w)
+    return self.data:getWrap(s, w)
+  end
+
   return Font
 end
