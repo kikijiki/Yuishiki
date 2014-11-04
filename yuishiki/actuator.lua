@@ -10,21 +10,18 @@ return function(loader)
 
     self.interface = setmetatable({}, {
       __index = function(_, k)
-        if k == "can" then
-          return setmetatable({}, {
-          __call = function(_, ...)
-            return self:execute(k, ...)
-          end
+        return setmetatable(
+        {
+          available = function(...) return self:canExecute(k, ...) end,
+          execute = function(...) return self:execute(k, ...) end,
+          cost = function(...) return self:getCost(k, ...)end,
+        },
+        {
+          __call = function(t, ...) return self:execute(k, ...) end
         })
-        else
-          return setmetatable({}, {
-            __call = function(_, ...)
-              return self:execute(k, ...)
-            end
-          })
-        end
       end
     })
+
   end
 
   function Actuator:setCaller(caller)
@@ -42,8 +39,14 @@ return function(loader)
   end
 
   function Actuator:canExecute(action, ...)
-    if caller and caller.canExecute then
-      return caller.canExecute(action, ...)
+    if self.caller and self.caller.canExecute then
+      return self.caller.canExecute(action, ...)
+    end
+  end
+
+  function Actuator:getCost(action, ...)
+    if self.caller and self.caller.getCost then
+      return self.caller.getCost(action, ...)
     end
   end
 

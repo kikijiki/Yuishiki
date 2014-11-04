@@ -172,6 +172,12 @@ return function(loader)
     end
   end
 
+  function GM:getActionCost(c, a, ...)
+    local cost = self.actions[a].cost
+    if type(cost) == "function" then return cost(self, c, ...)
+    else return cost end
+  end
+
   function GM:canPayCost(c, cost, ...)
     if type(cost) == "function" then
       cost = cost(self, c, ...)

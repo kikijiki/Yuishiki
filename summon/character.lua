@@ -67,6 +67,9 @@ return function(loader)
       end,
       canExecute = function(a, ...)
         return self.gm:canExecuteAction(self, a, ...)
+      end,
+      getCost = function(a, ...)
+        return self.gm:getActionCost(self, a, ...)
       end
     })
 
