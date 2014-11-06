@@ -27,6 +27,7 @@ return function(loader)
     self.camera = Camera()
     self.interface = BattleInterface(self)
     self.mouse = vec()
+    self.background = {0, 0, 0}
     self.messageRenderer = MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30,
       function(v) return self.camera:gameToScreen(v) end)
 
@@ -80,6 +81,7 @@ return function(loader)
     sg.origin()
     self.camera:begin()
     self.canvas:clear()
+    sg.setBackgroundColor( self.background )
     sg.setCanvas(self.canvas)
     
     SpriteBatch.clear()
