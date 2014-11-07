@@ -19,6 +19,7 @@ return function(loader)
     Observable.initialize(self)
 
     self.agent = agent
+    self.log = log.tag("BDI")
 
     self.belief_base    = BeliefBase()
     self.goal_base      = GoalBase(agent)
@@ -83,7 +84,7 @@ return function(loader)
     local plans, metaplans = self.plan_base:filter(event)
 
     if plans == nil or #plans == 0 then
-      log.i("No plans available for the goal <"..goal.name..">.")
+      self.log.i("No plans available for the goal <"..goal.name..">.")
       return
     end
 
@@ -94,7 +95,7 @@ return function(loader)
     if not plan_schema then plan_schema = self:selectPlan(goal, plans) end
 
     if not plan_schema then
-      log.i("No plans could be selected for the goal <"..goal.name..">.")
+      self.log.i("No plans could be selected for the goal <"..goal.name..">.")
       return nil
     else
       local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
@@ -114,17 +115,17 @@ return function(loader)
 
   function BDIModel:step()
     if self:waiting() then
-      log.i("No executable intentions.")
+      self.log.i("No executable intentions.")
       return false
     end
 
     local intention = self:selectIntention()
 
     if intention then
-      log.i("Executing intention <"..intention.id.." - "..intention.name..">.")
+      self.log.i("Executing intention <"..intention.id.." - "..intention.name..">.")
       self.intention_base:execute(intention)
     else
-      log.i("No active intentions.")
+      self.log.i("No active intentions.")
       return false
     end
 

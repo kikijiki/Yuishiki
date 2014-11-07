@@ -32,6 +32,8 @@ return function(loader)
     self.initiative = {list = {}, current = 0}
     self.activeCharacter = nil
     self.auto_pause = true
+
+    self.log = log.tag("GM")
   end
 
   function GM:loadRuleset(ruleset)
@@ -42,30 +44,30 @@ return function(loader)
 
   function GM:loadRules(rules)
     for k,v in pairs(rules) do
-      if self.rules[k] then log.w("Overriding rule '"..k.."'.") end
+      if self.rules[k] then self.log.w("Overriding rule '"..k.."'.") end
       self.rules[k] = v
     end
   end
 
   function GM:loadActions(actions)
     for k,v in pairs(actions) do
-      if self.actions[k] then log.w("Overriding action '"..k.."'.") end
+      if self.actions[k] then self.log.w("Overriding action '"..k.."'.") end
       self.actions[k] = Action(v)
     end
   end
 
   function GM:loadItems(items)
     for k,v in pairs(items) do
-      if self.items[k] then log.w("Overriding item '"..k.."'.") end
+      if self.items[k] then self.log.w("Overriding item '"..k.."'.") end
       self.items[k] = v
     end
   end
 
   function GM:applyRule(rule, ...)
-    if self.rules[rule] then                                                      log.i("RULE "..rule)
+    if self.rules[rule] then                                                    self.log.i("RULE "..rule)
       return self.rules[rule](self, ...)
     else
-      log.w("Could not apply rule '"..rule.."'.")
+      self.log.w("Could not apply rule '"..rule.."'.")
     end
   end
 
@@ -239,19 +241,19 @@ return function(loader)
   end
 
   function GM:executeAction(c, a, ...) assert(c and a)
-    log.i("Executing action ["..a.."].")
+    self.log.i("Executing action ["..a.."].")
     if not c.actions:isset(a) then
-      log.fw("Character %s is trying to use the action [%s] which cannot use.",
+      self.log.fw("Character %s is trying to use the action [%s] which cannot use.",
         c.id, a)
       return false
     end
     if not self.actions[a] then
-      log.fw("Character %s is trying to use the action [%s] which not defined.",
+      self.log.fw("Character %s is trying to use the action [%s] which not defined.",
         c.id, a)
       return false
     end
     local action = self.actions[a]
-    log.i("ACTION "..a, ...)
+    self.log.i("ACTION "..a, ...)
     return action:execute(self, c, ...)
   end
 
@@ -293,24 +295,22 @@ return function(loader)
     end)
   end
 
-  GM.log = log
-
-  function GM:logc(c, ...)
-    log.i("["..c.name.."] ", ...)
+  function GM.logc(c, ...)
+    self.log.i("["..c.name.."] ", ...)
   end
 
-  function GM:logcc(c, target, ...)
-    log.i("["..c.name.."]->["..target.name.."] ", ...)
+  function GM.logcc(c, target, ...)
+    self.log.i("["..c.name.."]->["..target.name.."] ", ...)
   end
 
   function GM:roll(v1, v2)
     local ret
     if not v2 then
       ret = math.random(v1)
-      log.i("Roll [1, "..v1.."] -> "..ret)
+      self.log.i("Roll [1, "..v1.."] -> "..ret)
     else
       ret = math.random(v1, v2)
-      log.i("Roll ["..v1..", "..v2.."] -> "..ret)
+      self.log.i("Roll ["..v1..", "..v2.."] -> "..ret)
     end
     return ret
   end

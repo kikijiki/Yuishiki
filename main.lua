@@ -1,19 +1,19 @@
 local ys = require "yuishiki"()
 local summon = require "summon"()
 
-local gamestate = require "lib.hump.gamestate"
+local gamestate = require "lib.hump.gamestate" --TODO: implement gamestate and remove hump.
 local console = summon.Console()
 
 -- Setup logging and console
 ys.log.showTime = false
 ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose
-ys.log.addOutput(function(data) console[data.tag](console, data.msg) end)
+ys.log.addOutput(function(data) console[data.severity](console, data.full) end)
 
 summon.log.showTime = false
 summon.log.showInfo = false
 summon.log.verbosity = summon.log.Verbosity.verbose
-summon.log.addOutput(function(data) console[data.tag](console, data.msg) end)
+summon.log.addOutput(function(data) console[data.severity](console, data.full) end)
 
 -- Load scenarios data
 local scenarios_path = "assets/scenarios/"

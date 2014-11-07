@@ -24,6 +24,8 @@ return function(loader)
     self.modules = data.modules
     self.aimod = data.aimod
 
+    self.log = log.tag("CHAR "..self.id)
+
     self.sprite = AssetLoader.load("sprite", data.sprite)
     self.commands = Stack()
 
@@ -52,7 +54,7 @@ return function(loader)
       execute = function(a, ...)
         if self.gm:isActionAsync(a) then
           if not coroutine.running() then
-            log.e("Cannot run an async action <"..a.."> from outside a coroutine.")
+            self.log.e("Cannot run an async action <"..a.."> from outside a coroutine.")
             return
           end
           local data
@@ -235,8 +237,6 @@ return function(loader)
       end
     end
   end
-
-  function Character.log(...) print("CHAR", ...) end
 
   return Character
 end

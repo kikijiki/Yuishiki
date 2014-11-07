@@ -28,6 +28,8 @@ return function(loader)
 
     self.bdi = BDIModel(self)
 
+    self.log = log.tag("A")
+
     self.interface = setmetatable({
       log = print,
       bdi = self.bdi,
@@ -60,7 +62,7 @@ return function(loader)
   function Agent:step()
     self.step_count = self.step_count + 1
     if self.step_count > self.step_limit then return false end
-    log.i("Step "..self.step_count)
+    self.log.i("Step "..self.step_count)
     return self.bdi:step();
   end
 
@@ -96,8 +98,6 @@ return function(loader)
         self.bdi.functions[k] = f
       end
     end
-
-    return true
   end
 
   return Agent
