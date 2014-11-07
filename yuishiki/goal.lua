@@ -4,6 +4,7 @@ return function(loader)
   if Goal then return Goal end
 
   local uti = loader.load "uti"
+  local log = loader.load "log"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
 
@@ -29,6 +30,7 @@ return function(loader)
     GoalClass.retry = data.retry
     GoalClass.priority = data.priority
     GoalClass.describe = data.describe
+    GoalClass.log = log.tag ("G "..name)
 
     return GoalClass
   end

@@ -59,6 +59,7 @@ return function(loader)
     PlanClass.on = ManualTrigger(data.on)
     PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false
     PlanClass.describe = data.describe
+    PlanClass.log = log.tag ("P "..name)
 
     return PlanClass
   end
@@ -97,7 +98,7 @@ return function(loader)
     self.results.last = ret
 
     if err then
-      log.w("Error in plan body.", table.unpack(ret))
+      self.log.w("Error in plan body.", table.unpack(ret))
       self:fail(Plan.FailReason.BodyFailed)
     end
 
