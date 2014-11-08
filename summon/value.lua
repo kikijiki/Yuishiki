@@ -116,6 +116,14 @@ return function(loader)
     return ipairs(self.modifiers)
   end
 
+  function CompositeValue:pairs()
+    return pairs(self.modifiers)
+  end
+
+  function CompositeValue:ipairs()
+    return ipairs(self.modifiers)
+  end
+
   local TableValue = loader.class("TableValue", SimpleValue)
   Value.Table = TableValue
 
@@ -159,6 +167,14 @@ return function(loader)
   end
 
   function TableValue:__ipairs()
+    return ipairs(self.value)
+  end
+
+  function TableValue:pairs()
+    return pairs(self.value)
+  end
+
+  function TableValue:ipairs()
     return ipairs(self.value)
   end
 

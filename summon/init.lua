@@ -5,6 +5,11 @@ local module_path = ...
 local summon
 
 if not table.unpack then table.unpack = unpack end
+if not table.pack then table.pack =
+  function(...)
+    return { n = select("#", ...), ... }
+  end
+end
 
 return function (base_path)
   if summon then return summon end
@@ -35,8 +40,8 @@ return function (base_path)
   summon.EventDispatcher = loader.load "event-dispatcher"
   summon.EventObservable = loader.load "event-observable"
 
-  summon.fs          = loader.require "filesystem"
-  summon.AssetLoader = loader.load "asset-loader"
+  summon.fs              = loader.require "filesystem"
+  summon.AssetLoader     = loader.load "asset-loader"
 
   summon.graphics        = loader.require "graphics"
   summon.Console         = loader.load "console"
@@ -50,17 +55,17 @@ return function (base_path)
   summon.MessageRenderer = loader.load "message-renderer"
   summon.Map             = loader.load "map"
 
-  summon.Commands   = loader.load "commands"
-  summon.Action    = loader.load "action"
-  summon.Armor     = loader.load "armor"
-  summon.Character = loader.load "character"
-  summon.GM        = loader.load "gm"
-  summon.Item      = loader.load "item"
-  summon.Sensor    = loader.load "sensor"
-  summon.Stage     = loader.load "stage"
-  summon.Value     = loader.load "value"
-  summon.Weapon    = loader.load "weapon"
-  summon.World     = loader.load "world"
+  summon.Commands        = loader.load "commands"
+  summon.Action          = loader.load "action"
+  summon.Armor           = loader.load "armor"
+  summon.Character       = loader.load "character"
+  summon.GM              = loader.load "gm"
+  summon.Item            = loader.load "item"
+  summon.Sensor          = loader.load "sensor"
+  summon.Stage           = loader.load "stage"
+  summon.Value           = loader.load "value"
+  summon.Weapon          = loader.load "weapon"
+  summon.World           = loader.load "world"
 
   summon.AssetLoader.register("texture",     "textures",   summon.Texture.load,         true)
   summon.AssetLoader.register("spritesheet", "textures",   summon.SpriteSheet.load,     true)
@@ -72,10 +77,10 @@ return function (base_path)
   summon.AssetLoader.register("ai_module",   "ai/modules", summon.AssetLoader.loadRaw, false)
   summon.AssetLoader.register("sensor",      "ai/sensors", summon.Sensor.load,         false)
 
-  summon._VERSION = "0.0.1"
+  summon._VERSION     = "0.0.1"
   summon._DESCRIPTION = "Support game engine."
-  summon._AUTHOR = "Matteo Bernacchia <kikijikispaccaspecchi@gmail.com>"
-  summon._COPYRIGHT = "Copyright (c) 2013-2014 Matteo Bernacchia"
+  summon._AUTHOR      = "Matteo Bernacchia <kikijikispaccaspecchi@gmail.com>"
+  summon._COPYRIGHT   = "Copyright (c) 2013-2014 Matteo Bernacchia"
 
   return summon
 end

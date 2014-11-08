@@ -24,7 +24,7 @@ return function(loader)
     self.modules = data.modules
     self.aimod = data.aimod
 
-    self.log = log.tag("CHAR "..self.id)
+    self.log = log.tag("CHAR "..self.name)
 
     self.sprite = AssetLoader.load("sprite", data.sprite)
     self.commands = Stack()
@@ -87,6 +87,8 @@ return function(loader)
   function Character:setWorld(world, id)
     self.world = world
     self.id = id
+
+    self.log = log.tag("CHAR "..self.id)
 
     for _,sensor in pairs(self.sensors) do
       sensor:register(world)

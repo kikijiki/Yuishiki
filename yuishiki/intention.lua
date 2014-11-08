@@ -16,7 +16,7 @@ return function(loader)
   function Intention:initialize()
     self.stack = Stack()
     self.id = generateId()
-    self.log = log.tag("I")
+    self.log = log.tag("I "..self.id)
   end
 
   function Intention.getYsType()
@@ -42,7 +42,7 @@ return function(loader)
   end
 
   function Intention:stepPlan(plan)
-    self:log("Stepping in plan", plan)
+    self.log.i("Stepping in plan", plan)
     if plan.status == Plan.Status.Succeeded then
       self:pop()
       local goal = self:top()
