@@ -29,7 +29,7 @@ function love.load()
 
   gamestate.registerEvents(
     {'keyreleased', 'mousereleased', 'quit', 'resize', 'update', 'textinput' })
-  gamestate.switch(require "states.menu", scenarios)
+  gamestate.switch(require "game.menu", scenarios)
 end
 
 function love.update(dt)

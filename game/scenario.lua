@@ -3,8 +3,8 @@ local summon = require "summon"()
 local Gamestate = require "lib.hump.gamestate"
 local Character = summon.Character
 local Stage = summon.Stage
-local Phase = require "states.phase"
-local Message = require "states.message"
+local Phase = require "game.phase"
+local Message = require "game.message"
 local gui = require "lib.quickie"
 
 local vec = summon.Vector
