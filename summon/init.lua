@@ -24,9 +24,13 @@ return function (base_path)
   loader.require = function(lib)
     return require(base_path..lib)
   end
-  loader.class = loader.require "middleclass"
+
+  local class = loader.require "middleclass"
+  loader.class = class
 
   summon = {}
+
+  summon.class           = class
 
   summon.astar           = loader.load "a-star"
   summon.sandbox         = loader.require "sandbox"
@@ -66,6 +70,7 @@ return function (base_path)
   summon.Value           = loader.load "value"
   summon.Weapon          = loader.load "weapon"
   summon.World           = loader.load "world"
+  summon.Game            = loader.load "game"
 
   summon.AssetLoader.register("texture",     "textures",   summon.Texture.load,         true)
   summon.AssetLoader.register("spritesheet", "textures",   summon.SpriteSheet.load,     true)

@@ -1,7 +1,5 @@
 local ys = require "yuishiki"()
 local summon = require "summon"()
-
-local gamestate = require "lib.hump.gamestate" --TODO: implement gamestate and remove hump.
 local console = summon.Console()
 
 -- Setup logging and console
@@ -24,19 +22,22 @@ summon.fs.getDirectoryItems(scenarios_path, function(file)
 end)
 table.sort(scenarios, function(a, b) return a.name < b.name end)
 
+local game = summon.Game()
+
 function love.load()
   console:resize(summon.graphics.getDimensions())
 
-  gamestate.registerEvents(
-    {'keyreleased', 'mousereleased', 'quit', 'resize', 'update', 'textinput' })
-  gamestate.switch(require "game.menu", scenarios)
+  local menu = require "game.menu"(scenarios)
+  game:push(menu)
 end
 
 function love.update(dt)
+  game.on.update(dt)
 end
 
 function love.resize(w, h)
   console:resize(w, h)
+  game.on.resize(w, h)
 end
 
 function love.keypressed(key)
@@ -49,16 +50,24 @@ function love.keypressed(key)
     ss:encode("ss"..os.date("%Y%m%d%H%M%S")..".bmp", "bmp")
   end
 
-  gamestate.keypressed(key)
+  game.on.keypressed(key)
+end
+
+function love.keyreleased(key)
+  game.on.keyreleased(key)
 end
 
 function love.mousepressed(x, y, button)
   if not console:mousepressed(x, y, button) then
-    gamestate.mousepressed(x, y, button)
+    game.on.mousepressed(x, y, button)
   end
 end
 
+function love.mousereleased(x, y, button)
+  game.on.mousereleased(x, y, button)
+end
+
 function love.draw()
-  gamestate.draw()
+  game.on.draw()
   console:draw()
 end

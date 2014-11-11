@@ -1,23 +1,10 @@
-local class = require "lib.middleclass"
-
 local gui = require "lib.quickie"
 local summon = require "summon"()
-local Gamestate = require "lib.hump.gamestate"
 local Stage = summon.Stage
 local vec = summon.Vector
-
-local Phase = class("state.Phase")
-
-local padding = 10
-local title_size = 80
-local description_size = 40
-
-local font = {
-  description = summon.AssetLoader.load("font", "ipamp.ttf@"..description_size),
-  title = summon.AssetLoader.load("font", "ipamp.ttf@"..title_size),
-}
-
 local sg = summon.graphics
+
+local Phase = summon.class("state.Phase")
 
 function Phase:initialize(data)
   self.stages = {}
@@ -25,14 +12,20 @@ function Phase:initialize(data)
   self.title = data.title
   self.description = data.desc
   self.vp = vec(0, 0)
+  self.padding = 10
+  self.title_size = 80
+  self.description_size = 40
+  self.font = {
+    description =
+      summon.AssetLoader.load("font", "ipamp.ttf@"..self.description_size),
+    title = summon.AssetLoader.load("font", "ipamp.ttf@"..self.title_size),
+  }
 
   for _,stage_data in pairs(data.stages) do
     local stage = Stage(stage_data)
     table.insert(self.stages, {stage, {}})
   end
-end
 
-function Phase:enter(previous)
   self:resize()
   self.activeStage = self.stages[1]
 end
@@ -41,23 +34,23 @@ function Phase:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
 
   self.vp = vec(w, h)
-  local header = title_size + description_size + padding * 3
+  local header = self.title_size + self.description_size + self.padding * 3
   local scount = #self.stages
-  local sw = (w - padding * (scount + 1)) / scount
-  local sh = h - header - padding
-  local x = padding
+  local sw = (w - self.padding * (scount + 1)) / scount
+  local sh = h - header - self.padding
+  local x = self.padding
   local y = header
 
   for _,stage in pairs(self.stages) do
     stage[1]:resize(sw, sh)
     stage[2] = {x = x, y = y, w = sw, h = sh}
-    x = x + sw + padding
+    x = x + sw + self.padding
   end
 end
 
-function drawStageBorder(stage, color)
+function Phase:drawStageBorder(stage, color)
     local vp = stage[2]
-    local p = padding
+    local p = self.padding
     local p2 = p * 2
     sg.setColor(color)
     sg.rectangle("fill",    vp.x - p,    vp.y - p, vp.w + p2,         p)
@@ -68,29 +61,30 @@ end
 
 function Phase:draw()
   sg.setColor(200, 200, 200)
-  font.title:apply()
-  sg.print(self.title or "", padding, padding)
-  font.description:apply()
-  sg.print(self.description or "", padding, title_size + padding * 2)
+  self.font.title:apply()
+  sg.print(self.title or "", self.padding, self.padding)
+  self.font.description:apply()
+  sg.print(self.description or "",
+    self.padding, self.title_size + self.padding * 2)
 
   for _,stage in pairs(self.stages) do
-    drawStageBorder(stage, {64, 64, 64})
+    self:drawStageBorder(stage, {64, 64, 64})
     sg.push()
     sg.translate(stage[2].x, stage[2].y)
     stage[1]:draw()
     sg.pop()
   end
 
-  font.description:apply()
+  self.font.description:apply()
   gui.core.draw()
 end
 
 function Phase:update(dt)
   if gui.Button{
     text = "Next",
-    pos = {self.vp.x - 120 - padding, padding},
-    size = {120, title_size + description_size}} then
-      Gamestate.pop()
+    pos = {self.vp.x - 120 - self.padding, self.padding},
+    size = {120, self.title_size + self.description_size}} then
+      self.game:pop()
   end
 
   if self.activeStage then
