@@ -29,9 +29,12 @@ return function(loader)
 
     -- TODO
     self.interface = {
-      p = self.lookup,
       d = self.beliefs,
-      set = function(...) self:set(...) end
+      set = function(...) return self:set(...) end,
+      get = function(...)
+        local b = self:get(...)
+        if b then return b:get() end
+      end
     }
   end
 
@@ -104,7 +107,9 @@ return function(loader)
     self:notify(event)
   end
 
-  function BeliefBase:get(path)
+  function BeliefBase:get(path, p2, ...)
+    if type(path) == "table" then path = table.concat(path, PATH_SEPARATOR) end
+    if p2 then path = table.concat({path, p2, ...}, PATH_SEPARATOR) end
     return self.lookup[path]
   end
 
@@ -131,7 +136,7 @@ return function(loader)
     self.log.i()
     for _,path in pairs(paths) do
       local skip = longest - lengths[path]
-      self.log.fi("%s %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
+      self.log.fi("%s %s %s", path, string.rep(PATH_SEPARATOR, skip), tostring(self.lookup[path]))
     end
     self.log.i()
     self.log.i("--[[BELIEF BASE DUMP END]]--")
