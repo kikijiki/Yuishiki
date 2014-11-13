@@ -26,6 +26,7 @@ return function(loader)
     end
 
     character:setWorld(self, id)
+    self:propagateEvent(self, {"new", "character"}, character)
   end
 
   function World:removeCharacter(char)
