@@ -25,10 +25,13 @@ return function(loader)
       self:notify(event)
     end
 
+    self.log = log.tag("BB")
+
     -- TODO
     self.interface = {
       p = self.lookup,
-      d = self.beliefs
+      d = self.beliefs,
+      set = function(...) self:set(...) end
     }
   end
 
@@ -107,7 +110,7 @@ return function(loader)
 
   function BeliefBase:dump()
     if not next(self.lookup) then
-      log.i("--[[BELIEF BASE EMPTY]]--")
+      self.log.i("--[[BELIEF BASE EMPTY]]--")
       return
     end
 
@@ -124,14 +127,14 @@ return function(loader)
 
     table.sort(paths)
 
-    log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
-    log.i()
+    self.log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
+    self.log.i()
     for _,path in pairs(paths) do
       local skip = longest - lengths[path]
-      log.fi("%s %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
+      self.log.fi("%s %s %s", path, string.rep(".", skip), tostring(self.lookup[path]))
     end
-    log.i()
-    log.i("--[[BELIEF BASE DUMP END]]--")
+    self.log.i()
+    self.log.i("--[[BELIEF BASE DUMP END]]--")
   end
 
   return BeliefBase
