@@ -117,7 +117,7 @@ return function(loader)
 
     data.meta = table.concat(data.meta)
 
-    local buffer = timestamp..severity..tagstamp
+    local buffer = timestamp..severity..tagstamp.." "
     if log.showInfo then
       buffer = buffer..data.meta..data.msg
     else
