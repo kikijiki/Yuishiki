@@ -67,7 +67,11 @@ return function(loader)
     for _,schema in pairs(options) do
       local confidence = 0
       if schema.confidence then
-        confidence = schema.confidence(self.agent.interface, self.belief_base.interface, goal)
+        confidence = schema.confidence(
+          schema,
+          goal.parameters,
+          self.belief_base.interface,
+          self.agent.actuator)
         if type(confidence) ~= "number" then confidence = 0 end
       end
       if not best or confidence > best_confidence then
