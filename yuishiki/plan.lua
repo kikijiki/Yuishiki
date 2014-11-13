@@ -20,6 +20,7 @@ return function(loader)
   Plan.static.Status = uti.makeEnum("New", "Active", "Waiting", "Succeeded", "Failed", "Error")
   Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
   Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
+  Plan.static.history_path = "history.plan"
 
   --- Create a new plan class from the definition data.
   -- The following can be specified:
@@ -60,6 +61,7 @@ return function(loader)
     PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false
     PlanClass.describe = data.describe
     PlanClass.log = log.tag ("P "..name)
+    PlanClass.history_path = Plan.history_path.."."..name
 
     return PlanClass
   end
@@ -190,6 +192,54 @@ return function(loader)
     else
       return "[P]("..self.status..") <"..self.name..">"
     end
+  end
+
+  function Plan:record(result, state)
+    local bb = self.agent.bdi.belief_base
+    local history = bb:get(self.history_path)
+
+    if not history then
+      history = {}
+      bb:set(history, self.history_path)
+    end
+
+    table.insert({result = result, state = state})
+  end
+
+  function Plan.static.matchHistory(plan, bb, state)
+    local history = bb.get(plan.history_path)
+
+    if not history or #history == 0 then return 0, 0 end
+
+    local state_count = 0
+    for _,_ in pairs(state) do state_count = state_count + 1 end
+    local best = {matches = 0, records = {}}
+
+    for _,record in pairs(history) do
+      local matches = 0
+      for k,v in pairs(state) do
+        if record[k] == v then matches = matches + 1 end
+      end
+      if matches > 0 then
+        if matches > best.matches then
+          best.matches = matches
+          best.entries = {record}
+        elseif matches == best.matches then
+          table.insert(best.records, record)
+        end
+      end
+    end
+
+    if best.matches == 0 then return 0, 0 end
+
+    local average
+    for _,record in pairs(self.records) do
+      average = average + record.value
+    end
+    average = average / #self.records
+    local matches = best.matches / state_count
+
+    return matches, average
   end
 
   return Plan
