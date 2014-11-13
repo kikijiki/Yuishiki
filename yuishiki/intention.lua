@@ -110,7 +110,7 @@ return function(loader)
 
     -- failure condition
     if plan.conditions.default(false).failure() then
-      self.log.i("Plan [%s] failure condition, popping %d elements",
+      self.log.fi("Plan [%s] failure condition, popping %d elements",
         plan.name, sub_count)
       self:popn(sub_count)
       plan:fail(Plan.FailReason.ConditionFailed)
@@ -119,7 +119,7 @@ return function(loader)
 
     -- success condition
     if plan.conditions.default(false).success() then
-      self.log.i("Plan [%s] success condition, popping %d elements",
+      self.log.fi("Plan [%s] success condition, popping %d elements",
         plan.name, sub_count)
       self:popn(sub_count)
       plan:succeed()
@@ -143,7 +143,7 @@ return function(loader)
 
     -- failure condition
     if goal.conditions.default(false).failure() then
-      self.log.i("Goal [%s] failure condition, popping %d elements",
+      self.log.fi("Goal [%s] failure condition, popping %d elements",
         goal.name, sub_count)
       self:popn(sub_count)
       goal:fail(Goal.FailReason.ConditionFailed)
@@ -152,7 +152,7 @@ return function(loader)
 
     -- success condition
     if goal.conditions.default(false).success() then
-      self.log.i("Goal [%s] success condition, popping %d elements",
+      self.log.fi("Goal [%s] success condition, popping %d elements",
         goal.name, sub_count)
       self:popn(sub_count)
       goal:succeed()
