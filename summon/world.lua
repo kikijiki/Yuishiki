@@ -15,6 +15,7 @@ return function(loader)
     self.map = map
 
     self.events_enabled = false
+    self.event_queue = {}
   end
 
   function World:addCharacter(character, id) assert(character)
@@ -39,6 +40,9 @@ return function(loader)
 
   function World:start()
     self.events_enabled = true
+    for _,event_data in pairs(self.event_queue) do
+      self:propagateEvent(table.unpack(event_data))
+    end
   end
 
   function World:placeCharacter(char, x, y)
@@ -72,6 +76,8 @@ return function(loader)
   function World:propagateEvent(source, event, ...)
     if self.events_enabled then
       self:notify(source, event, ...)
+    else
+      table.insert(self.event_queue, {source, event, ...})
     end
   end
 
