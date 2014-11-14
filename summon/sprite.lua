@@ -100,7 +100,8 @@ return function(loader)
   end
 
   function Sprite:updateAnimation(dt)
-    local frame = self.current.animation:update(dt * self.speed.animation, self.direction)
+    local frame =
+      self.current.animation:update(dt * self.speed.animation, self.direction)
     self.current.frame = frame
     self.current.center = frame.center
   end
@@ -139,16 +140,28 @@ return function(loader)
     setColor(c[1], c[2], c[3], self.alpha)
 
     if frame.mirror then
-      draw(self.texture.data, frame.quad, pos.x, pos.y, 0, -scale, scale,  cnt.x, cnt.y)
+      draw(
+        self.texture.data,
+        frame.quad,
+        pos.x, pos.y,
+        0, -scale, scale,
+        cnt.x, cnt.y)
     else
-      draw(self.texture.data, frame.quad, pos.x, pos.y, 0, scale, scale, cnt.x, cnt.y)
+      draw(
+        self.texture.data,
+        frame.quad,
+        pos.x, pos.y,
+        0, scale, scale,
+        cnt.x, cnt.y)
     end
   end
 
   function Sprite:face(v)
     local dir
     local diff1 = vec(v.x - v.y, v.x + v.y)
-    local diff2 = vec(self.position.x - self.position.y, self.position.x + self.position.y)
+    local diff2 = vec(
+      self.position.x - self.position.y,
+      self.position.x + self.position.y)
     local diff = diff1 - diff2
 
     if math.abs(diff.x) > math.abs(diff.y) then

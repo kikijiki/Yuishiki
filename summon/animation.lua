@@ -52,7 +52,8 @@ return function(loader)
         end
       end
     else
-      local mdir = assert(a.mirror and a.mirror[dir], "Direction "..dir.." is missing.")
+      local mdir =
+        assert(a.mirror and a.mirror[dir], "Direction "..dir.." is missing.")
       assert(v[mdir], "Mirrored direction "..mdir.." is missing.")
 
       local src = ss:getFrame(v[mdir])
@@ -105,56 +106,60 @@ return function(loader)
     a.length = #a.frames
   end
 
-  function Animation.static.updateState(self, dt, direction)
-    local frames = self.frames
-    local length = self.length
-    local elapsed = self.elapsed
-    local index = self.index
+  local function step(a, dt)
+    a.elapsed = a.elapsed + dt
 
-    if self.paused then
-      if direction then return frames[index][direction]
-      else return frames[index] end
-    end
-
-    elapsed = elapsed + dt
-    local nextframe = frames[index].dt
-
-    while elapsed > nextframe do
-      elapsed = elapsed - nextframe
-      index = index + 1
-      if index > length then
-        if self.loops > 0 then
-          if self.loop_count < self.loops then
-            index = 1
-            self.loop_count = self.loop_count + 1
+    local nextframe = a.frames[a.index].dt
+    while a.elapsed > nextframe do
+      a.elapsed = a.elapsed - nextframe
+      a.index = a.index + 1
+      if a.index > a.length then
+        if a.loops > 0 then
+          if a.loop_count < a.loops then
+            a.index = 1
+            a.loop_count = a.loop_count + 1
           end
-          if self.loop_count >= self.loops then
-            index = length
-            self.paused = true
+          if a.loop_count >= a.loops then
+            a.index = a.length
+            a.paused = true
           end
         else
-          self.loop_count = self.loop_count + 1
-          index = 1
+          a.loop_count = a.loop_count + 1
+          a.index = 1
         end
       end
 
-      if self.tags and self.callbacks then
-        for tag, callback in pairs(self.callbacks) do
-          local cindex = self.tags[tag]
-          if cindex and cindex == index then
+      if a.tags and a.callbacks then
+        for tag, callback in pairs(a.callbacks) do
+          local cindex = a.tags[tag]
+          if cindex and cindex == a.index then
             callback()
           end
         end
       end
 
-      nextframe = frames[index].dt
+      nextframe = a.frames[a.index].dt
+    end
+  end
+
+  local function getCurrentFrame(a, direction)
+    if direction then return a.frames[a.index][direction]
+    else return a.frames[a.index] end
+  end
+
+  function Animation.static.updateState(self, dt, direction)
+    if self.paused then return getCurrentFrame(self, direction) end
+
+    local frames = self.frames
+    local length = self.length
+    local index = self.index
+
+    if length <= 1 and frames[index].dt <= 0 then
+      return getCurrentFrame(self, direction)
     end
 
-    self.index = index
-    self.elapsed = elapsed
-
-    if direction then return frames[index][direction]
-    else return frames[index] end
+    step(self, dt)
+    return getCurrentFrame(self, direction)
   end
 
   function Animation.static.updateStateless(self, dt, elapsed, index, direction)
