@@ -3,13 +3,13 @@ local Agent
 return function(loader)
   if Agent then return Agent end
 
-  local uti = loader.load "uti"
-  local log = loader.load "log"
-  local Event = loader.load "event"
+  local uti      = loader.load "uti"
+  local log      = loader.load "log"
+  local Event    = loader.load "event"
   local BDIModel = loader.load "bdi-model"
-  local Goal = loader.load "goal"
-  local Plan = loader.load "plan"
-  local Belief = loader.load "belief"
+  local Goal     = loader.load "goal"
+  local Plan     = loader.load "plan"
+  local Belief   = loader.load "belief"
   local Actuator = loader.load "actuator"
 
   Agent = loader.class("Agent")
@@ -28,7 +28,7 @@ return function(loader)
 
     self.bdi = BDIModel(self)
 
-    self.log = log.tag("A")
+    self.log = log.tag("A "..self.id)
 
     self.interface = setmetatable({
       log = print,

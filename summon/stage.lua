@@ -3,18 +3,18 @@ local Stage
 return function(loader)
   if Stage then return Stage end
 
-  local vec = loader.require "vector"
-  local log = loader.load "log"
-  local sg = loader.require "graphics"
-  local fs = loader.require "filesystem"
+  local vec             = loader.require "vector"
+  local log             = loader.load "log"
+  local sg              = loader.require "graphics"
+  local fs              = loader.require "filesystem"
   local BattleInterface = loader.load "battle-interface"
   local EventDispatcher = loader.load "event-dispatcher"
-  local World = loader.load "world"
-  local AssetLoader = loader.load "asset-loader"
-  local GM = loader.load "gm"
-  local Camera = loader.load "camera"
+  local World           = loader.load "world"
+  local AssetLoader     = loader.load "asset-loader"
+  local GM              = loader.load "gm"
+  local Camera          = loader.load "camera"
   local MessageRenderer = loader.load "message-renderer"
-  local SpriteBatch = loader.load "spritebatch"
+  local SpriteBatch     = loader.load "spritebatch"
 
   Stage = loader.class("Stage", EventDispatcher)
 
@@ -83,7 +83,7 @@ return function(loader)
     self.canvas:clear()
     sg.setBackgroundColor( self.background )
     sg.setCanvas(self.canvas)
-    
+
     SpriteBatch.clear()
     self.world:draw()
     SpriteBatch.draw()
