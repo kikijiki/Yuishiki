@@ -119,13 +119,13 @@ return function(loader)
       local cmd = self.commands:top()
 
       if coroutine.status(cmd) == "dead" then
-        self.commands:pop()
+        self:pop()
       else
         local ok
         ok, dt = coroutine.resume(cmd, dt, self)
         if not ok then
           log.e("Error in command:"..dt)
-          self.commands:pop()
+          self:pop()
         end
       end
     end
