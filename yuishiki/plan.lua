@@ -194,16 +194,22 @@ return function(loader)
     end
   end
 
-  function Plan:record(result, state)
+  function Plan:record(result, state, max)
     local bb = self.agent.bdi.belief_base
     local history = bb:get(self.history_path)
 
     if not history then
       history = {}
       bb:set(history, self.history_path)
+    else
+      history = history:get()
     end
 
-    table.insert({result = result, state = state})
+    table.insert(history, {result = result, state = state})
+
+    if max then
+      while #history > max do table.remove(history, 1) end
+    end
   end
 
   function Plan.static.matchHistory(plan, bb, state)
@@ -218,12 +224,12 @@ return function(loader)
     for _,record in pairs(history) do
       local matches = 0
       for k,v in pairs(state) do
-        if record[k] == v then matches = matches + 1 end
+        if record.state[k] == v then matches = matches + 1 end
       end
       if matches > 0 then
         if matches > best.matches then
           best.matches = matches
-          best.entries = {record}
+          best.records = {record}
         elseif matches == best.matches then
           table.insert(best.records, record)
         end
@@ -232,11 +238,11 @@ return function(loader)
 
     if best.matches == 0 then return 0, 0 end
 
-    local average
-    for _,record in pairs(self.records) do
-      average = average + record.value
+    local average = 0
+    for _,record in pairs(best.records) do
+      average = average + record.result
     end
-    average = average / #self.records
+    average = average / #best.records
     local matches = best.matches / state_count
 
     return matches, average
