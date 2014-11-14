@@ -90,12 +90,13 @@ return function(loader)
       local duration = distance / speed
       local versor = diff:normalize_inplace()
 
-      if z then char.sprite.z = math.min(z, char.sprite.z) end
+      local startz = char.sprite.z
 
       while progress < distance do
         local d = dt * speed
         progress = progress + d
         char.sprite:move(versor * d)
+        char.sprite.z = startz + progress / distance * (z - startz)
         dt = coroutine.yield()
       end
 
@@ -126,6 +127,7 @@ return function(loader)
   Commands.jump = function(destination, jumpFactor)
     return function(dt, char)
       local map = char.world.map
+      local sprite = char.sprite
 
       if not map:containsTile(destination) then return end
       if destination == char.status.position then return end
@@ -135,14 +137,14 @@ return function(loader)
       local h = to.height - from.height
       local dstbase = to.top + vec(0, h)
       local diff = dstbase - from.top
-      local dist = diff:len()
+      local distance = diff:len()
       local versor = diff:normalize_inplace()
-      local j = math.max(h * 1.2, jumpFactor * math.sqrt(h*h + dist * dist))
+      local j = math.max(h * 1.2, jumpFactor * math.sqrt(h*h + distance^2))
       local g = 1000
       local a = -2 * math.sqrt(j*(j-h)) + h - 2 * j -- magic
       local b = h - a
       local duration = math.sqrt((4*j - h)/g) -- more magic
-      local speed = dist / duration
+      local speed = distance / duration
 
       sprite:setAnimation("jump")
       sprite:setDirection(
@@ -161,7 +163,7 @@ return function(loader)
         elapsed = elapsed + coroutine.yield()
       end
 
-      sprite:setPosition(to.top, to.z)
+      sprite:setPosition(to.top, to.spriteZ)
       char.status.position:set(destination)
       return (progress - distance) / speed
     end
