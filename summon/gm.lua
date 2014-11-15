@@ -256,6 +256,12 @@ return function(loader)
     return action:execute(self, c, ...)
   end
 
+  function GM:getActionMetadata(c, a, ...)
+    if c.actions:isset(a) and self.actions[a] then
+      return self.actions[a]:getMetadata(self, c, ...)
+    end
+  end
+
   function GM:canExecuteAction(c, a, ...)
     if not c or not c.actions[a] or not self.actions[a] then return false end
     local action = self.actions[a]
