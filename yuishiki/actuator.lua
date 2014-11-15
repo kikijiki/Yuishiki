@@ -12,10 +12,11 @@ return function(loader)
       __index = function(_, k)
         return setmetatable(
         {
-          available = function() return self:available(k) end,
-          canExecute = function(...) return self:canExecute(k, ...) end,
-          execute = function(...) return self:execute(k, ...) end,
-          cost = function(...) return self:getCost(k, ...)end,
+          available  = function(...) return self:available  (k, ...) end,
+          canExecute = function(...) return self:canExecute (k, ...) end,
+          execute    = function(...) return self:execute    (k, ...) end,
+          cost       = function(...) return self:getCost    (k, ...) end,
+          meta       = function(...) return self:getMetadata(k, ...) end
         },
         {
           __call = function(t, ...) return self:execute(k, ...) end
@@ -52,6 +53,12 @@ return function(loader)
   function Actuator:getCost(action, ...)
     if self.caller and self.caller.getCost then
       return self.caller.getCost(action, ...)
+    end
+  end
+
+  function Actuator:getMetadata(action, ...)
+    if self.caller and self.caller.getMetadata then
+      return self.caller.getMetadata(action, ...)
     end
   end
 

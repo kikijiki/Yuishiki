@@ -73,6 +73,9 @@ return function(loader)
       end,
       getCost = function(a, ...)
         return self.gm:getActionCost(self, a, ...)
+      end,
+      getMetadata = function(a, ...)
+        return a:getMetadata(self.gm, c, ...)
       end
     })
 
