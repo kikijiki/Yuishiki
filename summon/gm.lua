@@ -332,5 +332,10 @@ return function(loader)
     return Value.fromData(...)
   end
 
+  function GM:getAttackDirection(c, target)
+    local dx = c.sprite.position.x - target.sprite.position.x
+    if dx > 0 then return -1 else return 1 end
+  end
+
   return GM
 end

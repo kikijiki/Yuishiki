@@ -147,8 +147,8 @@ return function(loader)
     self:dispatch("speak", self, message, duration or 1, position)
   end
 
-  function Character:bubble(message, color)
-    self:dispatch("bubble", self, message, self.sprite:getTag("head"), color)
+  function Character:bubble(message, direction, color)
+    self:dispatch("bubble", self, message, self.sprite:getTag("head"), direction, color)
   end
 
   function Character:addValue(data, ...) assert(data)
@@ -202,9 +202,9 @@ return function(loader)
     end
   end
 
-  function Character:hit(damage)
+  function Character:hit(damage, direction)
     if damage then
-      self:bubble(damage, {255, 127, 0})
+      self:bubble(damage, direction, {255, 127, 0})
       self:pushCommand("animation", "hit")
     end
   end

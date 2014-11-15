@@ -3,7 +3,8 @@ local MessageRenderer
 return function(loader)
   if MessageRenderer then return MessageRenderer end
 
-  local sg  = loader.require "graphics"
+  local sg = loader.require "graphics"
+  local sp = loader.require "physics"
   local vec = loader.require "vector"
   local split = loader.load("uti").split
   local AssetLoader = loader.load "asset-loader"
@@ -34,19 +35,20 @@ return function(loader)
     self.bubbling = {
       fontsize = bsize or 40,
       fontname = bfont or "ipamp.ttf",
-      top = 400,
-      fadeout = 50,
-      speed = 250,
-      jitter = 10,
       bubbles = {}
     }
     self.bubbling.font = AssetLoader.load(
       "font", self.bubbling.fontname.."@"..self.bubbling.fontsize)
 
     self.camera = camera
+
+    sp.setMeter(64)
+    self.world = sp.newWorld(0, 640, true)
   end
 
   function MessageRenderer:update(dt)
+  self.world:update(dt)
+
   self:updateSpeech(dt)
   self:updateBubbles(dt)
   end
@@ -156,72 +158,58 @@ return function(loader)
       end
     end
   end
-
-  function MessageRenderer:bubble(id, message, position, color)
+local ba = false
+  function MessageRenderer:bubble(id, message, position, direction, color)
     local b = self.bubbling
     local width = b.font:getWidth(message)
-    if not b.bubbles[id] then b.bubbles[id] = {} end
+
     local col = color or {255, 255, 255, 255}
     if not col[4] then col[4] = 255 end
 
     position.x = position.x - width / 2
     position.y = position.y - b.fontsize
 
-    table.insert(b.bubbles[id], 1, {
+    local body = sp.newBody(self.world, position.x, position.y, "dynamic")
+    local shape = sp.newRectangleShape(width, b.fontsize)
+    local fixture = sp.newFixture(body, shape)
+
+    --body:setMass(width)
+    directon = direction or 0
+    body:applyForce(direction * 3000, -2000)
+    
+    local cat = math.floor(direction) + 2
+    fixture:setCategory(cat)
+    if cat ~= 1 then fixture:setMask(1) end
+    if cat ~= 2 then fixture:setMask(2) end
+    if cat ~= 3 then fixture:setMask(3) end
+
+    table.insert(b.bubbles, {
       message = message,
       size = {width, b.fontsize},
-      position = position,
-      offset = vec((b.jitter - 2*b.jitter*math.random()), 0),
-      --offset = vec(0, 0),
       color = col,
-      alpha = 1})
-  end
-
-  local function updateBubble(bubble, s, b, dt)
-    bubble.offset.y = bubble.offset.y + b.speed * dt
-    if bubble.offset.y > b.top then table.remove(s) end
-    local remaining = b.top - bubble.offset.y
-    if remaining < b.fadeout then
-      bubble.alpha = remaining / b.fadeout
-    end
-    if bubble.offset.y < b.fontsize then return false
-    else return true end
+      alpha = 1,
+      body = body,
+      shape = shape,
+      fixture = fixture
+    })
   end
 
   function MessageRenderer:updateBubbles(dt)
-    local b = self.bubbling
-    for id,s in pairs(b.bubbles) do
-      local i = #s
-      while i > 0 and updateBubble(s[i], s, b, dt) do i = i - 1 end
-    end
+
   end
 
   function MessageRenderer:drawBubbles()
-    for _,s in pairs(self.bubbling.bubbles) do
-      for _,b in pairs(s) do
-        if b.offset.y > 0 then
-          self:drawBubble(b)
-        end
-      end
+    for _,b in pairs(self.bubbling.bubbles) do
+      self:drawBubble(b)
     end
   end
 
   function MessageRenderer:drawBubble(b)
     local c = b.color
     self.bubbling.font:apply()
-    local pos = b.position - b.offset
-    sg.setColor(0, 0, 0, c[4] * b.alpha)
-    local d = 3
-    sg.print(b.message, pos.x, pos.y + d)
-    sg.print(b.message, pos.x, pos.y - d)
-    sg.print(b.message, pos.x + d, pos.y + d)
-    sg.print(b.message, pos.x + d, pos.y - d)
-    sg.print(b.message, pos.x - d, pos.y + d)
-    sg.print(b.message, pos.x - d, pos.y - d)
-    sg.print(b.message, pos.x - d, pos.y)
-    sg.print(b.message, pos.x + d, pos.y)
+    local posx, posy = b.body:getWorldPoints(b.shape:getPoints())
     sg.setColor(c[1], c[2], c[3], c[4] * b.alpha)
-    sg.print(b.message, pos.x, pos.y)
+    sg.print(b.message, posx, posy, b.body:getAngle())
   end
 
   return MessageRenderer

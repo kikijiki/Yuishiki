@@ -61,8 +61,8 @@ return function(loader)
             self.messageRenderer:speak(character.sprite, message, duration, position)
           end)
         c:listen(self, "bubble",
-          function(character, message, position, color)
-            self.messageRenderer:bubble(character.sprite, message, position, color)
+          function(character, message, position, direction, color)
+            self.messageRenderer:bubble(character.sprite, message, position, direction, color)
           end)
       end)
   end
