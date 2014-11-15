@@ -10,7 +10,7 @@ return function(loader)
 
   MessageRenderer = loader.class("MessageRenderer")
 
-  function MessageRenderer:initialize(mfont, msize, bfont, bsize, transform)
+  function MessageRenderer:initialize(mfont, msize, bfont, bsize, camera)
     self.speech = {
       fontsize = msize or 28,
       fontname = mfont or "ipamp.ttf",
@@ -23,9 +23,9 @@ return function(loader)
         left = 20,
         right = 60},
       color = {
-        text = {255, 255, 255, 255},
-        background = {100, 100, 100, 200},
-        border = {200, 200, 200, 255}},
+        text = {0, 0, 0, 255},
+        background = {255, 255, 255, 200},
+        border = {50, 50, 50, 255}},
       queues = {}
     }
     self.speech.font = AssetLoader.load(
@@ -43,7 +43,7 @@ return function(loader)
     self.bubbling.font = AssetLoader.load(
       "font", self.bubbling.fontname.."@"..self.bubbling.fontsize)
 
-    self.transform = transform
+    self.camera = camera
   end
 
   function MessageRenderer:update(dt)
@@ -109,7 +109,7 @@ return function(loader)
         if type(position) == "function" then position = position(speech.source)
         elseif position.getPosition then position = position:getPosition() end
 
-        position = self.transform(position)
+        position = self.camera:gameToScreen(position)
         local o = position:clone()
 
         o.x = o.x + s.arrow.offset

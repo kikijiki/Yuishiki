@@ -28,11 +28,10 @@ return function(loader)
     self.interface = BattleInterface(self)
     self.mouse = vec()
     self.background = {0, 0, 0}
-    self.messageRenderer = MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30,
-      function(v) return self.camera:gameToScreen(v) end)
+    self.messageRenderer =
+      MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
 
     self:listenToGM(self.gm)
-
     local path = AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
     fs.getDirectoryItems(path, function(file)
       log.i("Loading ruleset "..file)
@@ -88,10 +87,11 @@ return function(loader)
     self.world:draw()
     SpriteBatch.draw()
 
-    self.messageRenderer:draw()
+    self.messageRenderer:drawBubbles()
     self.interface:drawCursor()
 
     self.camera:finish()
+    self.messageRenderer:drawSpeech()
     self.interface:draw()
     sg.setCanvas()
     sg.pop()
