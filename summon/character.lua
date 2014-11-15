@@ -204,7 +204,9 @@ return function(loader)
 
   function Character:hit(damage, direction)
     if damage then
-      self:bubble(damage, direction, {255, 127, 0})
+      local range = 0.2
+      local cint = math.floor(120 * (1 - range + math.random() * range)) print(cint)
+      self:bubble(damage, direction, {255, cint, 0})
       self:pushCommand("animation", "hit")
     end
   end

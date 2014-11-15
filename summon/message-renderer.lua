@@ -42,8 +42,8 @@ return function(loader)
 
     self.camera = camera
 
-    sp.setMeter(64)
-    self.world = sp.newWorld(0, 640, true)
+    sp.setMeter(100)
+    self.world = sp.newWorld(0, 1000, true)
   end
 
   function MessageRenderer:update(dt)
@@ -162,21 +162,21 @@ local ba = false
   function MessageRenderer:bubble(id, message, position, direction, color)
     local b = self.bubbling
     local width = b.font:getWidth(message)
+    directon = direction or 0
 
     local col = color or {255, 255, 255, 255}
     if not col[4] then col[4] = 255 end
 
-    position.x = position.x - width / 2
+    position.x = position.x - (width / 2) * (1 - direction)
     position.y = position.y - b.fontsize
 
     local body = sp.newBody(self.world, position.x, position.y, "dynamic")
     local shape = sp.newRectangleShape(width, b.fontsize)
     local fixture = sp.newFixture(body, shape)
 
-    --body:setMass(width)
-    directon = direction or 0
-    body:applyForce(direction * 3000, -2000)
-    
+    body:setMass(1)
+    body:applyForce(direction * 10000, -30000)
+
     local cat = math.floor(direction) + 2
     fixture:setCategory(cat)
     if cat ~= 1 then fixture:setMask(1) end
@@ -208,6 +208,11 @@ local ba = false
     local c = b.color
     self.bubbling.font:apply()
     local posx, posy = b.body:getWorldPoints(b.shape:getPoints())
+    sg.setColor(0, 0, 0, 255 * b.alpha)
+    sg.print(b.message, posx - 2, posy - 2, b.body:getAngle())
+    sg.print(b.message, posx - 2, posy + 2, b.body:getAngle())
+    sg.print(b.message, posx + 2, posy + 2, b.body:getAngle())
+    sg.print(b.message, posx + 2, posy - 2, b.body:getAngle())
     sg.setColor(c[1], c[2], c[3], c[4] * b.alpha)
     sg.print(b.message, posx, posy, b.body:getAngle())
   end
