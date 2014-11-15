@@ -71,7 +71,7 @@ return function(loader)
           schema,
           goal.parameters,
           self.belief_base.interface,
-          self.agent.actuator)
+          self.agent.actuator.interface)
         if type(efficiency) ~= "number" then efficiency = 0 end
       end
       if not best or efficiency > best_efficiency then
