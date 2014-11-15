@@ -90,13 +90,12 @@ return function(loader)
       local duration = distance / speed
       local versor = diff:normalize_inplace()
 
-      local startz = char.sprite.z
+      char.sprite.z = math.min(char.sprite.z, z)
 
       while progress < distance do
         local d = dt * speed
         progress = progress + d
         char.sprite:move(versor * d)
-        char.sprite.z = startz + progress / distance * (z - startz)
         dt = coroutine.yield()
       end
 
