@@ -48,6 +48,8 @@ return function (base_path)
   summon.AssetLoader     = loader.load "asset-loader"
 
   summon.graphics        = loader.require "graphics"
+  summon.physics         = loader.require "physics"
+
   summon.Console         = loader.load "console"
   summon.Camera          = loader.load "camera"
   summon.Texture         = loader.load "texture"
