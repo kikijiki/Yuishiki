@@ -9,6 +9,7 @@ return function(loader)
     self.cost = data.cost
     self.condition = data.condition
     self.async = data.async or false
+    self.meta = data.meta
   end
 
   function Action:canExecute(gm, c, ...)
@@ -28,6 +29,10 @@ return function(loader)
     else
       return false
     end
+  end
+
+  function Action:getMetadata(gm, c, ...)
+    if self.meta then return self.meta(gm, c, ...)
   end
 
   return Action
