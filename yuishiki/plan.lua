@@ -27,7 +27,7 @@ return function(loader)
   --
   -- - `body`: a function defining the main code of the plan.
   -- - `meta`: true if the plan is a metaplan (optional, default = false).
-  -- - `confidence`: a function returning a value that represents how good this plan is in the current situation (optional).
+  -- - `efficiency`: a function returning a value that represents how good this plan is in the current situation (optional).
   -- - `trigger`: definition of the creation trigger of the plan.
   -- - `conditions`: definition of a manual trigger for [completion, context, initial, failure, success].
   -- - `on`: definition of a manual trigger for [success, failure, yield, resume].
@@ -54,7 +54,7 @@ return function(loader)
 
     PlanClass.body = data.body
     PlanClass.meta = data.meta or false
-    PlanClass.confidence = data.confidence
+    PlanClass.efficiency = data.efficiency
     PlanClass.trigger = Trigger.fromData(data.trigger)
     PlanClass.conditions = ManualTrigger(data.conditions)
     PlanClass.on = ManualTrigger(data.on)

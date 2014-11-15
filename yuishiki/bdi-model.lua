@@ -63,20 +63,20 @@ return function(loader)
 
     -- Default
     local best
-    local best_confidence = 0
+    local best_efficiency = 0
     for _,schema in pairs(options) do
-      local confidence = 0
-      if schema.confidence then
-        confidence = schema.confidence(
+      local efficiency = 0
+      if schema.efficiency then
+        efficiency = schema.efficiency(
           schema,
           goal.parameters,
           self.belief_base.interface,
           self.agent.actuator)
-        if type(confidence) ~= "number" then confidence = 0 end
+        if type(efficiency) ~= "number" then efficiency = 0 end
       end
-      if not best or confidence > best_confidence then
+      if not best or efficiency > best_efficiency then
         best = schema
-        best_confidence = confidence
+        best_efficiency = efficiency
       end
     end
 
