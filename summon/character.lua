@@ -75,7 +75,7 @@ return function(loader)
         return self.gm:getActionCost(self, a, ...)
       end,
       getMetadata = function(a, ...)
-        return a:getMetadata(self.gm, c, ...)
+        return self.gm:getActionMetadata(self, a, ...)
       end
     })
 
@@ -144,7 +144,7 @@ return function(loader)
     local position = function(s)
       return self.sprite:getTag("head") + vec(5, -5) * self.sprite.scale
     end
-    self:dispatch("speak", self, message, duration, position)
+    self:dispatch("speak", self, message, duration or 1, position)
   end
 
   function Character:bubble(message, color)

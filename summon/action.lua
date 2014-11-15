@@ -32,7 +32,7 @@ return function(loader)
   end
 
   function Action:getMetadata(gm, c, ...)
-    if self.meta then return self.meta(gm, c, ...)
+    if self.meta then return self.meta(gm, c, ...) end
   end
 
   return Action
