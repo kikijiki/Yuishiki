@@ -58,11 +58,13 @@ return function(loader)
       function(c)
         c:listen(self, "speak",
           function(character, message, duration, position)
-            self.messageRenderer:speak(character.sprite, message, duration, position)
+            self.messageRenderer:speak(
+              character.sprite, message, duration, position)
           end)
         c:listen(self, "bubble",
           function(character, message, position, direction, color)
-            self.messageRenderer:bubble(character.sprite, message, position, direction, color)
+            self.messageRenderer:bubble(
+              character.sprite, message, position, direction, color)
           end)
       end)
   end
@@ -163,6 +165,14 @@ return function(loader)
   function Stage:mousereleased(x, y, button)
     if button == "l" then self.camera:stopDrag() end
     self:dispatch("mousereleased", x, y, button)
+  end
+
+  function Stage:export()
+    return self.world.characters
+  end
+
+  function Stage:import(data)
+    print(data)
   end
 
   return Stage

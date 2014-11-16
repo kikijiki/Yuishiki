@@ -1,5 +1,4 @@
 local summon = require "summon"()
-local Character = summon.Character
 local Stage = summon.Stage
 local Phase = require "game.phase"
 local Message = require "game.message"
@@ -32,10 +31,22 @@ end
 
 function Scenario:play()
   local phases = self.data.phases
-  for phase = #phases, 1, -1 do
-    local data = phases[phase]
-    if data[1] == "message" then self.game:push(Message(data))
-    else self.game:push(Phase(data, characters)) end
+  local next_battle_phase
+  for i = #phases, 1, -1 do
+    local data = phases[i]
+
+    if data[1] == "message" then
+      self.game:push(Message(data))
+    else
+      local phase = Phase(data)
+
+      if next_battle_phase then
+        phase.next_phase = next_battle_phase
+      end
+
+      self.game:push(phase)
+      next_battle_phase = phase
+    end
   end
 end
 

@@ -84,7 +84,7 @@ function Phase:update(dt)
     text = "Next",
     pos = {self.vp.x - 120 - self.padding, self.padding},
     size = {120, self.title_size + self.description_size}} then
-      self.game:pop()
+      self:pop()
   end
 
   if self.activeStage then
@@ -123,6 +123,21 @@ function Phase:mousereleased(x, y, button)
     y = y - self.activeStage[2].y
     self:updateStageMouse(self.activeStage[1], x, y)
     self.activeStage[1]:mousereleased(x, y, button)
+  end
+end
+
+function Phase:pop()
+  local data = {}
+  for i, stage in ipairs(self.stages) do
+    data[i] = stage[1]:export()
+  end
+  if self.next_phase then self.next_phase:import(data) end
+  self.game:pop()
+end
+
+function Phase:import(data)
+  for i, stage in ipairs(self.stages) do
+    stage[1]:import(data[i])
   end
 end
 
