@@ -89,7 +89,7 @@ return function(loader)
 
     if mod.b then
       for k,v in pairs(mod.b) do
-        self.bdi.belief_base:set(v, k)
+        self.bdi.belief_base:setLong(v, k)
       end
     end
 
@@ -98,6 +98,18 @@ return function(loader)
         self.bdi.functions[k] = f
       end
     end
+  end
+
+  function Agent:save()
+    local data = {
+      beliefs = self.bdi.belief_base:save(),
+      -- goals = {}
+    }
+    return data
+  end
+
+  function Agent:restore(data)
+    self.bdi.belief_base:restore(data.beliefs)
   end
 
   return Agent

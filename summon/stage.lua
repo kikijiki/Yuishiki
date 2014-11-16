@@ -168,11 +168,19 @@ return function(loader)
   end
 
   function Stage:export()
-    return self.world.characters
+    local data = {}
+    for id, char in pairs(self.world.characters) do
+      data[id] = char.agent:save()
+    end
+    return data
   end
 
   function Stage:import(data)
-    print(data)
+    for id, agent_data in pairs(data) do
+      if self.world.characters[id] then
+        self.world.characters[id].agent:restore(agent_data)
+      end
+    end
   end
 
   return Stage

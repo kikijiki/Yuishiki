@@ -8,7 +8,7 @@ return function(loader)
 
   Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 
-  function Belief:initialize(value, name, path, source)
+  function Belief:initialize(value, name, path, storage, source)
     Observable.initialize(self)
 
     self.name = name
@@ -16,6 +16,7 @@ return function(loader)
 
     self.value  = value
 
+    self.storage = storage or "short"
     self.source  = source or "internal"
     self.history = nil -- TODO: save past values.
   end

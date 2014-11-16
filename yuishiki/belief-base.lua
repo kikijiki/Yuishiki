@@ -27,7 +27,6 @@ return function(loader)
 
     self.log = log.tag("BB")
 
-    -- TODO
     self.interface = {
       d = self.beliefs,
       set = function(...) return self:set(...) end,
@@ -74,11 +73,11 @@ return function(loader)
     return a..PATH_SEPARATOR..b
   end
 
-  function set(bb, source, data, ...)
+  function set(bb, source, storage, data, ...)
     local full_path = table.concat({...}, ".")
     local base_path, name = BeliefBase.parsePath(full_path)
 
-    local belief = Belief(data, name, full_path, source)
+    local belief = Belief(data, name, full_path, storage, source)
     belief:addObserver(bb, bb.observer)
 
     bb.lookup[full_path] = belief
@@ -91,13 +90,33 @@ return function(loader)
     return belief
   end
 
-  -- TODO check for overwrite?
-  function BeliefBase:set(...)
-    return set(self, "internal", ...)
+  function raw_set(bb, path, belief)
+    local base_path, name = BeliefBase.parsePath(path)
+    local root = bb:resolve(base_path, true)
+
+    root[name] = belief
+    bb.lookup[path] = belief
+
+    belief:addObserver(bb, bb.observer)
+    bb:notify(Event.Belief(belief, Belief.Status.new, belief:get()))
+
+    return belief
+  end
+
+  function BeliefBase:set(storage, ...)
+    return set(self, "internal", storage, ...)
+  end
+
+  function BeliefBase:setShort(...)
+    return set(self, "internal", "short", ...)
+  end
+
+  function BeliefBase:setLong(...)
+    return set(self, "internal", "long", ...)
   end
 
   function BeliefBase:import(...)
-    return set(self, "external", ...)
+    return set(self, "external", "short", ...)
   end
 
   function BeliefBase:unset(path)
@@ -135,11 +154,31 @@ return function(loader)
     self.log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
     self.log.i()
     for _,path in pairs(paths) do
+      local belief = self.lookup[path]
+      local source, storage
+      if belief.source == "internal" then source = "I" else source = "E" end
+      if belief.storage == "short" then storage = "S" else storage = "L" end
       local skip = longest - lengths[path]
-      self.log.fi("%s %s %s", path, string.rep(PATH_SEPARATOR, skip), tostring(self.lookup[path]))
+      self.log.fi("[%s%s] %s %s %s", source, storage, path, string.rep(".", skip), tostring(belief))
     end
     self.log.i()
     self.log.i("--[[BELIEF BASE DUMP END]]--")
+  end
+
+  function BeliefBase:save()
+    local data = {}
+    for path, belief in pairs(self.lookup) do
+      if belief.source == "internal" and belief.storage == "long" then
+        data[path] = belief
+      end
+    end
+    return data
+  end
+  
+  function BeliefBase:restore(data)
+    for path, belief in pairs(data) do print("restoring", path)
+      raw_set(self, path, belief)
+    end
   end
 
   return BeliefBase
