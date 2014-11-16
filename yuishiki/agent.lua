@@ -31,7 +31,7 @@ return function(loader)
     self.log = log.tag("A "..self.id)
 
     self.interface = setmetatable({
-      log = print,
+      log = self.log,
       bdi = self.bdi,
       internal = self,
       external = setmetatable({},{}),
