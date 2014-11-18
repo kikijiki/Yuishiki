@@ -158,6 +158,8 @@ return function(loader)
         local x = progress / distance
         local y = x^2 * a + x * b
         local tra = versor * progress + from.top
+        tra.y = tra.y - y
+        
         sprite:setPosition(tra)
         elapsed = elapsed + coroutine.yield()
       end
