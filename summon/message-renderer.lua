@@ -195,7 +195,13 @@ local ba = false
   end
 
   function MessageRenderer:updateBubbles(dt)
-
+    for i = #self.bubbling.bubbles, 1, -1 do
+      local b = self.bubbling.bubbles[i]
+      local posx, posy = b.body:getWorldPoints(b.shape:getPoints())
+      if posy > self.camera.vp.y then
+        table.remove(self.bubbling.bubbles, i)
+      end
+    end
   end
 
   function MessageRenderer:drawBubbles()
