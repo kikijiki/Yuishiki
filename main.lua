@@ -11,7 +11,8 @@ ys.log.addOutput(function(data) console[data.severity](console, data.full) end)
 summon.log.showTime = false
 summon.log.showInfo = false
 summon.log.verbosity = summon.log.Verbosity.verbose
-summon.log.addOutput(function(data) console[data.severity](console, data.full) end)
+summon.log.addOutput(
+  function(data) console[data.severity](console, data.full) end)
 
 -- Load scenarios data
 local scenarios_path = "assets/scenarios/"

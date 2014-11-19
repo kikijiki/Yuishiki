@@ -34,7 +34,7 @@ end
 function addScenario(menu, data)
   if gui.Button{
       text = data.name,
-      size = {menu.btnw, menu.fonts.normal_size}}
+      size = {menu.btnw, menu.fonts.normal_size + menu.button_margin}}
   then
     menu.game:push(Scenario(data))
   end
@@ -75,8 +75,9 @@ function Menu:resize(w, h)
   self.title_offset = title_size + self.title_spacing * 2
 
   local entry_height = (h - self.title_offset) / #self.scenarios
+  self.button_margin = entry_height / 10
   self.spacing = entry_height / 4
-  local font_size = entry_height - self.spacing
+  local font_size = entry_height - self.spacing - self.button_margin * 2
   self.spacing = math.max(self.spacing, 1)
   font_size = math.max(font_size, 10)
 
