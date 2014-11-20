@@ -10,7 +10,7 @@ function Phase:initialize(data)
   self.stages = {}
   self.activeStage = nil
   self.title = data.title
-  self.description = data.desc
+  self.description = data.description
   self.vp = vec(0, 0)
   self.padding = 10
   self.title_size = 80
@@ -75,11 +75,11 @@ function Phase:draw()
     sg.pop()
   end
 
-  self.font.description:apply()
   gui.core.draw()
 end
 
 function Phase:update(dt)
+  self.font.description:apply()
   if gui.Button{
     text = "Next",
     pos = {self.vp.x - 120 - self.padding, self.padding},

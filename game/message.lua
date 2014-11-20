@@ -5,7 +5,7 @@ local Message = summon.class("state.Message")
 
 function Message:initialize(data)
   self.title = data.title
-  self.message = data.msg
+  self.message = data.message
   self.fade = -255
   self.fadeout = 0.2
   self.margin = 100
