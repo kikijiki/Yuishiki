@@ -40,6 +40,32 @@ return function(loader)
   function Console:keypressed(key)
   	if key == self.enable_key then self.visible = not self.visible end
   end
+  
+    function Console:mousepressed(x, y, button )
+  	if not self.visible then return false end
+
+    local consumed = false
+
+    if button == "wu" then
+    	self.current_line = self.current_line + 1
+   		consumed = true
+    end
+
+    if button == "wd" then
+    	self.current_line = self.current_line - 1
+    	consumed = true
+    end
+    
+    if button == "m" then
+      self.current_line = 1
+      consumed = true
+    end
+
+    if self.current_line < 1 then self.current_line = 1 end
+    if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
+
+  	return consumed
+  end
 
   function Console:draw()
   	if not self.visible then return end
@@ -72,27 +98,6 @@ return function(loader)
 
     if original_font then sg.setFont(original_font) end
   	sg.setColor(original_color)
-  end
-
-  function Console:mousepressed(x, y, button )
-  	if not self.visible then return false end
-
-    local consumed = false
-
-    if button == "wu" then
-    	self.current_line = self.current_line + 1
-   		consumed = true
-    end
-
-    if button == "wd" then
-    	self.current_line = self.current_line - 1
-    	consumed = true
-    end
-
-    if self.current_line < 1 then self.current_line = 1 end
-    if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
-
-  	return consumed
   end
 
   local function log(self, level, msg)
