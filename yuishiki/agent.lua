@@ -45,6 +45,7 @@ return function(loader)
 
   function Agent:importBelief(...) return self.bdi.belief_base:import(...) end
   function Agent:addAction(action) return self.actuator:addAction(action) end
+  function Agent:pushGoal(...) return self.bdi:pushGoal(...) end
 
   function Agent:dispatch(event)
     self.bdi:dispatch(event)
