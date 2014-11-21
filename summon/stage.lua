@@ -115,23 +115,7 @@ return function(loader)
     local ac = self.gm.activeCharacter
 
     if key == " " then self.gm:resume() end
-    if key == "return" then
-      for _,c in pairs(self.gm.world.characters) do
-        print(c.name, c.agent.bdi.goal_base)
-        for k,v in pairs(c.agent.bdi.goal_base.goal_schemas) do print(k, v) end
-      end
-    end
-
-    if key == "z" then
-      local oni = self.gm.world.characters["oni"]
-      for k,v in pairs(self.gm.world.characters) do
-        if k ~= "oni" then
-          v.agent.bdi:pushGoal("defeat character", {target = "oni"})
-          oni.agent.bdi:pushGoal("defeat character", {target = k})
-        end
-      end
-    end
-
+    
     if key == "x" and ac then
       ac.agent.bdi.belief_base:dump()
       ac.agent.bdi.intention_base:dump()
