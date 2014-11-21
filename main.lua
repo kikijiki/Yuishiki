@@ -23,7 +23,7 @@ summon.fs.getDirectoryItems(scenarios_path, function(file)
   local scenario = summon.fs.load(scenarios_path..file)()
   table.insert(scenarios, scenario)
 end)
-table.sort(scenarios, function(a, b) return a.name < b.name end)
+--table.sort(scenarios, function(a, b) return a.name < b.name end)
 
 local game = summon.Game()
 

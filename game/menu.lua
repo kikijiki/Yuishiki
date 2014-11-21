@@ -24,9 +24,11 @@ end
 
 function Menu:draw()
   sg.setBackgroundColor(40, 40, 40)
+  
   fonts.title:apply()
   sg.setColor(0, 200, 255)
   sg.printf("YS", 0, self.title_spacing, self.w, "center")
+  
   self:drawLogo()
   gui.core.draw()
 end
@@ -34,7 +36,7 @@ end
 function addScenario(menu, data)
   if gui.Button{
       text = data.name,
-      size = {menu.btnw, menu.fonts.normal_size + menu.button_margin}}
+      size = {menu.btnw, menu.button_height}}
   then
     menu.game:push(Scenario(data))
   end
@@ -74,10 +76,11 @@ function Menu:resize(w, h)
   self.title_offset = title_size + self.title_spacing * 2
   self.logo.scale = title_size / self.logo.h / 2
 
-  local entry_height = (h - self.title_offset) / #self.scenarios
-  self.button_margin = entry_height / 10
-  self.spacing = entry_height / 4
-  local font_size = entry_height - self.spacing - self.button_margin * 2
+  self.entry_height = (h - self.title_offset) / #self.scenarios
+  self.button_height = self.entry_height / 4 * 3
+  self.button_margin = self.entry_height / 10
+  self.spacing = self.entry_height / 4
+  local font_size = self.entry_height - self.spacing - self.button_margin * 2
   self.spacing = math.max(self.spacing, 1)
   font_size = math.max(font_size, 10)
 
