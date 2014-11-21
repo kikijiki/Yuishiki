@@ -62,7 +62,7 @@ local function isBindingDown(bind)
 end
 
 local function makeCyclable(id)
-	tryGrab(id)
+	--tryGrab(id)
 	if hasFocus(id) then
 		if isBindingDown(cycle.prev) then
 			setFocus(lastwidget)
