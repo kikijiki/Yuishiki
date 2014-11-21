@@ -55,11 +55,11 @@ function Message:update(dt)
   end
 end
 
-function Message:keyreleased(key)
+function Message:keypressed(key)
   self.fade = 0
 end
 
-function Message:mousereleased(x, y, button)
+function Message:mousepressed(x, y, button)
   self.fade = 0
 end
 

@@ -48,14 +48,22 @@ return function(loader)
   end
 
   function Console:keypressed(key)
-  	if key == self.enable_key then self.visible = not self.visible end
-    if not self.visible then return end
+    local consumed = false
     
-    if key == "up"       then self:scroll( 1) end
-    if key == "down"     then self:scroll(-1) end
-    if key == "pageup"   then self:scroll( self.page) end
-    if key == "pagedown" then self:scroll(-self.page) end
-    if key == "end"      then self:scroll(0) end
+  	if key == self.enable_key then
+      self.visible = not self.visible
+      return true
+    end
+    
+    if not self.visible then return false end
+    
+    if key == "up"       then self:scroll( 1)         consumed = true end
+    if key == "down"     then self:scroll(-1)         consumed = true end
+    if key == "pageup"   then self:scroll( self.page) consumed = true end
+    if key == "pagedown" then self:scroll(-self.page) consumed = true end
+    if key == "end"      then self:scroll(0)          consumed = true end
+    
+    return consumed
   end
   
     function Console:mousepressed(x, y, button )

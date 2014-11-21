@@ -14,6 +14,8 @@ summon.log.verbosity = summon.log.Verbosity.verbose
 summon.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
+print = summon.log.d
+
 -- Load scenarios data
 local scenarios_path = "assets/scenarios/"
 local scenarios = {}
@@ -42,7 +44,7 @@ function love.resize(w, h)
 end
 
 function love.keypressed(key)
-  console:keypressed(key)
+  if console:keypressed(key) then return end
 
   if key == "escape" then love.event.quit() end
 
