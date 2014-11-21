@@ -30,15 +30,32 @@ return function(loader)
     self.rh = rh or 1
     self.width = 0
     self.height = 0
+    self.page = 3
   end
 
   function Console:resize(w, h)
     self.width = self.rw * w
     self.height = self.rh * h
+    self.page = math.max(1, math.floor((h - self.margin * 2) / (self.font_size + self.padding)) - 1)
+  end
+  
+  function Console:scroll(l)
+    if l == 0 then self.current_line = 1
+    else self.current_line = self.current_line + l end
+  
+    if self.current_line < 1 then self.current_line = 1 end
+    if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
   end
 
   function Console:keypressed(key)
   	if key == self.enable_key then self.visible = not self.visible end
+    if not self.visible then return end
+    
+    if key == "up"       then self:scroll( 1) end
+    if key == "down"     then self:scroll(-1) end
+    if key == "pageup"   then self:scroll( self.page) end
+    if key == "pagedown" then self:scroll(-self.page) end
+    if key == "end"      then self:scroll(0) end
   end
   
     function Console:mousepressed(x, y, button )
@@ -46,20 +63,9 @@ return function(loader)
 
     local consumed = false
 
-    if button == "wu" then
-    	self.current_line = self.current_line + 1
-   		consumed = true
-    end
-
-    if button == "wd" then
-    	self.current_line = self.current_line - 1
-    	consumed = true
-    end
-    
-    if button == "m" then
-      self.current_line = 1
-      consumed = true
-    end
+    if button == "wu" then self:scroll( 1) consumed = true end
+    if button == "wd" then self:scroll(-1) consumed = true end
+    if button ==  "m" then self:scroll( 0) consumed = true end
 
     if self.current_line < 1 then self.current_line = 1 end
     if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
