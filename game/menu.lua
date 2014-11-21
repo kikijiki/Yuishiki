@@ -57,10 +57,9 @@ end
 function Menu:drawLogo()
   sg.setColor(255, 255, 255)
   local rot = math.pow((math.abs(math.sin(self.elapsed))), 0.4)
-  sg.draw(self.logo.texture.data,
-    self.w - self.logo.w * self.logo.scale/2 - 10,
-    self.h - self.logo.h * self.logo.scale/2 - 10,
-    0, self.logo.scale * rot, self.logo.scale, self.logo.w/2, self.logo.h/2)
+  local x = self.w - self.logo.w * self.logo.scale/2 - 10
+  local y = self.title_offset / 2
+  sg.draw(self.logo.texture.data, x, y, 0, self.logo.scale * rot, self.logo.scale, self.logo.w/2, self.logo.h/2)
  end
 
 function Menu:keypressed(key)
@@ -73,6 +72,7 @@ function Menu:resize(w, h)
   local title_size = math.min(320, h / 4)
   self.title_spacing = title_size / 8
   self.title_offset = title_size + self.title_spacing * 2
+  self.logo.scale = title_size / self.logo.h / 2
 
   local entry_height = (h - self.title_offset) / #self.scenarios
   self.button_margin = entry_height / 10
