@@ -81,7 +81,7 @@ end
 function Phase:update(dt)
   self.font.description:apply()
   if gui.Button{
-    text = "Next",
+    text = "次へ",
     pos = {self.vp.x - 120 - self.padding, self.padding},
     size = {120, self.title_size + self.description_size}} then
       self:pop()
