@@ -15,6 +15,7 @@ return function(loader)
   local Camera          = loader.load "camera"
   local MessageRenderer = loader.load "message-renderer"
   local SpriteBatch     = loader.load "spritebatch"
+  local Gui             = loader.load "gui"
 
   Stage = loader.class("Stage", EventDispatcher)
 
@@ -30,14 +31,17 @@ return function(loader)
     self.background = {0, 0, 0}
     self.messageRenderer =
       MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
+    self.play_button = Gui.PlayButton(0, 0, 40,
+      function() self.gm:resume() end)
 
     self:listenToGM(self.gm)
     local path = AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
-    fs.getDirectoryItems(path, function(file)
-      log.i("Loading ruleset "..file)
-      local ruleset = fs.load(path..file)()
-      self.gm:loadRuleset(ruleset)
-    end)
+    fs.getDirectoryItems(path,
+      function(file)
+        log.i("Loading ruleset "..file)
+        local ruleset = fs.load(path..file)()
+        self.gm:loadRuleset(ruleset)
+      end)
 
     for id,char in pairs(data.characters) do
       self.gm:addCharacter(id, char)
@@ -67,6 +71,11 @@ return function(loader)
               character.sprite, message, position, direction, color)
           end)
       end)
+    self.gm:listen(self, "resume",
+      function() self.play_button:stop() end)
+    
+    self.gm:listen(self, "pause",
+      function() self.play_button:play() end)
   end
 
   function Stage:resize(w, h)
@@ -74,6 +83,8 @@ return function(loader)
     self.height = h
     self.camera:resize(w, h)
     self.canvas = sg.newCanvas(w, h)
+    self.play_button.x = w - 50
+    self.play_button.y = h - 50
     self:dispatch("resize", w, h)
   end
 
@@ -95,6 +106,9 @@ return function(loader)
     self.camera:finish()
     self.messageRenderer:drawSpeech()
     self.interface:draw()
+    
+    self.play_button:draw()
+    
     sg.setCanvas()
     sg.pop()
     sg.draw(self.canvas)
@@ -104,18 +118,17 @@ return function(loader)
     self.gm:update(dt)
     self.camera:update(dt, self.mouse)
     self.messageRenderer:update(dt)
+    self.play_button:update(dt)
+    
     if self.gm.activeCharacter then
-      self.interface:setCursor(
-        self.gm.activeCharacter.sprite:getTag("head"))
+      self.interface:setCursor(self.gm.activeCharacter.sprite:getTag("head"))
     end
+    
     self.interface:update(dt)
   end
 
   function Stage:keypressed(key)
     local ac = self.gm.activeCharacter
-
-    if key == " " then self.gm:resume() end
-    
     if key == "x" and ac then
       ac.agent.bdi.belief_base:dump()
       ac.agent.bdi.intention_base:dump()
@@ -148,6 +161,7 @@ return function(loader)
 
   function Stage:mousereleased(x, y, button)
     if button == "l" then self.camera:stopDrag() end
+    self.play_button:mousereleased(x, y, button)
     self:dispatch("mousereleased", x, y, button)
   end
 

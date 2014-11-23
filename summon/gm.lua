@@ -322,10 +322,12 @@ return function(loader)
 
   function GM:pause()
     self.paused = true
+    self:dispatch("pause")
   end
 
   function GM:resume()
     self.paused = false
+    self:dispatch("resume")
   end
 
   function GM.uti.newValue(...)
