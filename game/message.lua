@@ -37,6 +37,7 @@ function Message:draw()
   sg.setColor(200, 200, 200)
   self.font.title:apply()
   sg.print(self.title, self.margin, self.margin)
+  
   self.font.description:apply()
   sg.printf(self.message, self.margin, self.margin * 2 + self.title_size, self.w)
   

@@ -166,6 +166,7 @@ return function(loader)
 
       sprite:setPosition(to.top, to.spriteZ)
       char.status.position:set(destination)
+      sprite:setAnimation("idle")
       return (progress - distance) / speed
     end
   end

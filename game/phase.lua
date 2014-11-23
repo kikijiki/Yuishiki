@@ -63,6 +63,7 @@ function Phase:draw()
   sg.setColor(200, 200, 200)
   self.font.title:apply()
   sg.print(self.title or "", self.padding, self.padding)
+  
   self.font.description:apply()
   sg.print(self.description or "",
     self.padding, self.title_size + self.padding * 2)
