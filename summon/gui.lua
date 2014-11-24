@@ -8,6 +8,50 @@ return function(loader)
 
   Gui = {}
 
+  local RoundButton = loader.class("Gui.RoundButton")
+  Gui.RoundButton = RoundButton
+
+  function RoundButton:initialize(x, y, size, text, callback)
+    self.x = x
+    self.y = y
+    self.callback = callback
+    self.text = text
+    self.colors = {
+      background = { 60,  60,  60},
+      foreground = {120, 120, 120},
+      border     = {255, 255, 255}
+    }
+    self:resize(size)
+  end
+
+  function RoundButton:resize(size)
+    self.size = size
+    self.font_size = size * 2
+    self.font = AssetLoader.load("font", "ipamp.ttf@"..self.font_size)
+    self.text_width = self.font:getWidth(self.text)
+  end
+
+  function RoundButton:draw()
+    sg.setColor(self.colors.background)
+    sg.circle("fill", self.x, self.y, self.size)
+    sg.setColor(self.colors.border)
+    sg.circle("line", self.x, self.y, self.size)
+    sg.setColor(self.colors.foreground)
+    self.font:apply()
+    sg.print(self.text, self.x - self.text_width / 2, self.y - self.font_size / 2)
+    sg.setColor(255, 255, 255)
+  end
+
+  function RoundButton:mousereleased(x, y, button)
+    local dx = self.x - x
+    local dy = self.y - y
+    if dx^2 + dy^2 < self.size^2 then
+      self.callback()
+    end
+  end
+
+  function RoundButton:update(dt) end
+
   local PlayButton = loader.class("Gui.PlayButton")
   Gui.PlayButton = PlayButton
 
@@ -30,7 +74,6 @@ return function(loader)
   end
 
   function PlayButton:draw()
-
     sg.setColor(self.colors.background)
     sg.circle("fill", self.x, self.y, self.size)
     sg.setColor(self.colors.border)

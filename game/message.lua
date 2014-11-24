@@ -16,7 +16,7 @@ function Message:initialize(data)
     description = summon.AssetLoader.load("font", "ipamp.ttf@"..self.description_size),
     title       = summon.AssetLoader.load("font", "ipamp.ttf@"..self.title_size)
   }
-  
+
   self.continue = {
     message = "続けるには, どれかキーを押してください",
     jitter = 5
@@ -28,6 +28,8 @@ function Message:onResume()
 end
 
 function Message:resize(w, h)
+  if not w or not h then w,h = sg.getDimensions() end
+  
   self.w = w
   self.h = h
 end
@@ -37,10 +39,10 @@ function Message:draw()
   sg.setColor(200, 200, 200)
   self.font.title:apply()
   sg.print(self.title, self.margin, self.margin)
-  
+
   self.font.description:apply()
   sg.printf(self.message, self.margin, self.margin * 2 + self.title_size, self.w)
-  
+
   sg.setColor(255, 0, 0)
   local dx = math.random(self.continue.jitter)
   local dy = math.random(self.continue.jitter)

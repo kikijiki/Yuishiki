@@ -31,9 +31,14 @@ return function(loader)
     self.background = {0, 0, 0}
     self.messageRenderer =
       MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
-    self.play_button = Gui.PlayButton(0, 0, 40,
-      function() self.gm:resume() end)
 
+    -- Minimal GUI
+    self.buttons = {}
+    self.buttons.play = Gui.PlayButton(0, 0, 40, function() self.gm:resume() end)
+    self.buttons.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
+    self.buttons.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
+
+    -- Initialize GM
     self:listenToGM(self.gm)
     local path = AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
     fs.getDirectoryItems(path,
@@ -43,10 +48,12 @@ return function(loader)
         self.gm:loadRuleset(ruleset)
       end)
 
+    -- Load characters
     for id,char in pairs(data.characters) do
       self.gm:addCharacter(id, char)
     end
 
+    -- Initialize stage
     if data.init then data.init(self, self.world, self.world.characters) end
     self.gm:start()
     self.gm:nextTurn()
@@ -72,10 +79,10 @@ return function(loader)
           end)
       end)
     self.gm:listen(self, "resume",
-      function() self.play_button:stop() end)
+      function() self.buttons.play:stop() end)
 
     self.gm:listen(self, "pause",
-      function() self.play_button:play() end)
+      function() self.buttons.play:play() end)
   end
 
   function Stage:resize(w, h)
@@ -83,9 +90,22 @@ return function(loader)
     self.height = h
     self.camera:resize(w, h)
     self.canvas = sg.newCanvas(w, h)
-    self.play_button.size = 40 * w / 1000
-    self.play_button.x = w - self.play_button.size - 20
-    self.play_button.y = h - self.play_button.size - 20
+
+    local btn = self.buttons
+    local gui_size = 40 * w / 1000
+
+    btn.play.size = gui_size
+    btn.play.x = w - btn.play.size - 20
+    btn.play.y = h - btn.play.size - 20
+
+    btn.zoom_out:resize(gui_size)
+    btn.zoom_out.x = w - btn.zoom_out.size - 20
+    btn.zoom_out.y = btn.play.y - btn.zoom_out.size * 2 - 20
+
+    btn.zoom_in:resize(gui_size)
+    btn.zoom_in.x = w - btn.zoom_in.size - 20
+    btn.zoom_in.y = btn.zoom_out.y - btn.zoom_in.size * 2 - 20
+
     self:dispatch("resize", w, h)
   end
 
@@ -108,7 +128,7 @@ return function(loader)
     self.messageRenderer:drawSpeech()
     self.interface:draw()
 
-    self.play_button:draw()
+    for _,btn in pairs(self.buttons) do btn:draw() end
 
     sg.setCanvas()
     sg.pop()
@@ -119,7 +139,8 @@ return function(loader)
     self.gm:update(dt)
     self.camera:update(dt, self.mouse)
     self.messageRenderer:update(dt)
-    self.play_button:update(dt)
+
+    for _,btn in pairs(self.buttons) do btn:update(dt) end
 
     if self.gm.activeCharacter then
       self.interface:setCursor(self.gm.activeCharacter.sprite:getTag("head"))
@@ -148,13 +169,11 @@ return function(loader)
     end
 
     if button == "wu" then
-      local c = self.camera
-      c:zoomIn()
+      self.camera:zoomIn()
     end
 
     if button == "wd" then
-      local c = self.camera
-      c:zoomOut()
+      self.camera:zoomOut()
     end
 
     self:dispatch("mousepressed", x, y, button)
@@ -162,7 +181,9 @@ return function(loader)
 
   function Stage:mousereleased(x, y, button)
     if button == "l" then self.camera:stopDrag() end
-    self.play_button:mousereleased(x, y, button)
+    for _,btn in pairs(self.buttons) do
+      btn:mousereleased(x, y, button)
+    end
     self:dispatch("mousereleased", x, y, button)
   end
 

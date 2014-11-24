@@ -51,6 +51,8 @@ function Scenario:play()
 end
 
 function Scenario:resize(w, h)
+  if not w or not h then w,h = sg.getDimensions() end
+  
   self.vp = vec(w, h)
 end
 
@@ -60,7 +62,7 @@ function Scenario:draw()
   sg.setColor(0, 200, 255)
   self.font.title:apply()
   sg.printf(self.name, 60, 60, self.vp.x - 60, "center")
-  
+
   sg.setColor(200, 200, 200)
   self.font.normal:apply()
   sg.printf(self.description, 60, 250, self.vp.x - 60, "left")

@@ -24,11 +24,11 @@ end
 
 function Menu:draw()
   sg.setBackgroundColor(40, 40, 40)
-  
+
   fonts.title:apply()
   sg.setColor(0, 200, 255)
   sg.printf("YS", 0, self.title_spacing, self.w, "center")
-  
+
   self:drawLogo()
   gui.core.draw()
 end
@@ -69,6 +69,8 @@ function Menu:keypressed(key)
 end
 
 function Menu:resize(w, h)
+  if not w or not h then w,h = sg.getDimensions() end
+  
   self.w = w
   self.h = h
   local title_size = math.min(320, h / 4)
