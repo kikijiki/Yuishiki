@@ -52,8 +52,9 @@ return function(loader)
         end
       end
     else
-      local mdir =
-        assert(a.mirror and a.mirror[dir], "Direction "..dir.." is missing.")
+      assert(a.mirror and a.mirror[dir], "Direction "..dir.." is missing.")
+
+      local mdir = a.mirror[dir]
       assert(v[mdir], "Mirrored direction "..mdir.." is missing.")
 
       local src = ss:getFrame(v[mdir])
