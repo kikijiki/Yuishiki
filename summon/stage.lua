@@ -26,6 +26,7 @@ return function(loader)
     self.world = World(map)
     self.gm = GM(self.world)
     self.camera = Camera()
+    self.camera:zoom(2)
     self.interface = BattleInterface(self)
     self.mouse = vec()
     self.background = {0, 0, 0}

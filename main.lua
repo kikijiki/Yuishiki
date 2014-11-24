@@ -1,6 +1,6 @@
 local ys = require "yuishiki"()
 local summon = require "summon"()
-local console = summon.Console()
+console = summon.Console()
 
 -- Setup logging and console
 ys.log.showTime = false

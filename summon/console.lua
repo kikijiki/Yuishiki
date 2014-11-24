@@ -38,34 +38,34 @@ return function(loader)
     self.height = self.rh * h
     self.page = math.max(1, math.floor((h - self.margin * 2) / (self.font_size + self.padding)) - 1)
   end
-  
+
   function Console:scroll(l)
     if l == 0 then self.current_line = 1
     else self.current_line = self.current_line + l end
-  
+
     if self.current_line < 1 then self.current_line = 1 end
     if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
   end
 
+  function Console:show() self.visible = true end
+  function Console:hide() self.visible = false end
+  function Console:flip() self.visible = not self.visible end
+
   function Console:keypressed(key)
-    local consumed = false
-    
-  	if key == self.enable_key then
-      self.visible = not self.visible
-      return true
-    end
-    
+  	if key == self.enable_key then self:flip() return false end
     if not self.visible then return false end
-    
+
+    local consumed = false
+
     if key == "up"       then self:scroll( 1)         consumed = true end
     if key == "down"     then self:scroll(-1)         consumed = true end
     if key == "pageup"   then self:scroll( self.page) consumed = true end
     if key == "pagedown" then self:scroll(-self.page) consumed = true end
     if key == "end"      then self:scroll(0)          consumed = true end
-    
+
     return consumed
   end
-  
+
     function Console:mousepressed(x, y, button )
   	if not self.visible then return false end
 

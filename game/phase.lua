@@ -63,7 +63,7 @@ function Phase:draw()
   sg.setColor(200, 200, 200)
   self.font.title:apply()
   sg.print(self.title or "", self.padding, self.padding)
-  
+
   self.font.description:apply()
   sg.print(self.description or "",
     self.padding, self.title_size + self.padding * 2)
@@ -83,10 +83,17 @@ function Phase:update(dt)
   self.font.description:apply()
   if gui.Button{
     text = "次へ",
-    pos = {self.vp.x - 120 - self.padding, self.padding},
+    pos = {self.vp.x - self.padding - 120, self.padding},
     size = {120, self.title_size + self.description_size}} then
       self:pop()
-  end
+    end
+
+  if gui.Button{
+    text = ".",
+    pos = {self.vp.x - self.padding -180, self.padding + 80},
+    size = {40, 40}} then
+      console:flip()
+    end
 
   if self.activeStage then
     self.activeStage[1].mouse.x = love.mouse.getX() - self.activeStage[2].x
