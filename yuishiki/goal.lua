@@ -23,7 +23,7 @@ return function(loader)
       self.name = name
     end
 
-    GoalClass.creation = Trigger.fromData(data.creation)
+    GoalClass.creation = Trigger.fromData(table.unpack(data.creation))
     GoalClass.conditions = ManualTrigger(data.conditions)
     GoalClass.limit = data.limit
     GoalClass.on = ManualTrigger(data.on)
