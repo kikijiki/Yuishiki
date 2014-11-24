@@ -27,6 +27,14 @@ return function(loader)
     return self.stack:top()
   end
 
+  function Intention:bottom()
+    return self.stack:bottom()
+  end
+
+  function Intention:pairs(n)
+    return self.stack:pairs(n)
+  end
+
   function Intention:empty()
     return self.stack:empty()
   end
@@ -87,7 +95,7 @@ return function(loader)
   end
 
   function Intention:checkConditions()
-    for k,v in self.stack:iterator() do -- check all from the bottom
+    for k,v in self.stack:pairs() do -- check all from the bottom
       if v.getYsType() == "goal" then
         if self:checkGoalConditions(k, v) then break end
       elseif v.getYsType() == "plan" then
@@ -224,7 +232,7 @@ return function(loader)
 
   function Intention:getGoalCount(name)
     local count = 0
-    for _,v in self.stack:iterator() do
+    for _,v in self.stack:pairs() do
       if v:getYsType() == "goal" and v.name == name then
         count = count + 1
       end
@@ -234,6 +242,17 @@ return function(loader)
 
   function Intention:__tostring()
     return "[I] "..self.id.."("..self.stack.size..")"
+  end
+
+  function Intention:getPriority()
+    local priority = 0
+    for k,v in self:pairs() do
+      if v:getYsType() == "goal" then
+        if type(v.priority) == "function" then priority = v:priority()
+        elseif type(v.priority) == "number" then priority = v.priority end
+      end
+    end
+    return priority
   end
 
   return Intention

@@ -2,7 +2,7 @@ local Stack
 
 return function(loader)
   if Stack then return Stack end
-  
+
   Stack = loader.class("Stack")
 
   function Stack:initialize()
@@ -35,6 +35,10 @@ return function(loader)
     return self.elements[self.size]
   end
 
+  function Stack:bottom()
+    return self.elements[1]
+  end
+
   function Stack:insert(e, index)
     table.insert(self.elements, index, e)
     self.size = self.size + 1
@@ -44,7 +48,7 @@ return function(loader)
     return self.size == 0
   end
 
-  function Stack:iterator(start)
+  function Stack:pairs(start)
     local index = start or 1
     return function()
       if index <= self.size then

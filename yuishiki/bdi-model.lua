@@ -51,9 +51,19 @@ return function(loader)
     end
 
     --Default
+    local highest
+    local highest_priority
     for _,intention in pairs(self.intention_base.intentions) do
-      if not intention:waiting() then return intention end
+      if not intention:waiting() then
+        local priority = intention:getPriority()
+        if not highest_priority or priority > highest_priority then
+          highest_priority = priority
+          highest = intention
+        end
+      end
     end
+
+    return highest
   end
 
   function BDIModel:selectPlan(goal, options)
