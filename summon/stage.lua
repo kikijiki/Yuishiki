@@ -73,7 +73,7 @@ return function(loader)
       end)
     self.gm:listen(self, "resume",
       function() self.play_button:stop() end)
-    
+
     self.gm:listen(self, "pause",
       function() self.play_button:play() end)
   end
@@ -83,8 +83,9 @@ return function(loader)
     self.height = h
     self.camera:resize(w, h)
     self.canvas = sg.newCanvas(w, h)
-    self.play_button.x = w - 50
-    self.play_button.y = h - 50
+    self.play_button.size = 40 * w / 1000
+    self.play_button.x = w - self.play_button.size - 20
+    self.play_button.y = h - self.play_button.size - 20
     self:dispatch("resize", w, h)
   end
 
@@ -106,9 +107,9 @@ return function(loader)
     self.camera:finish()
     self.messageRenderer:drawSpeech()
     self.interface:draw()
-    
+
     self.play_button:draw()
-    
+
     sg.setCanvas()
     sg.pop()
     sg.draw(self.canvas)
@@ -119,11 +120,11 @@ return function(loader)
     self.camera:update(dt, self.mouse)
     self.messageRenderer:update(dt)
     self.play_button:update(dt)
-    
+
     if self.gm.activeCharacter then
       self.interface:setCursor(self.gm.activeCharacter.sprite:getTag("head"))
     end
-    
+
     self.interface:update(dt)
   end
 

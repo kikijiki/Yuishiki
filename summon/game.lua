@@ -28,7 +28,9 @@ return function(loader)
   function Game:pop()
     self.states:pop()
     local top = self.states:top()
-    if top and top.onResume then top:onResume() end
+    if not top then return end
+    if top.resize then top:resize() end
+    if top.onResume then top:onResume() end
   end
 
   return Game
