@@ -55,7 +55,7 @@ return function(loader)
     PlanClass.body = data.body
     PlanClass.meta = data.meta or false
     PlanClass.efficiency = data.efficiency
-    PlanClass.trigger = Trigger.fromData(data.trigger)
+    PlanClass.trigger = Trigger.fromData(table.unpack(data.trigger))
     PlanClass.conditions = ManualTrigger(data.conditions)
     PlanClass.on = ManualTrigger(data.on)
     PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false

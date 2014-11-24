@@ -67,29 +67,33 @@ return function(loader)
     return self.bdi:step();
   end
 
-  function Agent:onEvent(...)
-    self.bdi:dispatch(Event(...))
+  function Agent:onEvent(e)
+    self.bdi:dispatch(e)
+  end
+
+  function Agent:sendEvent(...)
+    self:onEvent(Event.fromData(...))
   end
 
   function Agent:plugModule(mod)
     if type(mod) ~= "table" then return end
 
     if mod.g then
-      for k,v in pairs(mod.g) do
+      for k,v in pairs(mod.goals) do
         local goal_schema = Goal.define(k, v)
         self.bdi.goal_base:register(goal_schema)
       end
     end
 
     if mod.p then
-      for k,v in pairs(mod.p) do
+      for k,v in pairs(mod.plans) do
         local plan_schema = Plan.define(k, v)
         self.bdi.plan_base:register(plan_schema)
       end
     end
 
     if mod.b then
-      for k,v in pairs(mod.b) do
+      for k,v in pairs(mod.beliefs) do
         self.bdi.belief_base:setLong(v, k)
       end
     end

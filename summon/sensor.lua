@@ -7,7 +7,6 @@ return function(loader)
   Sensor = loader.class("Sensor")
 
   function Sensor:initialize()
-    self.events = {}
   end
 
   function Sensor.static.load(path)

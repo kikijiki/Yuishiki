@@ -148,16 +148,15 @@ return function(loader)
     end
   end
 
-  function Trigger.static.fromData(data)
+  function Trigger.static.fromData(trigger_type, ...)
     if not data then return end
-    local trigger_type = data[1]
-    local args = {select(2, unpack(data))}
 
-    if trigger_type == "event"        then return Trigger             (table.unpack(args)) end
-    if trigger_type == "goal"         then return Trigger.Goal        (table.unpack(args)) end
-    if trigger_type == "parametrized" then return Trigger.Parametrized(table.unpack(args)) end
-    if trigger_type == "custom"       then return Trigger.Custom      (table.unpack(args)) end
+    if trigger_type == "event"        then return Trigger             (...) end
+    if trigger_type == "goal"         then return Trigger.Goal        (...) end
+    if trigger_type == "parametrized" then return Trigger.Parametrized(...) end
+    if trigger_type == "custom"       then return Trigger.Custom      (...) end
     if trigger_type == "belief"       then
+      local args = {...}
       local trigger = Trigger.Belief(args[1])
       if args["begins"] then trigger:begins(args["begins"]) end
       if args["ends"] then trigger:ends(args["ends"]) end

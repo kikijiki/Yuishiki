@@ -33,11 +33,16 @@ return function(loader)
   local MessageEvent = loader.class("MessageEvent", Event)
   Event.Message = MessageEvent
 
-  function MessageEvent:initialize(message) assert(message)
+  function MessageEvent:initialize(sender, target, performative, message) assert(message)
     Event.initialize(self,
       Event.Type.Message,
-      nil,
-      { message = message })
+      sender,
+      {
+        sender = sender,
+        target = target,
+        performative = performative,
+        message = message
+      })
   end
 
   --[[ Belief ]]--
@@ -68,6 +73,16 @@ return function(loader)
       Event.Type.System,
       name,
       {...})
+  end
+
+  function Event.static.fromData(event_type, ...)
+    if not data then return end
+
+    if event_type == "base"    then return Event        (...) end
+    if event_type == "goal"    then return Event.Goal   (...) end
+    if event_type == "belief"  then return Event.Belief (...) end
+    if event_type == "message" then return Event.Message(...) end
+    if event_type == "System"  then return Event.System (...) end
   end
 
   return Event
