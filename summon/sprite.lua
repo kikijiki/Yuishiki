@@ -47,6 +47,7 @@ return function(loader)
   end
 
   function Sprite:setAnimation(name, reset, callback)
+    if self.locked then return false end
     if not self.animations[name] then return false end
 
     local a = self.current.animation
@@ -60,6 +61,10 @@ return function(loader)
     if self.current.animation.loops > 0 then self.callback = callback end
     if not reset == false then self.current.animation:reset() end
     return self.current.animation
+  end
+
+  function Sprite:lock()
+    self.locked = true
   end
 
   function Sprite:setDirection(dir)

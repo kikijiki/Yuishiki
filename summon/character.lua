@@ -135,7 +135,11 @@ return function(loader)
   end
 
   function Character:pop() return self.commands:pop() end
-  function Character:push(f) self.commands:push(coroutine.create(f)) end
+  function Character:popAll() return self.commands:popAll() end
+  function Character:push(f, wait)
+    self.commands:push(coroutine.create(f))
+    if wait then coroutine.yield() end
+  end
   function Character:append(f) self.commands:insert(coroutine.create(f)) end
   function Character:pushCommand(cmd, ...) self:push(Commands[cmd](...)) end
   function Character:appendCommand(cmd, ...) self:append(Commands[cmd](...)) end
@@ -191,9 +195,10 @@ return function(loader)
 
   function Character:kill(callback)
     self.status["alive"]:set(false)
+    self.sprite:setAnimation("dead")
+    self.sprite:lock()
+    self:bubble("DEAD", 0, {255, 0, 0})
     self:pushCommand("fade")
-    self:pushCommand("animation", "dead", {idle = false})
-    self:bubble("DEAD", {255, 0, 0})
   end
 
   function Character:move(path)
@@ -208,7 +213,6 @@ return function(loader)
       local range = 0.2
       local cint = math.floor(120 * (1 - range + math.random() * range))
       self:bubble(damage, direction, {255, cint, 0})
-      self:pushCommand("animation", "idle")
       self:pushCommand("animation", "hit")
     end
   end

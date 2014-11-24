@@ -289,15 +289,14 @@ return function(loader)
       end
     end
 
+    character:popAll()
     character:push(function()
       self.world:removeCharacter(character)
       self.world.map:setWalkable(character.status.position:get(), true)
       self:dispatch("character death", character)
     end)
 
-    character:push(function()
-      character:kill()
-    end)
+    character:kill()
   end
 
   function GM.logc(c, ...)

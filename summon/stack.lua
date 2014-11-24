@@ -21,6 +21,11 @@ return function(loader)
     return table.remove(self.elements)
   end
 
+  function Stack:popAll()
+    self.size = 0
+    self.elements = {}
+  end
+
   function Stack:top()
     return self.elements[self.size]
   end
