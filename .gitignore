@@ -23,3 +23,5 @@ CiderDebugger.lua
 GliderProperties.proj
 .tags
 .tags_sorted_by_file
+platforms/
+bin/
