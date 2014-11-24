@@ -95,7 +95,7 @@ return function(loader)
     end
 
     local tagstamp = ""
-    if tag then tagstamp = "["..tag.."]" end
+    if type(tag) == "string" then tagstamp = "["..tag.."]" end
 
     if log.useAnsiColors then
       severity = severity.color

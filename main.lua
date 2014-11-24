@@ -14,7 +14,7 @@ summon.log.verbosity = summon.log.Verbosity.verbose
 summon.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
-print = summon.log.d
+print = function(...) summon.log.d("PRN", ...) end
 
 -- Load scenarios data
 local scenarios_path = "assets/scenarios/"
