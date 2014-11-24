@@ -197,6 +197,7 @@ return function(loader)
   end
 
   function Character:move(path)
+    self:pushCommand("animation", "idle")
     for i = #path, 1, -1 do
       self:pushCommand("step", path[i])
     end
@@ -207,6 +208,7 @@ return function(loader)
       local range = 0.2
       local cint = math.floor(120 * (1 - range + math.random() * range))
       self:bubble(damage, direction, {255, cint, 0})
+      self:pushCommand("animation", "idle")
       self:pushCommand("animation", "hit")
     end
   end

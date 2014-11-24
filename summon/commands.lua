@@ -112,7 +112,7 @@ return function(loader)
       if not map:containsTile(destination) then return end
       local data = map:getTilePixelCoordinates(destination)
 
-      sprite:setAnimation("walk", {reset = false})
+      sprite:setAnimation("walk", false)
       sprite:setDirection(map:getFacingDirection(char.status.position:get(), destination))
 
       dt = char:pushCommand("translate", data.top, data.spriteZ, sprite.speed.movement)
@@ -159,14 +159,13 @@ return function(loader)
         local y = x^2 * a + x * b
         local tra = versor * progress + from.top
         tra.y = tra.y - y
-        
+
         sprite:setPosition(tra)
         elapsed = elapsed + coroutine.yield()
       end
 
       sprite:setPosition(to.top, to.spriteZ)
       char.status.position:set(destination)
-      sprite:setAnimation("idle")
       return (progress - distance) / speed
     end
   end
@@ -192,7 +191,6 @@ return function(loader)
           jumpFactor or 0.8)
       end
 
-      char.sprite:setAnimation("idle", {wait = false})
       return dt
     end
   end
