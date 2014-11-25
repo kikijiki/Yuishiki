@@ -12,7 +12,7 @@ return function(loader)
   - turn       Change direction.
   - lookAt     Change direction.
   - animation  Change animation.
-  - speak      Produce a speech bubble.
+  - dialog     Produce a speech bubble.
   - translate  Move linearly.
   - walk       Look towards the destination, use the walk animation and move.
   - jump       Look to the destination and jump using the jump animation.
@@ -74,9 +74,9 @@ return function(loader)
     end
   end
 
-  Commands.speak = function(message, duration)
+  Commands.dialog = function(message, duration)
     return function(dt, char)
-      char:speak(message, duration)
+      char:dialog(message, duration)
       return dt
     end
   end

@@ -144,11 +144,14 @@ return function(loader)
   function Character:pushCommand(cmd, ...) self:push(Commands[cmd](...)) end
   function Character:appendCommand(cmd, ...) self:append(Commands[cmd](...)) end
 
-  function Character:speak(message, duration)
+  function Character:dialog(message, duration)
     local position = function(s)
       return self.sprite:getTag("head") + vec(5, -5) * self.sprite.scale
     end
-    self:dispatch("speak", self, message, duration or 1, position)
+    self:dispatch("dialog", self, message, duration or 1, position)
+  end
+
+  function Character:speak(target, text, data)
   end
 
   function Character:bubble(message, direction, color)
