@@ -19,6 +19,7 @@ return function(loader)
     self.goal_schemas = {}
     self.inhibited = {}
     self.triggers = {}
+    self.log = log.tag("GB")
   end
 
   function GoalBase:register(schema) assert(schema and schema.name)
@@ -60,6 +61,20 @@ return function(loader)
         self.agent.bdi:addIntention(goal)
       end
     end
+  end
+
+  function GoalBase:dump()
+    if not next(self.goal_schemas) then
+      self.log.i("--[[GOAL BASE EMPTY]]--")
+      return
+    end
+    self.log.i("--[[GOAL BASE DUMP START]]--")
+    self.log.i()
+    for _,goal in pairs(self.goal_schemas) do
+      self.log.i(goal)
+    end
+    self.log.i()
+    self.log.i("--[[GOAL BASE DUMP END]]--")
   end
 
   return GoalBase

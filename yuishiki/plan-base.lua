@@ -3,6 +3,7 @@ local PlanBase
 return function(loader)
   if PlanBase then return PlanBase end
 
+  local log = loader.load "log"
   local Plan = loader.load "plan"
   local Trigger = loader.load "trigger"
   local Observable = loader.load "observable"
@@ -15,6 +16,7 @@ return function(loader)
 
     self.agent = agent
     self.schemas = {}
+    self.log = log.tag("PB")
   end
 
   function PlanBase:register(schema)
@@ -62,6 +64,20 @@ return function(loader)
         goal_base.agent.bdi:addIntention(plan)
       end
     end
+  end
+
+  function PlanBase:dump()
+    if not next(self.schemas) then
+      self.log.i("--[[PLAN BASE EMPTY]]--")
+      return
+    end
+    self.log.i("--[[PLAN BASE DUMP START]]--")
+    self.log.i()
+    for _,plan in pairs(self.schemas) do
+      self.log.i(plan)
+    end
+    self.log.i()
+    self.log.i("--[[PLAN BASE DUMP END]]--")
   end
 
   return PlanBase

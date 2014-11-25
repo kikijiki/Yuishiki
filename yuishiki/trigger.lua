@@ -149,8 +149,6 @@ return function(loader)
   end
 
   function Trigger.static.fromData(trigger_type, ...)
-    if not data then return end
-
     if trigger_type == "event"        then return Trigger             (...) end
     if trigger_type == "goal"         then return Trigger.Goal        (...) end
     if trigger_type == "parametrized" then return Trigger.Parametrized(...) end

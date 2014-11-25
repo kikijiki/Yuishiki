@@ -76,8 +76,6 @@ return function(loader)
   end
 
   function Event.static.fromData(event_type, ...)
-    if not data then return end
-
     if event_type == "base"    then return Event        (...) end
     if event_type == "goal"    then return Event.Goal   (...) end
     if event_type == "belief"  then return Event.Belief (...) end

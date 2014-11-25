@@ -78,28 +78,28 @@ return function(loader)
   function Agent:plugModule(mod)
     if type(mod) ~= "table" then return end
 
-    if mod.g then
+    if mod.goals then
       for k,v in pairs(mod.goals) do
         local goal_schema = Goal.define(k, v)
         self.bdi.goal_base:register(goal_schema)
       end
     end
 
-    if mod.p then
+    if mod.plans then
       for k,v in pairs(mod.plans) do
         local plan_schema = Plan.define(k, v)
         self.bdi.plan_base:register(plan_schema)
       end
     end
 
-    if mod.b then
+    if mod.beliefs then
       for k,v in pairs(mod.beliefs) do
         self.bdi.belief_base:setLong(v, k)
       end
     end
 
-    if mod.f then
-      for k,f in pairs(mod.f) do
+    if mod.functions then
+      for k,f in pairs(mod.functions) do
         self.bdi.functions[k] = f
       end
     end
