@@ -12,7 +12,7 @@ return function(loader)
   MessageRenderer = loader.class("MessageRenderer")
 
   function MessageRenderer:initialize(mfont, msize, bfont, bsize, camera)
-    self.speech = {
+    self.dialog_data = {
       fontsize = msize or 28,
       fontname = mfont or "ipamp.ttf",
       interline = 1,
@@ -29,16 +29,16 @@ return function(loader)
         border = {50, 50, 50, 255}},
       queues = {}
     }
-    self.speech.font = AssetLoader.load(
-      "font", self.speech.fontname.."@"..self.speech.fontsize)
+    self.dialog_data.font = AssetLoader.load(
+      "font", self.dialog_data.fontname.."@"..self.dialog_data.fontsize)
 
-    self.bubbling = {
+    self.bubble_data = {
       fontsize = bsize or 40,
       fontname = bfont or "ipamp.ttf",
       bubbles = {}
     }
-    self.bubbling.font = AssetLoader.load(
-      "font", self.bubbling.fontname.."@"..self.bubbling.fontsize)
+    self.bubble_data.font = AssetLoader.load(
+      "font", self.bubble_data.fontname.."@"..self.bubble_data.fontsize)
 
     self.camera = camera
 
@@ -49,18 +49,18 @@ return function(loader)
   function MessageRenderer:update(dt)
   self.world:update(dt)
 
-  self:updateSpeech(dt)
+  self:updateDialogs(dt)
   self:updateBubbles(dt)
   end
 
   function MessageRenderer:draw()
-    self:drawSpeech()
+    self:drawDialogs()
     self:drawBubbles()
     sg.setColor(255, 255, 255)
   end
 
-  function MessageRenderer:speak(source, content, duration, position)
-    local s = self.speech
+  function MessageRenderer:dialog(source, content, duration, position)
+    local s = self.dialog_data
     local text = split(content, "\n")
     local size = vec(0, (s.fontsize + s.interline) * #text - s.interline)
 
@@ -78,25 +78,25 @@ return function(loader)
     table.insert(s.queues[source], msg)
   end
 
-  function MessageRenderer:updateSpeech(dt)
-    local s = self.speech
+  function MessageRenderer:updateDialogs(dt)
+    local s = self.dialog_data
     for _,queue in pairs(s.queues) do
       local t = dt
       while t > 0 and #queue > 0 do
-        local speech = queue[1]
-        if speech.duration < t then
-          t = t - speech.duration
+        local dialog = queue[1]
+        if dialog.duration < t then
+          t = t - dialog.duration
           table.remove(queue, 1)
         else
-          speech.duration = speech.duration - t
+          dialog.duration = dialog.duration - t
           t = -1
         end
       end
     end
   end
 
-  function MessageRenderer:drawSpeech()
-    local s = self.speech
+  function MessageRenderer:drawDialogs()
+    local s = self.dialog_data
     local pad = s.padding
     local brd = s.border
     local brdpad = brd + pad
@@ -104,11 +104,11 @@ return function(loader)
 
     for _,queue in pairs(s.queues) do
       if #queue > 0 then
-        local speech = queue[1]
-        local size = speech.size
-        local position = speech.position
+        local dialog = queue[1]
+        local size = dialog.size
+        local position = dialog.position
 
-        if type(position) == "function" then position = position(speech.source)
+        if type(position) == "function" then position = position(dialog.source)
         elseif position.getPosition then position = position:getPosition() end
 
         position = self.camera:gameToScreen(position)
@@ -125,7 +125,7 @@ return function(loader)
         local cr = math.max(v.x + pad + size.x, o.x + s.arrow.right + s.border)
         local ct = v.y - pad
         local ar, al = s.arrow.right, s.arrow.left
-        local callout = {
+        local rect = {
           cl      , ct,  -- left top corner
           cr      , ct,  -- right top corner
           cr      , cb,  -- right bottom corner
@@ -147,20 +147,20 @@ return function(loader)
 
         sg.setColor(s.color.border)
         sg.setLineWidth(brd)
-        sg.polygon("line", callout)
+        sg.polygon("line", rect)
 
         sg.setColor(s.color.text)
 
-        for _,line in pairs(speech.text) do
+        for _,line in pairs(dialog.text) do
           sg.printf(line, v.x, v.y, size.x, "center")
           v.y = v.y + s.interline + s.fontsize
         end
       end
     end
   end
-local ba = false
+
   function MessageRenderer:bubble(id, message, position, direction, color)
-    local b = self.bubbling
+    local b = self.bubble_data
     local width = b.font:getWidth(message)
     directon = direction or 0
 
@@ -195,24 +195,24 @@ local ba = false
   end
 
   function MessageRenderer:updateBubbles(dt)
-    for i = #self.bubbling.bubbles, 1, -1 do
-      local b = self.bubbling.bubbles[i]
+    for i = #self.bubble_data.bubbles, 1, -1 do
+      local b = self.bubble_data.bubbles[i]
       local posx, posy = b.body:getWorldPoints(b.shape:getPoints())
       if posy > self.camera.vp.y then
-        table.remove(self.bubbling.bubbles, i)
+        table.remove(self.bubble_data.bubbles, i)
       end
     end
   end
 
   function MessageRenderer:drawBubbles()
-    for _,b in pairs(self.bubbling.bubbles) do
+    for _,b in pairs(self.bubble_data.bubbles) do
       self:drawBubble(b)
     end
   end
 
   function MessageRenderer:drawBubble(b)
     local c = b.color
-    self.bubbling.font:apply()
+    self.bubble_data.font:apply()
     local posx, posy = b.body:getWorldPoints(b.shape:getPoints())
     sg.setColor(0, 0, 0, 255 * b.alpha)
     sg.print(b.message, posx - 2, posy - 2, b.body:getAngle())

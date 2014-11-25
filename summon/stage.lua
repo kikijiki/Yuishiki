@@ -68,9 +68,9 @@ return function(loader)
     end)
     self.gm:listen(self, "new character",
       function(c)
-        c:listen(self, "speak",
+        c:listen(self, "dialog",
           function(character, message, duration, position)
-            self.messageRenderer:speak(
+            self.messageRenderer:dialog(
               character.sprite, message, duration, position)
           end)
         c:listen(self, "bubble",
@@ -126,7 +126,7 @@ return function(loader)
     self.interface:drawCursor()
 
     self.camera:finish()
-    self.messageRenderer:drawSpeech()
+    self.messageRenderer:drawDialogs()
     self.interface:draw()
 
     for _,btn in pairs(self.buttons) do btn:draw() end
@@ -154,6 +154,8 @@ return function(loader)
     local ac = self.gm.activeCharacter
     if key == "x" and ac then
       ac.agent.bdi.belief_base:dump()
+      ac.agent.bdi.goal_base:dump()
+      ac.agent.bdi.plan_base:dump()
       ac.agent.bdi.intention_base:dump()
     end
 
