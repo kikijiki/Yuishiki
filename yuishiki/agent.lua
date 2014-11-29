@@ -29,18 +29,6 @@ return function(loader)
     self.bdi = BDIModel(self)
 
     self.log = log.tag("A "..self.id)
-
-    self.interface = setmetatable({
-      log = self.log,
-      bdi = self.bdi,
-      internal = self,
-      external = setmetatable({},{}),
-      }, {
-      __newindex = function(t, k)
-        log.w("Trying to modify an interface.")
-        return uti.null_interface
-      end
-    })
   end
 
   function Agent:importBelief(...) return self.bdi.belief_base:import(...) end
