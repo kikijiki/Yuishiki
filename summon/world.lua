@@ -73,7 +73,9 @@ return function(loader)
     end
   end
 
-  function World:propagateEvent(source, event, ...)
+  function World:propagateEvent(source, event, ...) assert(source and event)
+    if type(event) == "string" then event = {event} end
+
     if self.events_enabled then
       self:notify(source, event, ...)
     else
