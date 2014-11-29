@@ -245,14 +245,13 @@ return function(loader)
   end
 
   function Intention:getPriority()
-    local priority = 0
     for k,v in self:pairs() do
       if v:getYsType() == "goal" then
-        if type(v.priority) == "function" then priority = v:priority()
-        elseif type(v.priority) == "number" then priority = v.priority end
+        if type(v.priority) == "function" then return v:priority()
+        elseif type(v.priority) == "number" then return v.priority end
       end
     end
-    return priority
+    return 0
   end
 
   return Intention
