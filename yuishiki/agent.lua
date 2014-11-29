@@ -29,19 +29,24 @@ return function(loader)
     self.bdi = BDIModel(self)
 
     self.log = log.tag("A "..self.id)
+
+    -- Shortcuts
+    self.bb = self.bdi.belief_base
+    self.gb = self.bdi.plan_base
+    self.pb = self.bdi.goal_base
   end
 
+  function Agent:setBelief(...)    return self.bdi.belief_base:set(...)    end
+  function Agent:setBeliefLT(...)  return self.bdi.belief_base:setLT(...)  end
+  function Agent:setBeliefST(...)  return self.bdi.belief_base:setST(...)  end
   function Agent:importBelief(...) return self.bdi.belief_base:import(...) end
-  function Agent:addAction(action) return self.actuator:addAction(action) end
-  function Agent:pushGoal(...) return self.bdi:pushGoal(...) end
+  function Agent:addAction(action) return self.actuator:addAction(action)  end
+  function Agent:pushGoal(...)     return self.bdi:pushGoal(...)           end
 
-  function Agent:dispatch(event)
-    self.bdi:dispatch(event)
-  end
-
-  function Agent:waiting()
-    return self.bdi:waiting()
-  end
+  function Agent:waiting() return self.bdi:waiting() end
+  function Agent:dispatch(event) self.bdi:dispatch(event) end
+  function Agent:onEvent(e) self.bdi:dispatch(e) end
+  function Agent:sendEvent(...) self:onEvent(Event.fromData(...)) end
 
   function Agent:resetStepCounter(step_limit)
     self.step_limit = step_limit
@@ -53,14 +58,6 @@ return function(loader)
     if self.step_count > self.step_limit then return false end
     self.log.i("Step "..self.step_count)
     return self.bdi:step();
-  end
-
-  function Agent:onEvent(e)
-    self.bdi:dispatch(e)
-  end
-
-  function Agent:sendEvent(...)
-    self:onEvent(Event.fromData(...))
   end
 
   function Agent:plugModule(mod)
