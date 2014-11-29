@@ -44,13 +44,14 @@ return function(loader)
     local path = AssetLoader.getAssetPath("ruleset").."/"..data.rules.."/"
     fs.getDirectoryItems(path,
       function(file)
-        log.i("Loading ruleset "..file)
+        log.i("stage", "Loading ruleset "..file)
         local ruleset = fs.load(path..file)()
         self.gm:loadRuleset(ruleset)
       end)
 
     -- Load characters
     for id,char in pairs(data.characters) do
+      log.fi("stage", "Loading character %s (%s)", id, char)
       self.gm:addCharacter(id, char)
     end
 
