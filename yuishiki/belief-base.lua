@@ -73,11 +73,11 @@ return function(loader)
     return a..PATH_SEPARATOR..b
   end
 
-  function set(bb, source, storage, data, ...)
+  function set(bb, source, retention, data, ...)
     local full_path = table.concat({...}, ".")
     local base_path, name = BeliefBase.parsePath(full_path)
 
-    local belief = Belief(data, name, full_path, storage, source)
+    local belief = Belief(data, name, full_path, retention, source)
     belief:addObserver(bb, bb.observer)
 
     bb.lookup[full_path] = belief
@@ -103,15 +103,15 @@ return function(loader)
     return belief
   end
 
-  function BeliefBase:set(storage, ...)
-    return set(self, "internal", storage, ...)
+  function BeliefBase:set(retention, ...)
+    return set(self, "internal", retention, ...)
   end
 
-  function BeliefBase:setShort(...)
+  function BeliefBase:setST(...)
     return set(self, "internal", "short", ...)
   end
 
-  function BeliefBase:setLong(...)
+  function BeliefBase:setLT(...)
     return set(self, "internal", "long", ...)
   end
 
