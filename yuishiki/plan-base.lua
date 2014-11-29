@@ -7,7 +7,6 @@ return function(loader)
   local Plan = loader.load "plan"
   local Trigger = loader.load "trigger"
   local Observable = loader.load "observable"
-  local Event = loader.load "event"
 
   PlanBase = loader.class("PlanBase", Observable)
 
@@ -33,7 +32,7 @@ return function(loader)
   function PlanBase:canInstance(schema, event) assert(schema)
     local parameters
     if event then
-      if event.event_type == Event.Type.Goal then parameters = event.parameters.goal.parameters
+      if event:getType() == "goal" then parameters = event.goal.parameters
       else parameters = event.parameters end
     end
 

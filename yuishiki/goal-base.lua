@@ -53,7 +53,7 @@ return function(loader)
   end
 
   function GoalBase:onEvent(event)
-    local et = event.event_type
+    local et = event:getType()
 
     for _,schema in pairs(self.triggers) do
       if schema.creation:check(event) and self:canInstance(schema) then

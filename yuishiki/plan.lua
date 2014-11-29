@@ -1,6 +1,6 @@
 --- The plan class.
 --
--- Dependencies: `middleclass`, `uti`, `log`, `Trigger`, `ManualTrigger`, `Event`
+-- Dependencies: `middleclass`, `uti`, `log`, `Trigger`, `ManualTrigger`
 --
 -- @classmod Plan
 
@@ -13,7 +13,6 @@ return function(loader)
   local log = loader.load "log"
   local Trigger = loader.load "trigger"
   local ManualTrigger = loader.load "manual-trigger"
-  local Event = loader.load "event"
 
   Plan = loader.class("Plan")
 
@@ -134,25 +133,23 @@ return function(loader)
     end
   end
 
-  function Plan:waitForEvent(name, parameters)
+  function Plan:waitForEvent(name)
     if not name then
       return self:yield()
     else
-      local trigger = Trigger.Event(name, parameters)
-      return self:waitForTrigger(trigger)
+      return self:waitForTrigger(Trigger(name))
     end
   end
 
   function Plan:waitForBelief(...)
-    return self:waitForTrigger(Trigger.Belief(...))
+    return self:waitForTrigger(Trigger.belief(...))
   end
 
   function Plan:waitForActuator(id)
     if not id then
       return self:yield()
     else
-      local trigger = Trigger.Event(Event.EventType.Actuator, {id = id})
-      return self:waitForTrigger(trigger)
+      return self:waitForTrigger(Trigger.actuator(id))
     end
   end
 

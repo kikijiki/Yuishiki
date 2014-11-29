@@ -94,7 +94,7 @@ return function(loader)
   end
 
   function BDIModel:processGoal(goal)
-    local event = Event.Goal(goal)
+    local event = Event.goal(goal)
     local plans, metaplans = self.plan_base:filter(event)
 
     if plans == nil or #plans == 0 then

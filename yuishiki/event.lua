@@ -3,84 +3,50 @@ local Event
 return function(loader)
   if Event then return Event end
 
-  local uti = loader.load "uti"
-
-  --[[ Base ]]--
-
   Event = loader.class("Event")
-  Event.static.Type = uti.makeEnum("Goal", "Message", "System", "Belief", "Actuator", "Custom")
 
-  function Event:initialize(event_type, name, parameters) assert(event_type)
-    self.event_type = event_type
+  function Event:initialize(name, parameters) assert(name)
+    if type(name) ~= "table" then name = {name} end
     self.name = name
-    self.parameters = parameters or {}
+    self.parameters = parameters
+    if parameters then
+      for k,v in pairs(parameters) do
+        self[k] = v
+      end
+    end
   end
 
-  --[[ Goal ]]--
+  function Event:getType() return self.name[1] end
 
-  local GoalEvent = loader.class("GoalEvent", Event)
-  Event.Goal = GoalEvent
-
-  function GoalEvent:initialize(goal) assert(goal)
-    Event.initialize(self,
-      Event.Type.Goal,
-      goal.name,
-      { goal = goal })
+  function Event.goal(goal)
+    return Event({"goal", goal.name}, {goal = goal})
   end
 
-  --[[ Message ]]--
-
-  local MessageEvent = loader.class("MessageEvent", Event)
-  Event.Message = MessageEvent
-
-  function MessageEvent:initialize(sender, target, performative, message) assert(message)
-    Event.initialize(self,
-      Event.Type.Message,
-      sender,
-      {
-        sender = sender,
-        target = target,
-        performative = performative,
-        message = message
-      })
+  function Event.message(message)
+    return Event("message", {message = message})
   end
 
-  --[[ Belief ]]--
-
-  local BeliefEvent = loader.class("BeliefEvent", Event)
-  Event.Belief = BeliefEvent
-
-  function BeliefEvent:initialize(belief, status, new, old, ...) assert(belief)
-    Event.initialize(self,
-      Event.Type.Belief,
-      belief.path,
-      {
-        belief = belief,
-        status = status,
-        new = new,
-        old = old,
-        args = {...}
-      })
+  function Event.actuator(id, data)
+    return Event({"actuator", id}, data)
   end
 
-  --[[ System ]]--
+  function Event.belief(belief, status, new, old, ...)
+    return Event({"belief", belief.path}, {
+      belief = belief,
+      status = status,
+      new = new,
+      old = old,
+      args = {...}
+    })
+  end
 
-  local SystemEvent = loader.class("SystemEvent", Event)
-  Event.System = SystemEvent
-
-  function SystemEvent:initialize(name, ...) assert(name)
-    return Event.initialize(self,
-      Event.Type.System,
-      name,
-      {...})
+  function Event.system(name, parameters)
+    return Event({"system", name}, parameters)
   end
 
   function Event.static.fromData(event_type, ...)
-    if event_type == "base"    then return Event        (...) end
-    if event_type == "goal"    then return Event.Goal   (...) end
-    if event_type == "belief"  then return Event.Belief (...) end
-    if event_type == "message" then return Event.Message(...) end
-    if event_type == "System"  then return Event.System (...) end
+    event_type = string.lower(event_type)
+    if Event[event_type] then return Event[event_type](...) end
   end
 
   return Event

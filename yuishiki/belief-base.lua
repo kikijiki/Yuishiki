@@ -21,7 +21,7 @@ return function(loader)
     self.beliefs = {} -- table -> belief
 
     self.observer = function(belief, new, old, ...)
-      local event = Event.Belief(belief, Belief.Status.changed, new, old, ...)
+      local event = Event.belief(belief, Belief.Status.changed, new, old, ...)
       self:notify(event)
     end
 
@@ -84,7 +84,7 @@ return function(loader)
     local root = bb:resolve(base_path, true)
     root[name] = belief
 
-    local event = Event.Belief(belief, Belief.Status.new, belief:get())
+    local event = Event.belief(belief, Belief.Status.new, belief:get())
     bb:notify(event)
 
     return belief
@@ -98,7 +98,7 @@ return function(loader)
     bb.lookup[path] = belief
 
     belief:addObserver(bb, bb.observer)
-    bb:notify(Event.Belief(belief, Belief.Status.new, belief:get()))
+    bb:notify(Event.belief(belief, Belief.Status.new, belief:get()))
 
     return belief
   end
@@ -122,7 +122,7 @@ return function(loader)
   function BeliefBase:unset(path)
     -- TODO
     local belief = self.lookup[path]
-    local event = Event.Belief(belief, Belief.Status.deleted, belief:get())
+    local event = Event.belief(belief, Belief.Status.deleted, belief:get())
     self:notify(event)
   end
 
@@ -174,7 +174,7 @@ return function(loader)
     end
     return data
   end
-  
+
   function BeliefBase:restore(data)
     for path, belief in pairs(data) do print("restoring", path)
       raw_set(self, path, belief)
