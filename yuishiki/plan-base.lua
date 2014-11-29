@@ -23,13 +23,22 @@ return function(loader)
     self.schemas[schema.name] = schema
   end
 
-  function PlanBase:instance(schema, parameters, goal) assert(schema)
-    local plan = schema(self.agent, parameters, goal)
+  function PlanBase:instance(schema_name, parameters) assert(schema_name)
+    local schema = self.schemas[schema_name]
+    if not schema then
+      self.log.w("Cannot instance plan <"..schema_name..">")
+      return
+    end
+
+    local plan = schema(self.agent, parameters)
     plan.on.create(plan, agent)
     return plan
   end
 
-  function PlanBase:canInstance(schema, event) assert(schema)
+  function PlanBase:canInstance(schema_name, event) assert(schema_name)
+    local schema = self.schemas[schema_name]
+    if not schema then return false end
+
     local parameters
     if event then
       if event:getType() == "goal" then parameters = event.goal.parameters
@@ -49,8 +58,8 @@ return function(loader)
     local metaplans = {}
     for _,schema in pairs(self.schemas) do
       if schema.trigger:check(event) and self:canInstance(schema, event) then
-        if schema.meta then table.insert(metaplans, schema)
-        else table.insert(plans, schema) end
+        if schema.meta then table.insert(metaplans, schema.name)
+        else table.insert(plans, schema.name) end
       end
     end
     return plans, metaplans

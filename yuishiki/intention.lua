@@ -72,8 +72,7 @@ return function(loader)
     if goal.status == Goal.Status.Active then
       local plan = self.agent.bdi:processGoal(goal)
       if plan then
-        self.log.i("Pushing new plan <"..plan.name..">")
-        self:push(plan)
+        self.log.i("Pushed new plan <"..plan.name..">")
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
         goal.past.last = plan

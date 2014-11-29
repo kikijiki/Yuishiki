@@ -110,16 +110,8 @@ return function(loader)
 
     if not plan_schema then
       self.log.i("No plans could be selected for the goal <"..goal.name..">.")
-      return nil
     else
-      local plan = self.plan_base:instance(plan_schema, goal.parameters, goal)
-      plan:bind(
-        plan,
-        plan.parameters,
-        self.belief_base.interface,
-        self.agent.actuator.interface
-      )
-      return plan
+      return self:pushPlan(plan_schema, goal.parameters)
     end
   end
 
@@ -149,12 +141,12 @@ return function(loader)
   function BDIModel:pushGoal(name, parameters, intention)
     local goal = self.goal_base:instance(name, parameters)
     if not goal then return end
+
     goal:bind(
       goal,
       parameters,
       self.belief_base.interface,
-      self.agent.actuator.interface
-    )
+      self.agent.actuator.interface)
 
     if intention then
       intention:push(goal)
@@ -166,6 +158,28 @@ return function(loader)
     end
 
     return goal
+  end
+
+  function BDIModel:pushPlan(name, parameters, intention)
+    local plan = self.plan_base:instance(name, parameters)
+    if not plan then return end
+
+    plan:bind(
+      plan,
+      plan.parameters,
+      self.belief_base.interface,
+      self.agent.actuator.interface)
+
+    if intention then
+      intention:push(plan)
+    else
+      intention = Intention()
+      intention.name = plan.name
+      intention:push(plan)
+      self.intention_base:add(intention)
+    end
+
+    return plan
   end
 
   return BDIModel
