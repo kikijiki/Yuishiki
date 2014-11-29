@@ -114,7 +114,6 @@ return function(loader)
     return ret
   end
 
-  -- TODO: refactor
   function Plan:onEventTriggered(e)
     self.status = Plan.Status.Active
     self.wait.data = e
