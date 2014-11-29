@@ -74,7 +74,7 @@ return function(loader)
   end
 
   function set(bb, source, retention, data, ...)
-    local full_path = table.concat({...}, ".")
+    local full_path = table.concat({...}, PATH_SEPARATOR)
     local base_path, name = BeliefBase.parsePath(full_path)
 
     local belief = Belief(data, name, full_path, retention, source)
