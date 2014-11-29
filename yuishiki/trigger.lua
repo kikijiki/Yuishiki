@@ -80,7 +80,6 @@ return function(loader)
     if self.path_end and not uti.endsWith(path, self.path_end) then return false end
 
     -- Check conditions
-
     if self.condition then
       local new = event.new
       local old = event.old
