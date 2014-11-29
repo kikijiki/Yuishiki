@@ -79,7 +79,7 @@ return function(loader)
 
     if mod.beliefs then
       for k,v in pairs(mod.beliefs) do
-        self.bdi.belief_base:setLong(v, k)
+        self.bdi.belief_base:setLT(v, k)
       end
     end
 
