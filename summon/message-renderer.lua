@@ -67,6 +67,8 @@ return function(loader)
     for _,v in pairs(text) do size.x = math.max(size.x, s.font:getWidth(v)) end
     size.x = size.x + 1
 
+    if not duration then duration = #text end
+
     local msg = {
       source = source,
       position = position,
