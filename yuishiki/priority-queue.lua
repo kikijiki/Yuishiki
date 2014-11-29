@@ -2,7 +2,7 @@ local PriorityQueue
 
 return function(loader)
   if PriorityQueue then return PriorityQueue end
-  
+
   PriorityQueue = loader.class("PriorityQueue")
 
   function PriorityQueue:initialize(compare, content)

@@ -25,7 +25,7 @@ return function(loader)
 
   function PlanBase:instance(schema_name, parameters) assert(schema_name)
     local schema = self.schemas[schema_name]
-    
+
     if not schema then
       self.log.w("Cannot instance plan <"..schema_name..">")
       return
@@ -58,7 +58,10 @@ return function(loader)
     local plans = {}
     local metaplans = {}
     for _,schema in pairs(self.schemas) do
-      if schema.trigger:check(event) and self:canInstance(schema, event) then
+      if schema.trigger
+        and schema.trigger:check(event)
+        and self:canInstance(schema, event) then
+
         if schema.meta then table.insert(metaplans, schema.name)
         else table.insert(plans, schema.name) end
       end
@@ -68,7 +71,10 @@ return function(loader)
 
   function PlanBase:onEvent(event)
     for _,schema in pairs(self.schemas) do
-      if schema.trigger:check(event) and self:canInstance(schema) then
+      if schema.trigger
+        and schema.trigger:check(event)
+        and self:canInstance(schema) then
+
         local plan = self:instance(schema, event.parameters)
         goal_base.agent.bdi:addIntention(plan)
       end
