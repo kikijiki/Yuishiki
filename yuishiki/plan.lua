@@ -197,7 +197,7 @@ return function(loader)
 
     if not history then
       history = {}
-      bb:setLong(history, self.history_path)
+      bb:setLT(history, self.history_path)
     else
       history = history:get()
     end
