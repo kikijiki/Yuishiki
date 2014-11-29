@@ -70,7 +70,7 @@ return function(loader)
   function Intention:stepGoal(goal)
     self.log.i("Stepping in goal", goal)
     if goal.status == Goal.Status.Active then
-      local plan = self.agent.bdi:processGoal(goal)
+      local plan = self.agent.bdi:processGoal(goal, self)
       if plan then
         self.log.i("Pushed new plan <"..plan.name..">")
         table.insert(goal.past.history, plan)

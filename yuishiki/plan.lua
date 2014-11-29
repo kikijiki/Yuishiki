@@ -159,6 +159,12 @@ return function(loader)
     return goal_instance.result
   end
 
+  function Plan:pushSubPlan(plan, parameters)
+    local plan_instance = self.agent.bdi:pushPlan(plan, parameters, self.intention)
+    self:yield()
+    return plan_instance.results.last
+  end
+
   function Plan:fail(reason)
     if type(reason) == "string" then reason = Plan.FailReason[reason] end
     self.status = Plan.Status.Failed

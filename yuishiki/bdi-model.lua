@@ -93,7 +93,7 @@ return function(loader)
     return best
   end
 
-  function BDIModel:processGoal(goal)
+  function BDIModel:processGoal(goal, intention)
     local event = Event.goal(goal)
     local plans, metaplans = self.plan_base:filter(event)
 
@@ -111,7 +111,7 @@ return function(loader)
     if not plan_schema then
       self.log.i("No plans could be selected for the goal <"..goal.name..">.")
     else
-      return self:pushPlan(plan_schema, goal.parameters)
+      return self:pushPlan(plan_schema, goal.parameters, intention)
     end
   end
 
@@ -138,7 +138,7 @@ return function(loader)
     return true
   end
 
-  function BDIModel:pushGoal(name, parameters, intention)
+  function BDIModel:pushGoal(name, parameters, intention) assert(name)
     local goal = self.goal_base:instance(name, parameters)
     if not goal then return end
 
@@ -160,15 +160,15 @@ return function(loader)
     return goal
   end
 
-  function BDIModel:pushPlan(name, parameters, intention)
+  function BDIModel:pushPlan(name, parameters, intention) assert(name)
     local plan = self.plan_base:instance(name, parameters)
     if not plan then return end
 
     plan:bind(
-      plan,
-      plan.parameters,
-      self.belief_base.interface,
-      self.agent.actuator.interface)
+    plan,
+    plan.parameters,
+    self.belief_base.interface,
+    self.agent.actuator.interface)
 
     if intention then
       intention:push(plan)

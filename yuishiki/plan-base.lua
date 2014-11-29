@@ -25,6 +25,7 @@ return function(loader)
 
   function PlanBase:instance(schema_name, parameters) assert(schema_name)
     local schema = self.schemas[schema_name]
+    
     if not schema then
       self.log.w("Cannot instance plan <"..schema_name..">")
       return
