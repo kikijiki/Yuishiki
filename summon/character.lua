@@ -91,6 +91,8 @@ return function(loader)
     self.world = world
     self.id = id
 
+    self.agent:importBelief(id, "self.id")
+
     self.log = log.tag("CHAR "..self.id)
 
     for _,sensor in pairs(self.sensors) do
