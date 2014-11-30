@@ -14,6 +14,7 @@ return function(loader)
   Trigger = loader.class("Trigger")
 
   function Trigger:initialize(event) assert(event)
+    if type(event) ~= "table" then event = {event} end
     self.event = event
   end
 

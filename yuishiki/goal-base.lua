@@ -24,7 +24,7 @@ return function(loader)
 
   function GoalBase:register(schema) assert(schema and schema.name)
     self.goal_schemas[schema.name] = schema
-    if schema.creation then table.insert(self.triggers, schema) end
+    if schema.trigger then table.insert(self.triggers, schema) end
   end
 
   function GoalBase:instance(name, parameters) assert(name)
@@ -56,7 +56,7 @@ return function(loader)
     local et = event:getType()
 
     for _,schema in pairs(self.triggers) do
-      if schema.creation:check(event) and self:canInstance(schema) then
+      if schema.trigger:check(event) and self:canInstance(schema) then
         local goal = self:instance(schema, event.parameters)
         self.agent.bdi:addIntention(goal)
       end

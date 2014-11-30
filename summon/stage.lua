@@ -63,11 +63,11 @@ return function(loader)
   end
 
   function Stage:listenToGM(gm)
-    self.gm:listen(self, "next character", function(c)
+    self.gm:listen(self, "next-character", function(c)
       self.camera:follow(c.sprite)
       self.interface:setCursor(c.sprite.position)
     end)
-    self.gm:listen(self, "new character",
+    self.gm:listen(self, "new-character",
       function(c)
         c:listen(self, "dialog",
           function(character, message, duration, position)
