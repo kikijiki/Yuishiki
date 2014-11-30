@@ -14,7 +14,7 @@ return function(loader)
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
-    local GoalClass = loader.class("G_"..name, Goal)
+    local GoalClass = loader.class("G "..name, Goal)
     GoalClass.static.name = name
     GoalClass.static.default = data
 

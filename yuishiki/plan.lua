@@ -39,7 +39,7 @@ return function(loader)
   -- @usage this is used when including a module.
   -- @see Trigger
   function Plan.static.define(name, data)
-    local PlanClass = loader.class("P_"..name, Plan)
+    local PlanClass = loader.class("P "..name, Plan)
 
     PlanClass.static.default = data
     PlanClass.static.name = name
