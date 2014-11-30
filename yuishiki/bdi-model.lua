@@ -67,6 +67,8 @@ return function(loader)
   end
 
   function BDIModel:selectPlan(goal, options)
+    if not options or #options == 0 then return end
+
     if self.functions.selectBestPlan then
       return self.functions.selectPlan(self, goal, options)
     end
@@ -96,12 +98,6 @@ return function(loader)
   function BDIModel:processGoal(goal, intention)
     local event = Event.goal(goal)
     local plans, metaplans = self.plan_base:filter(event)
-
-    if plans == nil or #plans == 0 then
-      self.log.i("No plans available for the goal <"..goal.name..">.")
-      return
-    end
-
     local plan_schema
 
     -- TODO: check retry flag and plan history
