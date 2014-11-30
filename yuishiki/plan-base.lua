@@ -36,10 +36,7 @@ return function(loader)
     return plan
   end
 
-  function PlanBase:canInstance(schema_name, event) assert(schema_name)
-    local schema = self.schemas[schema_name]
-    if not schema then return false end
-
+  function PlanBase:canInstance(schema, event) assert(schema)
     local parameters
     if event then
       if event:getType() == "goal" then parameters = event.goal.parameters
