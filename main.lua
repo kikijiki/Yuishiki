@@ -1,8 +1,9 @@
 local ys = require "yuishiki"()
 local summon = require "summon"()
-console = summon.Console(1, 1)
 
 -- Setup logging and console
+console = summon.Console(1, 1)
+
 ys.log.showTime = false
 ys.log.showInfo = false
 ys.log.verbosity = ys.log.Verbosity.verbose

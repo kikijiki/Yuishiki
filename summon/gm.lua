@@ -63,7 +63,8 @@ return function(loader)
   end
 
   function GM:applyRule(rule, ...)
-    if self.rules[rule] then                                                    log.i("RULE "..rule)
+    if self.rules[rule] then
+      log.i("RULE "..rule)
       return self.rules[rule](self, ...)
     else
       log.w("Could not apply rule '"..rule.."'.")
@@ -79,8 +80,8 @@ return function(loader)
     self.turn_count = self.turn_count + 1
     self.initiative.current = 0
     self.activeCharacter = nil
-    self:applyRule("turn start")
-    self:dispatch("turn start")
+    self:applyRule("turn-start")
+    self:dispatch("turn-start")
   end
 
   function GM:updateInitiative(character)
@@ -121,7 +122,7 @@ return function(loader)
   end
 
   function GM:initializeCharacter(character)
-    self:applyRule("initialize character", character)
+    self:applyRule("initialize-character", character)
 
     if character.modules then
       for _,v in pairs(character.modules) do
@@ -136,7 +137,7 @@ return function(loader)
   function GM:importCharacter(character, id)
     self.world:addCharacter(character, id)
     self:updateInitiative(character)
-    self:dispatch("new character", character)
+    self:dispatch("new-character", character)
 
     character.status.position:addObserver(self, function(new, old)
       self.world.map:setWalkable(new, false)
@@ -157,7 +158,7 @@ return function(loader)
     if init.current > #init.list then return false end
 
     self.activeCharacter = init.list[init.current].character
-    self:dispatch("next character", self.activeCharacter)
+    self:dispatch("next-character", self.activeCharacter)
     self.activeCharacter.agent:resetStepCounter(max_steps_per_turn)
     return self.activeCharacter
   end
@@ -293,7 +294,7 @@ return function(loader)
     character:push(function()
       self.world:removeCharacter(character)
       self.world.map:setWalkable(character.status.position:get(), true)
-      self:dispatch("character death", character)
+      self:dispatch("character-death", character)
     end)
 
     character:kill()
