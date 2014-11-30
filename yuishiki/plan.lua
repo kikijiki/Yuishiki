@@ -215,7 +215,7 @@ return function(loader)
       while #history > max do table.remove(history, 1) end
     end
   end
-
+  
   function Plan.static.matchHistory(plan, bb, state)
     local history = bb.get(plan.history_path)
 

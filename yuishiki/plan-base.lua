@@ -51,6 +51,12 @@ return function(loader)
     )
   end
 
+  function PlanBase:getEfficiency(schema_name, ...)
+    local schema = self.schemas[schema_name]
+    if schema.efficiency then return schema.efficiency(schema, ...)
+    else return 0 end
+  end
+
   function PlanBase:filter(event)
     local plans = {}
     local metaplans = {}
