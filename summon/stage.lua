@@ -160,6 +160,8 @@ return function(loader)
       ac.agent.bdi.intention_base:dump()
     end
 
+    if key == " " then self.gm:resume() end
+
     self:dispatch("keypressed", key)
   end
 
