@@ -320,12 +320,12 @@ return function(loader)
     return ret
   end
 
-  function Map:getNearestPoint(p) print("NEAREST", p)
+  function Map:getNearestPoint(p)
     if self:getTile(p) then return p end
 
     local min_dist
     local nearest
-    for tile in pairs(self.tiles) do
+    for _,tile in pairs(self.tiles) do
       local t = tile.coordinates
       local dist = math.abs(p.x - t.x) + math.abs(p.y - t.y)
       if not min_dist or dist < min_dist then
@@ -333,7 +333,7 @@ return function(loader)
         nearest = t
       end
     end
-print(nearest, min_dist)
+
     return nearest, min_dist
   end
 
