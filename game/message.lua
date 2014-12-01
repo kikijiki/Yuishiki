@@ -29,7 +29,7 @@ end
 
 function Message:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
-  
+
   self.w = w
   self.h = h
 end
@@ -67,11 +67,11 @@ function Message:update(dt)
 end
 
 function Message:keypressed(key)
-  self.fade = 0
+  if not self.fade then self.fade = 0 end
 end
 
 function Message:mousepressed(x, y, button)
-  self.fade = 0
+  if not self.fade then self.fade = 0 end
 end
 
 return Message
