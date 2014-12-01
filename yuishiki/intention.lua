@@ -72,7 +72,6 @@ return function(loader)
     if goal.status == Goal.Status.Active then
       local plan = self.agent.bdi:processGoal(goal, self)
       if plan then
-        self.log.i("Pushed new plan <"..plan.name..">")
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
         goal.past.last = plan
@@ -83,10 +82,8 @@ return function(loader)
     end
 
     if goal.status == Goal.Status.Succeeded then
-      self.log.i("Popping goal", goal)
       self:pop()
     elseif goal.status == Goal.Status.Failed then
-      self.log.i("Popping goal", goal)
       self:pop()
       local plan = self:top()
       if plan then plan:fail(Plan.FailReason.SubgoalFailed) end
@@ -188,11 +185,15 @@ return function(loader)
   function Intention:pushGoal(goal)
     self.stack:push(goal)
     goal:activate()
+    self.log.i("Pushed new goal ", goal)
+    self:dump()
   end
 
   function Intention:popGoal()
     local goal = self.stack:pop()
     goal.on.deactivation()
+    self.log.i("Popped goal ", goal)
+    self:dump()
   end
 
   function Intention:pushPlan(plan)
@@ -200,11 +201,15 @@ return function(loader)
     plan.status = Plan.Status.Active
     plan.on.activation()
     self.stack:push(plan)
+    self.log.i("Pushed new plan ", plan)
+    self:dump()
   end
 
   function Intention:popPlan()
     local plan = self.stack:pop()
     plan.on.deactivation()
+    self.log.i("Popped plan ", plan)
+    self:dump()
   end
 
   function Intention:popn(n)
@@ -254,7 +259,7 @@ return function(loader)
   end
 
   function Intention:dump()
-    self.log.i(self)
+    self.log.fi("Dump of %s", self)
     local i = 1
     for _,element in pairs(self.stack.elements) do
       local indent = string.rep("-", i)

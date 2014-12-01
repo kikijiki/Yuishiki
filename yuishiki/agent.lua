@@ -28,7 +28,7 @@ return function(loader)
 
     self.bdi = BDIModel(self)
 
-    self.log = log.tag("A "..self.id)
+    self.log = log.tag(self.id)
 
     -- Shortcuts
     self.bb = self.bdi.belief_base
