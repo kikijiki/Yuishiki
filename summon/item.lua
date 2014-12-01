@@ -5,11 +5,11 @@ return function(loader)
   Item = loader.class("Item")
 
   function Item:initialize(name, item_type, slot)
-    self.name = name
+    self.name      = name
     self.item_type = item_type
-    self.slot = slot
-    self.mods = {}
-    self.triggers = {}
+    self.slot      = slot
+    self.mods      = {}
+    self.triggers  = {}
   end
 
   function Item:__tostring()

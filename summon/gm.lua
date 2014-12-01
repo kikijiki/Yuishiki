@@ -3,15 +3,15 @@ local GM
 return function(loader)
   if GM then return GM end
 
-  local log = loader.load "log"
-  local Value = loader.load "value"
-  local Character = loader.load "character"
-  local Action = loader.load "action"
-  local Item = loader.load "item"
-  local Weapon = loader.load "weapon"
-  local Armor = loader.load "armor"
+  local log             = loader.load "log"
+  local Value           = loader.load "value"
+  local Character       = loader.load "character"
+  local Action          = loader.load "action"
+  local Item            = loader.load "item"
+  local Weapon          = loader.load "weapon"
+  local Armor           = loader.load "armor"
   local EventDispatcher = loader.load "event-dispatcher"
-  local AssetLoader = loader.load "asset-loader"
+  local AssetLoader     = loader.load "asset-loader"
 
   GM = loader.class("GM", EventDispatcher)
   GM.uti = {}
@@ -23,16 +23,16 @@ return function(loader)
   function GM:initialize(world)
     EventDispatcher.initialize(self)
 
-    self.world = world
-    self.rules = {}
+    self.world   = world
+    self.rules   = {}
     self.actions = {}
-    self.items = {}
+    self.items   = {}
 
-    self.turn_count = 0
-    self.paused = true
-    self.initiative = {list = {}, current = 0}
+    self.turn_count      = 0
+    self.paused          = true
+    self.initiative      = {list = {}, current = 0}
     self.activeCharacter = nil
-    self.auto_pause = true
+    self.auto_pause      = true
   end
 
   function GM:loadRuleset(ruleset)

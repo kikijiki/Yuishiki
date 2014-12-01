@@ -4,22 +4,22 @@ return function(loader)
   if BattleInterface then return BattleInterface end
   BattleInterface = loader.class("BattleInterface")
 
-  local sg = loader.require "graphics"
-  local vec = loader.require "vector"
+  local sg          = loader.require "graphics"
+  local vec         = loader.require "vector"
   local AssetLoader = loader.load "asset-loader"
 
   local Cursor = loader.class("Cursor")
 
   function Cursor:initialize()
     self.texture = AssetLoader.load("texture", "gb.png")
-    self.size = vec(84, 96)
-    self.center = self.size / 2
-    self.target = nil
-    self.dy = 0
+    self.size    = vec(84, 96)
+    self.center  = self.size / 2
+    self.target  = nil
+    self.dy      = 0
     self.elapsed = 0
-    self.offset = 20
-    self.jump = 15
-    self.scale = 0.2
+    self.offset  = 20
+    self.jump    = 15
+    self.scale   = 0.2
   end
 
   function Cursor:update(dt)

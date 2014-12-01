@@ -3,15 +3,15 @@ local Character
 return function(loader)
   if Character then return Character end
 
-  local ys = require "yuishiki"()
-  local vec = loader.require "vector"
-  local log = loader.load "log"
-  local Value = loader.load "value"
-  local Commands = loader.load "commands"
+  local ys              = require "yuishiki"()
+  local vec             = loader.require "vector"
+  local log             = loader.load "log"
+  local Value           = loader.load "value"
+  local Commands        = loader.load "commands"
   local EventDispatcher = loader.load "event-dispatcher"
-  local AssetLoader = loader.load "asset-loader"
-  local Stack = loader.load "stack"
-  local SpriteBatch = loader.load "spritebatch"
+  local AssetLoader     = loader.load "asset-loader"
+  local Stack           = loader.load "stack"
+  local SpriteBatch     = loader.load "spritebatch"
 
   Character = loader.class("Character", EventDispatcher)
 
@@ -20,18 +20,18 @@ return function(loader)
 
     self.gm = gm
 
-    self.name = data.name
+    self.name    = data.name
     self.modules = data.modules
-    self.aimod = data.aimod
+    self.aimod   = data.aimod
 
     self.log = log.tag("CHAR "..self.name)
 
-    self.sprite = AssetLoader.load("sprite", data.sprite)
+    self.sprite   = AssetLoader.load("sprite", data.sprite)
     self.commands = Stack()
 
-    self.agent = ys.Agent()
+    self.agent   = ys.Agent()
     self.sensors = {}
-    self.values = {}
+    self.values  = {}
 
     self:addValue({"simple", vec(1, 1)},    "status", "position")
     self:addValue({"simple",      true},    "status",    "alive")

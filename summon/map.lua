@@ -3,10 +3,10 @@ local Map
 return function(loader)
   if Map then return Map end
 
-  local vec = loader.require "vector"
+  local vec         = loader.require "vector"
   local spritebatch = loader.load "spritebatch"
-  local animation = loader.load "animation"
-  local astar = loader.load "a-star"
+  local animation   = loader.load "animation"
+  local astar       = loader.load "a-star"
   local AssetLoader = loader.load "asset-loader"
 
   local sg = loader.require "graphics"

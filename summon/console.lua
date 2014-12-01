@@ -3,34 +3,34 @@ local Console
 return function(loader)
   if Console then return Console end
 
-  local sg = loader.require "graphics"
+  local sg          = loader.require "graphics"
   local AssetLoader = loader.load "asset-loader"
 
   Console = loader.class("Console")
 
   function Console:initialize(rw, rh, x, y)
-    self.visible = false
-    self.enable_key = "`"
-    self.buffer = {}
+    self.visible       = false
+    self.enable_key    = "`"
+    self.buffer        = {}
     self.buffer_length = 0
-    self.font_size = 20
-    self.font = AssetLoader.load("font", "msmincho.ttc@"..self.font_size)
-    self.current_line = 1
-    self.padding = 5
-    self.margin = 10
-    self.colors = {}
-    self.colors.INF        = { 251, 241, 213      }
-    self.colors.DBG        = { 235, 197,  50      }
-    self.colors.WRN        = { 222,  69,  61      }
-    self.colors.ERR        = { 255,  10,  10      }
-    self.colors.background = {  23,  55,  86, 190 }
-    self.x = x or 0
-    self.y = y or 0
-    self.rw = rw or 0.5
-    self.rh = rh or 1
-    self.width = 0
-    self.height = 0
-    self.page = 3
+    self.font_size     = 20
+    self.font          = AssetLoader.load("font", "msmincho.ttc@"..self.font_size)
+    self.current_line  = 1
+    self.padding       = 5
+    self.margin        = 10
+    self.colors        = {}
+    self.colors.INF    = { 251, 241, 213      }
+    self.colors.DBG    = { 235, 197,  50      }
+    self.colors.WRN    = { 222,  69,  61      }
+    self.colors.ERR    = { 255,  10,  10      }
+    self.colors.back   = {  23,  55,  86, 190 }
+    self.x             = x or 0
+    self.y             = y or 0
+    self.rw            = rw or 0.5
+    self.rh            = rh or 1
+    self.width         = 0
+    self.height        = 0
+    self.page          = 3
   end
 
   function Console:resize(w, h)
@@ -87,7 +87,7 @@ return function(loader)
   	local original_color = {sg.getColor()}
   	local original_font = sg.getFont()
 
-  	sg.setColor(self.colors.background)
+  	sg.setColor(self.colors.back)
   	sg.rectangle("fill", self.x, self.y, self.width, self.height)
 
     if self.buffer_length == 0 then return end

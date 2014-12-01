@@ -11,12 +11,11 @@ return function(loader)
 
   AssetLoader = {}
 
-  AssetLoader.assets = {}
+  AssetLoader.assets      = {}
   AssetLoader.assets_path = "assets/"
-  AssetLoader.cache = {}
-
-  AssetLoader.sandboxed = true
-  AssetLoader.protected = true
+  AssetLoader.cache       = {}
+  AssetLoader.sandboxed   = true
+  AssetLoader.protected   = true
 
   --- Register a type of asset.
   -- @param asset The name of the asset type.

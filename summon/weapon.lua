@@ -9,10 +9,10 @@ return function(loader)
   function Weapon:initialize(data)
     Item.initialize(self, data.name, "weapon", "weapon")
 
-    self.attack = data.attack or 0
-    self.damage = data.damage or 0
-    self.range = data.range or 0
-    self.cost = data.cost or 0
+    self.attack    = data.attack or 0
+    self.damage    = data.damage or 0
+    self.range     = data.range or 0
+    self.cost      = data.cost or 0
     self.maxDamage = data.maxDamage or function() return 0 end
     self.minDamage = data.minDamage or function() return 0 end
 

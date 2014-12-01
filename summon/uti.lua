@@ -3,7 +3,7 @@ local Uti
 return function(loader)
   if Uti then return Uti end
 
-  local fs = loader.require "filesystem"
+  local fs      = loader.require "filesystem"
   local sandbox = loader.require "sandbox"
 
   Uti = {}

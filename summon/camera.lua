@@ -3,7 +3,7 @@ local Camera
 return function(loader)
   if Camera then return Camera end
 
-  local sg = loader.require "graphics"
+  local sg  = loader.require "graphics"
   local vec = loader.require "vector"
   local push, translate, scale, pop = sg.push, sg.translate, sg.scale, sg.pop
   local getWidth, getHeight = sg.getWidth, sg.getHeight
@@ -11,24 +11,23 @@ return function(loader)
   Camera = loader.class("Camera")
 
   function Camera:initialize()
-    self._scale = 1
-    self.center = vec(0, 0)
-    self.speed = 10
-    self.scalespeed = 10
-    self.tolerance = 1
+    self._scale         = 1
+    self.center         = vec(0, 0)
+    self.speed          = 10
+    self.scalespeed     = 10
+    self.tolerance      = 1
     self.scaletolerance = 0.01
-    self.vp = vec(0, 0)
-    self.vp2 = vec(0, 0)
-    self.max_scale = 10;
-    self.min_scale = 1/5;
-
-    self.scale = 1
-    self.target = vec(0, 0)
-    self.drag = { active = false, x = 0, y = 0 }
+    self.vp             = vec(0, 0)
+    self.vp2            = vec(0, 0)
+    self.max_scale      = 10;
+    self.min_scale      = 1/5;
+    self.scale          = 1
+    self.target         = vec(0, 0)
+    self.drag           = { active = false, x = 0, y = 0 }
   end
 
   function Camera:resize(w, h)
-    self.vp = vec(w, h)
+    self.vp  = vec(w, h)
     self.vp2 = vec(w / 2, h / 2)
   end
 

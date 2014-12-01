@@ -3,7 +3,7 @@ local Font
 return function(loader)
   if Font then return Font end
 
-  local sg = loader.require "graphics"
+  local sg  = loader.require "graphics"
   local Uti = loader.load "uti"
 
   Font = loader.class("Font")

@@ -5,11 +5,11 @@ return function(loader)
   Action = loader.class("Action")
 
   function Action:initialize(data)
-    self.body = data.body
-    self.cost = data.cost
+    self.body      = data.body
+    self.cost      = data.cost
     self.condition = data.condition
-    self.async = data.async or false
-    self.meta = data.meta
+    self.async     = data.async or false
+    self.meta      = data.meta
   end
 
   function Action:canExecute(gm, c, ...)

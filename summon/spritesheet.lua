@@ -2,8 +2,8 @@ local SpriteSheet
 
 return function(loader)
   if SpriteSheet then return SpriteSheet end
-  local sg = loader.require "graphics"
-  local vec = loader.require "vector"
+  local sg          = loader.require "graphics"
+  local vec         = loader.require "vector"
   local AssetLoader = loader.load "asset-loader"
 
   SpriteSheet = loader.class("SpriteSheet")

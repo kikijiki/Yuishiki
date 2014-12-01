@@ -3,7 +3,7 @@ local World
 return function(loader)
   if World then return World end
 
-  local vec = loader.require "vector"
+  local vec             = loader.require "vector"
   local EventObservable = loader.load "event-observable"
 
   World = loader.class("World", EventObservable)

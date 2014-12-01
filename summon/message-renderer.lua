@@ -3,10 +3,10 @@ local MessageRenderer
 return function(loader)
   if MessageRenderer then return MessageRenderer end
 
-  local sg = loader.require "graphics"
-  local sp = loader.require "physics"
-  local vec = loader.require "vector"
-  local split = loader.load("uti").split
+  local sg          = loader.require "graphics"
+  local sp          = loader.require "physics"
+  local vec         = loader.require "vector"
+  local split       = loader.load("uti").split
   local AssetLoader = loader.load "asset-loader"
 
   MessageRenderer = loader.class("MessageRenderer")

@@ -3,7 +3,7 @@ local Value
 return function(loader)
   if Value then return Value end
 
-  local sg = loader.require "graphics"
+  local sg         = loader.require "graphics"
   local Observable = loader.load "observable"
 
   local Value = {}

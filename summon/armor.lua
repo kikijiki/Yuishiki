@@ -9,9 +9,9 @@ return function(loader)
   function Armor:initialize(data)
     Item.initialize(self, data.name, "armor", "armor")
 
-    self.def = data.def
+    self.def  = data.def
     self.mdef = data.mdef
-    self.arm = data.arm
+    self.arm  = data.arm
     self.marm = data.marm
     self.sarm = data.sarm or {}
 
