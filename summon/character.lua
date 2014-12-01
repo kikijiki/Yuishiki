@@ -240,7 +240,7 @@ return function(loader)
 
     if self.world then
       self.world:propagateEvent(
-        self, {"character", "equipment"}, self, slot, item, old)
+        self, {"character", "equipment"}, slot, item, old)
     end
   end
 

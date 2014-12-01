@@ -24,9 +24,10 @@ return function(loader)
     self.beliefs = agent.bdi.belief_base.interface
   end
 
-  function Sensor:register(env)
+  function Sensor:register(world)
+    self.world = world
     for _, trigger in pairs(self.triggers) do
-      env:addObserver(
+      world:addObserver(
         self.character,
         trigger.event,
         function(...) trigger.body(self, ...) end)

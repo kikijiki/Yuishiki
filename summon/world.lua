@@ -27,7 +27,7 @@ return function(loader)
     end
 
     character:setWorld(self, id)
-    self:propagateEvent(self, {"character", "new"}, character)
+    self:propagateEvent(character, {"character", "new"})
   end
 
   function World:removeCharacter(char)
@@ -89,7 +89,6 @@ return function(loader)
 
   function World:propagateEvent(source, event, ...) assert(source and event)
     if type(event) == "string" then event = {event} end
-
     if self.events_enabled then
       self:notify(source, event, ...)
     else

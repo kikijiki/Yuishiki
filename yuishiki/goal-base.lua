@@ -53,8 +53,6 @@ return function(loader)
   end
 
   function GoalBase:onEvent(event)
-    local et = event:getType()
-
     for _,schema in pairs(self.triggers) do
       if schema.trigger:check(event) and self:canInstance(schema) then
         self.agent.bdi:pushGoal(schema.name, event.parameters)
