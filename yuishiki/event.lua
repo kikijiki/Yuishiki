@@ -10,9 +10,7 @@ return function(loader)
     self.name = name
     self.parameters = parameters
     if parameters then
-      for k,v in pairs(parameters) do
-        self[k] = v
-      end
+      for k,v in pairs(parameters) do self[k] = v end
     end
   end
 

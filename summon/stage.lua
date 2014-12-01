@@ -50,8 +50,8 @@ return function(loader)
       end)
 
     -- Load characters
-    for id,char in pairs(data.characters) do
-      log.fi("stage", "Loading character %s (%s)", id, char)
+    for id, char in pairs(data.characters) do
+      log.fi("stage", "Loading character %s", id)
       self.gm:addCharacter(id, char)
     end
 
