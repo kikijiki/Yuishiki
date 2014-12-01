@@ -101,7 +101,9 @@ return function(loader)
 
     for path,value in pairs(self.values) do
       value:addObserver(self, function(...)
-        self.world:propagateEvent(self, path, value, ...)
+        local event = {"character", "value"}
+        for _,v in pairs(path) do table.insert(event, v) end
+        self.world:propagateEvent(self, event, value, ...)
       end)
     end
   end
@@ -181,7 +183,9 @@ return function(loader)
     path.n = path.n + 1
     if self.world then
       value:addObserver(self, function(...)
-        self.world:propagateEvent(self, path, value, ...)
+        local event = {"character", "value"}
+        for _,v in pairs(path) do table.insert(event, v) end
+        self.world:propagateEvent(self, event, value, ...)
       end)
     end
 
@@ -236,7 +240,7 @@ return function(loader)
 
     if self.world then
       self.world:propagateEvent(
-        self, "character equipment changed", self, slot, item, old)
+        self, {"character", "equipment"}, self, slot, item, old)
     end
   end
 

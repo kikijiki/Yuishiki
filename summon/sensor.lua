@@ -27,7 +27,7 @@ return function(loader)
   function Sensor:register(env)
     for _, trigger in pairs(self.triggers) do
       env:addObserver(
-        self,
+        self.character,
         trigger.event,
         function(...) trigger.body(self, ...) end)
     end

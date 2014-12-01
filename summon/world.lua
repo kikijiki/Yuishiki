@@ -27,7 +27,7 @@ return function(loader)
     end
 
     character:setWorld(self, id)
-    self:propagateEvent(self, {"new", "character"}, character)
+    self:propagateEvent(self, {"character", "new"}, character)
   end
 
   function World:removeCharacter(char)
@@ -70,6 +70,20 @@ return function(loader)
     self.map:update(dt)
     for _,character in pairs(self.characters) do
       character:update(dt)
+    end
+  end
+
+  function World:otherCharacterPairs(c)
+    local char = self.characters
+
+    function next_char()
+      for k,v in pairs(char) do
+        if v ~= c then coroutine.yield(k, v) end
+      end
+    end
+    local f = coroutine.create(next_char)
+    return function()
+      return select(2, coroutine.resume(f))
     end
   end
 
