@@ -159,10 +159,10 @@ return function(loader)
     if not plan then return end
 
     plan:bind(
-    plan,
-    plan.parameters,
-    self.belief_base.interface,
-    self.agent.actuator.interface)
+      plan,
+      plan.parameters,
+      self.belief_base.interface,
+      self.agent.actuator.interface)
 
     if intention then
       intention:push(plan)

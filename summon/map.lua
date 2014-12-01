@@ -203,7 +203,11 @@ return function(loader)
   end
 
   function Map:getTile(v)
-    return self.grid[v.x][v.y]
+    if v and v.x and v.y
+      and self.grid[v.x]
+      and self.grid[v.x][v.y] then
+      return self.grid[v.x][v.y]
+    end
   end
 
   function Map:getFacingDirection(from, to)
@@ -314,6 +318,23 @@ return function(loader)
     local ret = {}
     for _,v in pairs(tiles) do table.insert(ret, v) end
     return ret
+  end
+
+  function Map:getNearestPoint(p) print("NEAREST", p)
+    if self:getTile(p) then return p end
+
+    local min_dist
+    local nearest
+    for tile in pairs(self.tiles) do
+      local t = tile.coordinates
+      local dist = math.abs(p.x - t.x) + math.abs(p.y - t.y)
+      if not min_dist or dist < min_dist then
+        min_dist = dist
+        nearest = t
+      end
+    end
+print(nearest, min_dist)
+    return nearest, min_dist
   end
 
   return Map
