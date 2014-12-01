@@ -47,6 +47,7 @@ return function(loader)
   end
 
   function Goal:bind(...)
+    self.exported = {...}
     self.on.setDefaultArguments(...)
     self.conditions.setDefaultArguments(...)
   end
@@ -74,6 +75,15 @@ return function(loader)
     else
       return "[G]("..self.status..") <"..self.name..">"
     end
+  end
+
+  function Goal:getPriority()
+    local priority = self.priority
+    if type(priority) == "number" then return priority end
+    if type(priority) == "function" then
+      return priority(table.unpack(self.exported))
+    end
+    return 0
   end
 
   return Goal
