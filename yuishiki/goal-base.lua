@@ -57,8 +57,7 @@ return function(loader)
 
     for _,schema in pairs(self.triggers) do
       if schema.trigger:check(event) and self:canInstance(schema) then
-        local goal = self:instance(schema, event.parameters)
-        self.agent.bdi:addIntention(goal)
+        self.agent.bdi:pushGoal(schema.name, event.parameters)
       end
     end
   end
