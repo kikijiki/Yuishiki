@@ -11,12 +11,12 @@ return function(loader)
 
   local Intention = loader.class("Intention")
 
-  local generateId = uti.makeIdGenerator("intention")
+  local generateId = uti.makeIdGenerator("I")
 
   function Intention:initialize()
     self.stack = Stack()
     self.id = generateId()
-    self.log = log.tag("I "..self.id)
+    self.log = log.tag(self.id)
   end
 
   function Intention.getYsType()
@@ -251,6 +251,16 @@ return function(loader)
       end
     end
     return 0
+  end
+
+  function Intention:dump()
+    self.log.i(self)
+    local i = 1
+    for _,element in pairs(self.stack.elements) do
+      local indent = string.rep("-", i)
+      self.log.fi("%s %s", indent, tostring(element))
+      i = i + 1
+    end
   end
 
   return Intention

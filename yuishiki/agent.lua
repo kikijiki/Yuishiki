@@ -14,7 +14,7 @@ return function(loader)
 
   Agent = loader.class("Agent")
 
-  local generateId = uti.makeIdGenerator("agent")
+  local generateId = uti.makeIdGenerator("A")
 
   function Agent:initialize()
     self.id = generateId()

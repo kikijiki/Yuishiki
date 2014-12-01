@@ -92,7 +92,7 @@ return function(loader)
     self.log.i("--[[PLAN BASE DUMP START]]--")
     self.log.i()
     for _,plan in pairs(self.schemas) do
-      self.log.i(plan)
+      self.log.i(plan.name)
     end
     self.log.i()
     self.log.i("--[[PLAN BASE DUMP END]]--")

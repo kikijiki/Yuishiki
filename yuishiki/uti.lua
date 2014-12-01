@@ -2,7 +2,7 @@ local uti
 
 return function(loader)
   if uti then return uti end
-  
+
   uti = {}
 
   local null_metatable = {}
@@ -16,14 +16,22 @@ return function(loader)
     return x and x ~= null_metatable and x ~= null_function
   end
 
-  function uti.makeIdGenerator(tag, hex)
-    local prefix = tag.."_"
+  function uti.makeIdGenerator(tag, sep)
     local counter = 0
 
-    return function()
-      counter = counter + 1
-      if hex then return string.format("%s_%x", prefix, counter)
-      else return prefix..tostring(counter) end
+    if tag then
+      sep = sep or "-"
+      local prefix = tag..sep
+
+      return function()
+        counter = counter + 1
+        return prefix..tostring(counter)
+      end
+    else
+      return function()
+        counter = counter + 1
+        return counter
+      end
     end
   end
 

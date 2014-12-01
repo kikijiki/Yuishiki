@@ -39,7 +39,7 @@ return function(loader)
   -- @usage this is used when including a module.
   -- @see Trigger
   function Plan.static.define(name, data)
-    local PlanClass = loader.class("P "..name, Plan)
+    local PlanClass = loader.class("P-"..name, Plan)
 
     PlanClass.static.default = data
     PlanClass.static.name = name
@@ -61,7 +61,7 @@ return function(loader)
     PlanClass.on = ManualTrigger(data.on)
     PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false
     PlanClass.describe = data.describe
-    PlanClass.log = log.tag ("P "..name)
+    PlanClass.log = log.tag ("P-"..name)
     PlanClass.history_path = Plan.history_path.."."..name
 
     return PlanClass
@@ -215,7 +215,7 @@ return function(loader)
       while #history > max do table.remove(history, 1) end
     end
   end
-  
+
   function Plan.static.matchHistory(plan, bb, state)
     local history = bb.get(plan.history_path)
 

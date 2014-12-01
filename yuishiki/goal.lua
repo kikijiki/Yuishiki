@@ -14,7 +14,7 @@ return function(loader)
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
-    local GoalClass = loader.class("G "..name, Goal)
+    local GoalClass = loader.class("G-"..name, Goal)
     GoalClass.static.name = name
     GoalClass.static.default = data
 
@@ -32,7 +32,7 @@ return function(loader)
     GoalClass.retry = data.retry
     GoalClass.priority = data.priority
     GoalClass.describe = data.describe
-    GoalClass.log = log.tag ("G "..name)
+    GoalClass.log = log.tag ("G-"..name)
 
     return GoalClass
   end

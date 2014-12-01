@@ -162,6 +162,7 @@ return function(loader)
   function log.fcheck(tag, value, fmt, ...) if not value then log.fe(tag, fmt, ...) end end
 
   function log.tag(tag)
+    tag = tostring(tag)
     return setmetatable({}, {
       __index = function(t, k)
         return function(...) log[k](tag, ...) end

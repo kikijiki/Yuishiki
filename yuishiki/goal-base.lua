@@ -68,7 +68,7 @@ return function(loader)
     self.log.i("--[[GOAL BASE DUMP START]]--")
     self.log.i()
     for _,goal in pairs(self.goal_schemas) do
-      self.log.i(goal)
+      self.log.i(goal.name)
     end
     self.log.i()
     self.log.i("--[[GOAL BASE DUMP END]]--")
