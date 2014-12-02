@@ -66,7 +66,7 @@ return function(loader)
     self.log.i("--[[INTENTION BASE DUMP START]]--")
     self.log.i()
     for _,intention in pairs(self.intentions) do
-      self.log.i(intention)
+      self.log.fi("%s / %d", intention, intention:getPriority())
       local i = 1
       for _,element in pairs(intention.stack.elements) do
         local indent = string.rep("-", i)
