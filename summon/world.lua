@@ -4,6 +4,7 @@ return function(loader)
   if World then return World end
 
   local vec             = loader.require "vector"
+  local log             = loader.load "log"
   local EventObservable = loader.load "event-observable"
 
   World = loader.class("World", EventObservable)
@@ -11,11 +12,11 @@ return function(loader)
   function World:initialize(map) assert(map)
     EventObservable.initialize(self)
 
-    self.characters = {}
-    self.map = map
-
+    self.characters     = {}
+    self.map            = map
     self.events_enabled = false
-    self.event_queue = {}
+    self.event_queue    = {}
+    self.log            = log.tag("world")
   end
 
   function World:addCharacter(character, id) assert(character)
