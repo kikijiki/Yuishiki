@@ -113,9 +113,7 @@ return function(loader)
   end
 
   function Character:updateAI()
-    for _,sensor in pairs(self.sensors) do
-      sensor:update(self.world)
-    end
+    for _,sensor in pairs(self.sensors) do sensor:update(self.world) end
     return self.agent:step()
   end
 
@@ -182,7 +180,7 @@ return function(loader)
     table.insert(path, 1, "character")
     path.n = path.n + 1
     if self.world then
-      value:addObserver(self, function(...)
+      value:addObserver(self.world, function(...)
         local event = {"character", "value"}
         for _,v in pairs(path) do table.insert(event, v) end
         self.world:propagateEvent(self, event, value, ...)
