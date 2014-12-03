@@ -59,11 +59,14 @@ return function(loader)
     end
   end
 
-  function Uti.runSandboxed(path, options)
+  function Uti.runSandboxed(path, error_handler, options)
     local data = fs.load(path)
     if not data then return nil, "Error loading "..path.."." end
-
-    return pcall(sandbox.run, data, options)
+    if errf then
+      return xpcall(sandbox.run, error_handler, data, options)
+    else
+      return pcall(sandbox.run, data, options)
+    end
   end
 
   return Uti

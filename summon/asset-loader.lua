@@ -7,6 +7,7 @@ return function(loader)
   if AssetLoader then return AssetLoader end
 
   local log = loader.load "log"
+  log = log.tag("AL")
   local uti = loader.load "uti"
 
   AssetLoader = {}
@@ -15,7 +16,6 @@ return function(loader)
   AssetLoader.assets_path = "assets/"
   AssetLoader.cache       = {}
   AssetLoader.sandboxed   = true
-  AssetLoader.protected   = true
 
   --- Register a type of asset.
   -- @param asset The name of the asset type.
@@ -65,27 +65,30 @@ return function(loader)
   end
 
   function AssetLoader.loadDirect(loader, path, base_path, asset_name, ...)
-    if AssetLoader.protected then
-      local ret, buf = pcall(loader, path, base_path, asset_name, ...)
+    local ret, buf = xpcall(loader,
+      function(err)
+        log.e("Could not load "..path)
+        log.e("Error:\n"..err)
+        log.e(debug.traceback())
+      end,
+      path, base_path, asset_name, ...)
 
-      if ret then
-        return buf
-      else
-        log.w("Could not load \""..path.."\", error: "..tostring(buf))
-        return nil
-      end
-    else
-      return loader(path, base_path, asset_name, ...)
-    end
+    if ret then return buf end
   end
 
-  function AssetLoader.loadRaw(path)
+  function AssetLoader.loadRaw(path, env)
     assert(path, "Path is nil.")
 
     if AssetLoader.sandboxed then
       local ret, data
-      ret, data = assert(uti.runSandboxed(path, env))
-      return data
+      ret, data = uti.runSandboxed(path,
+        function(err)
+          log.e("Could not load "..path)
+          log.e("Error:\n"..err)
+          log.e(debug.traceback())
+        end,
+        env)
+      if ret then return data end
     else
       return love.filesystem.load(path)()
     end
