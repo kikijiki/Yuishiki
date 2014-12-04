@@ -114,6 +114,12 @@ return function(loader)
   	sg.setColor(original_color)
   end
 
+  function Console:clear()
+    self.buffer_length = 0
+    self.current_line = 1
+    self.buffer = {}
+  end
+
   local function log(self, level, msg)
     --local NBSP = "\194\160"
     --msg = msg:gsub(" ", NBSP)
