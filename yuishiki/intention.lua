@@ -17,6 +17,7 @@ return function(loader)
     self.stack = Stack()
     self.id = generateId()
     self.log = log.tag(self.id)
+    self.name = "empty"
   end
 
   function Intention.getYsType()
@@ -35,8 +36,8 @@ return function(loader)
     return self.stack:pairs(n)
   end
 
-  function Intention:empty()
-    return self.stack:empty()
+  function Intention:isEmpty()
+    return self.stack:isEmpty()
   end
 
   function Intention:step()
@@ -171,6 +172,8 @@ return function(loader)
       self.log.w("Intention:push ignored (element is nil).")
       return
     end
+
+    if self.stack:isEmpty() then self.name = e.name end
     if e.getYsType() == "goal" then self:pushGoal(e)
     elseif e.getYsType() == "plan" then self:pushPlan(e)
     else self.log.w("Intention:push ignored (not a plan nor a goal).") end
