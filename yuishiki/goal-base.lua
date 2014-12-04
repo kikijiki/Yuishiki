@@ -29,16 +29,22 @@ return function(loader)
 
   function GoalBase:instance(name, parameters) assert(name)
     local schema = self.goal_schemas[name]
-    if schema then
+
+    if not schema then
+      self.log.w("Could not find the goal <"..name..">.")
+      return
+    end
+
+    if self:canInstance(schema, parameters) then
       return schema(parameters)
     else
-      log.w("Could not find the goal <"..name..">.")
+      self.log.i("Cannot instance goal <"..name..">.")
     end
   end
 
   function GoalBase:canInstance(schema) assert(schema)
     if self.inhibited[schema.name] then return false end
-    if not schema.conditions.default(true).initial() then return false end
+    if schema.enabled and not self.enabled() then return false end
 
     if schema.limit then
       local ib = self.agent.bdi.intention_base

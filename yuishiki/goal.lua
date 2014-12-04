@@ -16,19 +16,19 @@ return function(loader)
   function Goal.static.define(name, data)
     local GoalClass = loader.class("G-"..name, Goal)
     GoalClass.static.name = name
-    GoalClass.static.default = data
+    GoalClass.static.data = data
 
     GoalClass.initialize = function(self, ...)
       Goal.initialize(self, ...)
       self.name = name
+      self.on = ManualTrigger(data.on)
+      self.conditions = ManualTrigger(data.conditions)
     end
 
     if data.trigger then
       GoalClass.trigger = Trigger.fromData(table.unpack(data.trigger))
     end
-    GoalClass.conditions = ManualTrigger(data.conditions)
     GoalClass.limit = data.limit
-    GoalClass.on = ManualTrigger(data.on)
     GoalClass.retry = data.retry
     GoalClass.priority = data.priority
     GoalClass.describe = data.describe

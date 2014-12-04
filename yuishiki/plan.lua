@@ -41,14 +41,15 @@ return function(loader)
   function Plan.static.define(name, data)
     local PlanClass = loader.class("P-"..name, Plan)
 
-    PlanClass.static.default = data
+    PlanClass.static.data = data
     PlanClass.static.name = name
 
     PlanClass.initialize = function(self, agent, parameters)
       Plan.initialize(self, agent, parameters)
       self.name = name
       self.thread = coroutine.create(self.body)
-      self.step_count = 0
+      self.conditions = ManualTrigger(data.conditions)
+      self.on = ManualTrigger(data.on)
     end
 
     PlanClass.body = data.body
@@ -57,8 +58,6 @@ return function(loader)
     if data.trigger then
       PlanClass.trigger = Trigger.fromData(table.unpack(data.trigger))
     end
-    PlanClass.conditions = ManualTrigger(data.conditions)
-    PlanClass.on = ManualTrigger(data.on)
     PlanClass.manage_subgoal_failure = data.manage_subgoal_failure or false
     PlanClass.describe = data.describe
     PlanClass.log = log.tag ("P-"..name)
@@ -76,6 +75,7 @@ return function(loader)
     self.goal = goal
     self.agent = agent
     self.status = Plan.Status.New
+    self.step_count = 0
     self.results = {history = {}, last = nil}
   end
 

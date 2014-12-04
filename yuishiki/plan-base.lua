@@ -27,33 +27,33 @@ return function(loader)
     local schema = self.schemas[schema_name]
 
     if not schema then
-      self.log.w("Cannot instance plan <"..schema_name..">")
+      self.log.w("Cannot find plan <"..schema_name..">")
       return
     end
 
-    local plan = schema(self.agent, parameters)
-    plan.on.create(plan, agent)
-    return plan
-  end
-
-  function PlanBase:canInstance(schema, event) assert(schema)
-    local parameters
-    if event then
-      if event:getType() == "goal" then parameters = event.goal.parameters
-      else parameters = event.parameters end
+    if self:canInstance(schema, parameters) then
+      return schema(self.agent, parameters)
     end
-
-    return schema.conditions.default(true).initial(
-      schema,
-      parameters,
-      self.agent.bdi.belief_base.interface,
-      self.agent.actuator.interface
-    )
   end
 
-  function PlanBase:getEfficiency(schema_name, ...)
+  function PlanBase:canInstance(schema, parameters) assert(schema)
+    if schema.enabled then
+      return schema.enabled(
+        schema,
+        parameters,
+        self.agent.bdi.belief_base.interface,
+        self.agent.actuator.interface)
+    else return true end
+  end
+
+  function PlanBase:getEfficiency(schema_name, goal)
     local schema = self.schemas[schema_name]
-    if schema.efficiency then return schema.efficiency(schema, ...)
+    if schema.efficiency then
+      return schema.efficiency(
+        schema,
+        goal.parameters,
+        self.agent.bdi.belief_base.interface,
+        self.agent.actuator.interface)
     else return 0 end
   end
 
@@ -63,7 +63,7 @@ return function(loader)
     for _,schema in pairs(self.schemas) do
       if schema.trigger
         and schema.trigger:check(event)
-        and self:canInstance(schema, event) then
+        and self:canInstance(schema, event.parameters) then
 
         if schema.meta then table.insert(metaplans, schema.name)
         else table.insert(plans, schema.name) end

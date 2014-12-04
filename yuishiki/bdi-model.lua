@@ -77,12 +77,7 @@ return function(loader)
     local best
     local best_efficiency = 0
     for _,schema in pairs(options) do
-      local efficiency = self.plan_base:getEfficiency(
-        schema,
-        goal.parameters,
-        self.belief_base.interface,
-        self.agent.actuator.interface)
-
+      local efficiency = self.plan_base:getEfficiency(schema, goal)
       if type(efficiency) ~= "number" then efficiency = 0 end
       if not best or efficiency > best_efficiency then
         best = schema
@@ -114,6 +109,8 @@ return function(loader)
   end
 
   function BDIModel:step()
+    self.intention_base:update()
+    
     if self.intention_base:isEmpty()
       or self.intention_base:allWaiting() then
       self.log.i("No active intentions.")
@@ -165,6 +162,7 @@ return function(loader)
       self.intention_base:add(intention)
     end
 
+    plan.on.create()
     return plan
   end
 

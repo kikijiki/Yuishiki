@@ -44,6 +44,13 @@ return function(loader)
     end
   end
 
+  function IntentionBase:update()
+    for _,intention in pairs(self.intentions) do
+      intention:checkConditions()
+      if intention:isEmpty() then self:drop(intention) end
+    end
+  end
+
   function IntentionBase:execute(intention)
     if self.verbose then self:dump() end
     intention:step()

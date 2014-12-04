@@ -41,8 +41,6 @@ return function(loader)
   end
 
   function Intention:step()
-    self:checkConditions()
-
     local top = self:top()
     if not top then return end
 
