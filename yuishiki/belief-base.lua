@@ -30,10 +30,16 @@ return function(loader)
     self.interface = {
       d = self.beliefs,
       set = function(...) return self:set(...) end,
-      get = function(...)
-        local b = self:get(...)
-        if b then return b:get() end
-      end
+      get = function(...) return self:getValue(...) end,
+      isTrue    = function(...) return self:getValue(...) ==  true end,
+      isFalse   = function(...) return self:getValue(...) == false end,
+      isNil     = function(...) return self:getValue(...) ==   nil end,
+      isDefined = function(...) return self:getValue(...) ~=   nil end,
+      isEqual        = function(x, ...) return self:getValue(...) == x end,
+      isGreater      = function(x, ...) local v = self:getValue(...) return v and v >  x end,
+      isGreaterEqual = function(x, ...) local v = self:getValue(...) return v and v >= x end,
+      isLess         = function(x, ...) local v = self:getValue(...) return v and v <  x end,
+      isLessEqual    = function(x, ...) local v = self:getValue(...) return v and v <= x end,
     }
   end
 
@@ -130,6 +136,11 @@ return function(loader)
     if type(path) == "table" then path = table.concat(path, PATH_SEPARATOR) end
     if p2 then path = table.concat({path, p2, ...}, PATH_SEPARATOR) end
     return self.lookup[path]
+  end
+
+  function BeliefBase:getValue(...)
+    local b = self:get(...)
+    if b then return b:get() end
   end
 
   function BeliefBase:dump()
