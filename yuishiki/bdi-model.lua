@@ -110,25 +110,19 @@ return function(loader)
   end
 
   function BDIModel:waiting()
-    return self.intention_base:waiting()
+    return self.intention_base:allWaiting()
   end
 
   function BDIModel:step()
-    if self:waiting() then
-      self.log.i("No executable intentions.")
-      return false
-    end
-
-    local intention = self:selectIntention()
-
-    if intention then
-      self.log.i("Executing intention <"..intention.id.." - "..intention.name..">.")
-      self.intention_base:execute(intention)
-    else
+    if self.intention_base:isEmpty()
+      or self.intention_base:allWaiting() then
       self.log.i("No active intentions.")
       return false
     end
 
+    local intention = self:selectIntention()
+    self.log.i("Executing intention "..intention)
+    self.intention_base:execute(intention)
     return true
   end
 
@@ -146,7 +140,6 @@ return function(loader)
       intention:push(goal)
     else
       intention = Intention()
-      intention.name = goal.name
       intention:push(goal)
       self.intention_base:add(intention)
     end
@@ -168,7 +161,6 @@ return function(loader)
       intention:push(plan)
     else
       intention = Intention()
-      intention.name = plan.name
       intention:push(plan)
       self.intention_base:add(intention)
     end
