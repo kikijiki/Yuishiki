@@ -87,6 +87,14 @@ return function(loader)
     end
   end
 
+  local function exposeValue(world, character, value, path)
+    value:addObserver(world, function(...)
+      local event = {"character", "value"}
+      for _,v in ipairs(path) do table.insert(event, v) end
+      world:propagateEvent(character, event, value, ...)
+    end)
+  end
+
   function Character:setWorld(world, id)
     self.world = world
     self.id = id
@@ -100,11 +108,7 @@ return function(loader)
     end
 
     for path,value in pairs(self.values) do
-      value:addObserver(self, function(...)
-        local event = {"character", "value"}
-        for _,v in pairs(path) do table.insert(event, v) end
-        self.world:propagateEvent(self, event, value, ...)
-      end)
+      exposeValue(world, self, value, path)
     end
   end
 
@@ -177,16 +181,7 @@ return function(loader)
       belief:notify(belief, new, old, ...)
     end)
 
-    table.insert(path, 1, "character")
-    path.n = path.n + 1
-    if self.world then
-      value:addObserver(self.world, function(...)
-        local event = {"character", "value"}
-        for _,v in pairs(path) do table.insert(event, v) end
-        self.world:propagateEvent(self, event, value, ...)
-      end)
-    end
-
+    if self.world then exposeValue(self.world, self, value, path) end
     self.values[path] = value
 
     return value
