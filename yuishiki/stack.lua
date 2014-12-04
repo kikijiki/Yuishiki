@@ -44,7 +44,7 @@ return function(loader)
     self.size = self.size + 1
   end
 
-  function Stack:empty()
+  function Stack:isEmpty()
     return self.size == 0
   end
 

@@ -120,7 +120,7 @@ return function(loader)
   function Character:update(dt)
     self.sprite:update(dt)
 
-    while not self.commands:empty() and type(dt) == "number" and dt > 0 do
+    while not self.commands:isEmpty() and type(dt) == "number" and dt > 0 do
       local cmd = self.commands:top()
 
       if coroutine.status(cmd) == "dead" then

@@ -170,11 +170,11 @@ return function(loader)
     if not char then return end
 
     if self.paused then return end
-    if not char.commands:empty() then return end
+    if not char.commands:isEmpty() then return end
 
     for _ = 1, max_steps_per_update do
       local busy = char:updateAI(self.world)
-      if not char.commands:empty() then return end
+      if not char.commands:isEmpty() then return end
       if not busy then
         if self.auto_pause then self:pause() end
         if not self:nextCharacter() then
