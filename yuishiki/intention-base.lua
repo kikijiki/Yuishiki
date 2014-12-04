@@ -47,15 +47,15 @@ return function(loader)
   function IntentionBase:execute(intention)
     if self.verbose then self:dump() end
     intention:step()
-    if intention:empty() then self:drop(intention) end
+    if intention:isEmpty() then self:drop(intention) end
   end
 
-  function IntentionBase:waiting()
+  function IntentionBase:allWaiting()
     for _,intention in pairs(self.intentions) do
-      if intention:waiting() then return true end
+      if not intention:waiting() then return false end
     end
 
-    return false
+    return true
   end
 
   function IntentionBase:dump()
@@ -76,6 +76,10 @@ return function(loader)
     end
     self.log.i()
     self.log.i("--[[INTENTION BASE DUMP END]]--")
+  end
+
+  function IntentionBase:isEmpty()
+    return #self.intentions == 0
   end
 
   return IntentionBase
