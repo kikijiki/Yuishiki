@@ -118,7 +118,7 @@ return function(loader)
 
   function Plan:onEventTriggered(e)
     self.status = Plan.Status.Active
-    self.wait.data = e
+    self.wait.event = e
   end
 
   function Plan:waitForTrigger(trigger)
@@ -128,9 +128,9 @@ return function(loader)
       self.status = Plan.Status.Waiting
       self.wait = { trigger = trigger }
       self:yield()
-      local result = self.wait.result
+      local event = self.wait.event
       self.wait = nil
-      return result
+      return event
     end
   end
 

@@ -223,7 +223,7 @@ return function(loader)
 
   function Intention:waiting()
     local top = self.stack:top()
-    if not top then return true end
+    if not top then return false end
 
     if top:getYsType() == "plan" then
       return
