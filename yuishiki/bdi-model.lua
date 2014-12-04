@@ -121,7 +121,7 @@ return function(loader)
     end
 
     local intention = self:selectIntention()
-    self.log.i("Executing intention "..intention)
+    self.log.fi("Executing intention %s", intention)
     self.intention_base:execute(intention)
     return true
   end

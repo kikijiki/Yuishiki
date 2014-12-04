@@ -79,7 +79,7 @@ return function(loader)
   end
 
   function IntentionBase:isEmpty()
-    return #self.intentions == 0
+    return next(self.intentions) == nil
   end
 
   return IntentionBase
