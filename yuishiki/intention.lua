@@ -108,7 +108,8 @@ return function(loader)
     if not plan.conditions.default(true).context() then
       self.log.fi("Plan [%s] context condition, popping %d elements",
         plan.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
@@ -117,7 +118,8 @@ return function(loader)
     if plan.conditions.default(false).failure() then
       self.log.fi("Plan [%s] failure condition, popping %d elements",
         plan.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       plan:fail(Plan.FailReason.ConditionFailed)
       return true
     end
@@ -126,7 +128,8 @@ return function(loader)
     if plan.conditions.default(false).success() then
       self.log.fi("Plan [%s] success condition, popping %d elements",
         plan.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       plan:succeed()
       return true
     end
@@ -141,7 +144,8 @@ return function(loader)
     if not goal.conditions.default(true).context() then
       self.log.fi("Goal [%s] context condition, popping %d elements",
         goal.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
@@ -150,7 +154,8 @@ return function(loader)
     if goal.conditions.default(false).failure() then
       self.log.fi("Goal [%s] failure condition, popping %d elements",
         goal.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       goal:fail(Goal.FailReason.ConditionFailed)
       return true
     end
@@ -159,7 +164,8 @@ return function(loader)
     if goal.conditions.default(false).success() then
       self.log.fi("Goal [%s] success condition, popping %d elements",
         goal.name, sub_count)
-      self:popn(sub_count)
+      self:popn(sub_count, true)
+      self:dump()
       goal:succeed()
       return true
     end
@@ -179,10 +185,10 @@ return function(loader)
     else self.log.w("Intention:push ignored (not a plan nor a goal).") end
   end
 
-  function Intention:pop()
+  function Intention:pop(nodump)
     local top = self:top()
-    if top.getYsType() == "goal" then return self:popGoal()
-    elseif top.getYsType() == "plan" then return self:popPlan(e) end
+    if top.getYsType() == "goal" then return self:popGoal(nodump)
+    elseif top.getYsType() == "plan" then return self:popPlan(nodump) end
   end
 
   function Intention:pushGoal(goal)
@@ -192,11 +198,11 @@ return function(loader)
     self:dump()
   end
 
-  function Intention:popGoal()
+  function Intention:popGoal(nodump)
     local goal = self.stack:pop()
     goal.on.deactivation()
     self.log.i("Popped goal ", goal)
-    self:dump()
+    if not nodump then self:dump() end
   end
 
   function Intention:pushPlan(plan)
@@ -208,17 +214,17 @@ return function(loader)
     self:dump()
   end
 
-  function Intention:popPlan()
+  function Intention:popPlan(nodump)
     local plan = self.stack:pop()
     plan.on.deactivation()
     self.log.i("Popped plan ", plan)
-    self:dump()
+    if not nodump then self:dump() end
   end
 
-  function Intention:popn(n)
+  function Intention:popn(n, nodump)
     local ret = {}
     for i = 1, n do
-      local e = self:pop()
+      local e = self:pop(nodump)
       if e then table.insert(ret, e) end
     end
     return ret
