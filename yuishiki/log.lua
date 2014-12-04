@@ -6,11 +6,11 @@ return function(loader)
   local ansicolors = loader.require "ansicolors".noReset
 
   log = {
-    Verbosity = {verbose = 3, normal = 2, minimal = 1, none = 0},
-    showInfo = true,
-    showTime = true,
+    Verbosity     = {all = 3, debug = 2, errors = 1, disabled = 0},
+    showInfo      = true,
+    showTime      = true,
     useAnsiColors = false,
-    verbosity = 3
+    verbosity     = 3
   }
 
   local outputs = {
@@ -19,45 +19,45 @@ return function(loader)
   }
 
   local colors = {
-    reset = ansicolors("%{reset}"),
-    source = "",
-    arrow = "",
-    name = ansicolors("%{bright yellow}"),
-    line = ansicolors("%{bright cyan}"),
+    reset   = ansicolors("%{reset}"),
+    source  = "",
+    arrow   = "",
+    name    = ansicolors("%{bright yellow}"),
+    line    = ansicolors("%{bright cyan}"),
     message = ""
   }
 
   local severities = {
     p = {
       normal = "",
-      color = "",
-      level = 3,
-      die = false},
+      color  = "",
+      level  = 3,
+      die    = false},
     i = {
       normal = "[INF]",
-      color = ansicolors("%{bright green}[INF]%{reset}"),
-      level = 3,
-      die = false},
+      color  = ansicolors("%{bright green}[INF]%{reset}"),
+      level  = 3,
+      die    = false},
     d = {
       normal = "[DBG]",
-      color = ansicolors("%{bright black}[DBG]%{reset}"),
-      level = 2,
-      die = false},
+      color  = ansicolors("%{bright black}[DBG]%{reset}"),
+      level  = 2,
+      die    = false},
     w = {
       normal = "[WRN]",
-      color = ansicolors("%{bright yellow}[WRN]%{reset}"),
-      level = 2,
-      die = false},
+      color  = ansicolors("%{bright yellow}[WRN]%{reset}"),
+      level  = 2,
+      die    = false},
     e = {
       normal = "[ERR]",
-      color = ansicolors("%{bright red}[ERR]%{reset}"),
-      level = 1,
-      die = false},
+      color  = ansicolors("%{bright red}[ERR]%{reset}"),
+      level  = 1,
+      die    = false},
     f = {
       normal = "[FAT]",
-      color = ansicolors("%{bright red}[FAT]%{reset}"),
-      level = 0,
-      die = true}
+      color  = ansicolors("%{bright red}[FAT]%{reset}"),
+      level  = 0,
+      die    = true}
   }
 
   local function sendRawOutput(data)
@@ -162,7 +162,6 @@ return function(loader)
   function log.fcheck(tag, value, fmt, ...) if not value then log.fe(tag, fmt, ...) end end
 
   function log.tag(tag)
-    tag = tostring(tag)
     return setmetatable({}, {
       __index = function(t, k)
         return function(...) log[k](tag, ...) end

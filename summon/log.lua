@@ -6,7 +6,7 @@ return function(loader)
   local ansicolors = loader.require "ansicolors".noReset
 
   log = {
-    Verbosity     = {verbose = 3, normal = 2, minimal = 1, none = 0},
+    Verbosity     = {all = 3, debug = 2, errors = 1, disabled = 0},
     showInfo      = true,
     showTime      = true,
     useAnsiColors = false,
