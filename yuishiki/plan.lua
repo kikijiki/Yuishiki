@@ -16,9 +16,12 @@ return function(loader)
 
   Plan = loader.class("Plan")
 
-  Plan.static.Status = uti.makeEnum("New", "Active", "Waiting", "Succeeded", "Failed", "Error")
-  Plan.static.FailReason = uti.makeEnum("Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
-  Plan.static.Condition = uti.makeEnum("Success", "Failure", "Context", "Completion")
+  Plan.static.Status = uti.makeEnum(
+    "New", "Active", "Waiting", "Succeeded", "Failed", "Error")
+  Plan.static.FailReason = uti.makeEnum(
+    "Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
+  Plan.static.Condition = uti.makeEnum(
+    "Success", "Failure", "Context", "Completion")
   Plan.static.history_path = "history.plan"
 
   --- Create a new plan class from the definition data.
@@ -191,9 +194,10 @@ return function(loader)
 
   function Plan:__tostring()
     if self.describe then
-      return "[P]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"
+      return string.format("[P](%s) <%s> {%s}",
+        self.status, self.name, self:describe(self.parameters))
     else
-      return "[P]("..self.status..") <"..self.name..">"
+      return string.format("[P](%s) <%s>", self.status, self.name)
     end
   end
 

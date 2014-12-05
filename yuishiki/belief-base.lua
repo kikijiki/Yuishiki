@@ -10,7 +10,8 @@ return function(loader)
 
   local PATH_SEPARATOR = "."
   local PATH_TRAVERSER_PATTERN = '([^'..PATH_SEPARATOR..']+)'
-  local PATH_SPLITTER_PATTERN = '%'..PATH_SEPARATOR..'([^%'..PATH_SEPARATOR..']*)$'
+  local PATH_SPLITTER_PATTERN =
+    '%'..PATH_SEPARATOR..'([^%'..PATH_SEPARATOR..']*)$'
 
   BeliefBase = loader.class("BeliefBase", Observable)
 
@@ -31,15 +32,16 @@ return function(loader)
       d = self.beliefs,
       set = function(...) return self:set(...) end,
       get = function(...) return self:getValue(...) end,
-      isTrue    = function(...) return self:getValue(...) ==  true end,
-      isFalse   = function(...) return self:getValue(...) == false end,
-      isNil     = function(...) return self:getValue(...) ==   nil end,
-      isDefined = function(...) return self:getValue(...) ~=   nil end,
+      
+      isTrue         = function(   ...) return self:getValue(...) ==  true end,
+      isFalse        = function(   ...) return self:getValue(...) == false end,
+      isNil          = function(   ...) return self:getValue(...) ==   nil end,
+      isDefined      = function(   ...) return self:getValue(...) ~=   nil end,
       isEqual        = function(x, ...) return self:getValue(...) == x end,
-      isGreater      = function(x, ...) local v = self:getValue(...) return v and v >  x end,
-      isGreaterEqual = function(x, ...) local v = self:getValue(...) return v and v >= x end,
-      isLess         = function(x, ...) local v = self:getValue(...) return v and v <  x end,
-      isLessEqual    = function(x, ...) local v = self:getValue(...) return v and v <= x end,
+      isGreater      = function(x, ...) return self:getValue(...) >  x end,
+      isGreaterEqual = function(x, ...) return self:getValue(...) >= x end,
+      isLess         = function(x, ...) return self:getValue(...) <  x end,
+      isLessEqual    = function(x, ...) return self:getValue(...) <= x end,
     }
   end
 
@@ -170,7 +172,8 @@ return function(loader)
       if belief.source == "internal" then source = "I" else source = "E" end
       if belief.storage == "short" then storage = "S" else storage = "L" end
       local skip = longest - lengths[path]
-      self.log.fi("[%s%s] %s %s %s", source, storage, path, string.rep(".", skip), tostring(belief))
+      self.log.fi("[%s%s] %s %s %s",
+        source, storage, path, string.rep(".", skip), tostring(belief))
     end
     self.log.i()
     self.log.i("--[[BELIEF BASE DUMP END]]--")

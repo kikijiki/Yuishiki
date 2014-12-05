@@ -54,7 +54,8 @@ return function(loader)
       execute = function(a, ...)
         if self.gm:isActionAsync(a) then
           if not coroutine.running() then
-            self.log.e("Cannot run an async action <"..a.."> from outside a coroutine.")
+            self.log.fe(
+              "Cannot run an async action <%s> from outside a coroutine.", a)
             return
           end
           local data
@@ -158,7 +159,8 @@ return function(loader)
   end
 
   function Character:bubble(message, direction, color)
-    self:dispatch("bubble", self, message, self.sprite:getTag("head"), direction, color)
+    self:dispatch("bubble",
+      self, message, self.sprite:getTag("head"), direction, color)
   end
 
   function Character:addValue(data, ...) assert(data)
