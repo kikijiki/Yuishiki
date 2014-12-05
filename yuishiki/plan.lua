@@ -1,6 +1,6 @@
 --- The plan class.
 --
--- Dependencies: `middleclass`, `uti`, `log`, `Trigger`, `ManualTrigger`
+-- Dependencies: `uti`, `log`, `Trigger`, `ManualTrigger`
 --
 -- @classmod Plan
 
@@ -44,8 +44,8 @@ return function(loader)
     PlanClass.static.data = data
     PlanClass.static.name = name
 
-    PlanClass.initialize = function(self, agent, parameters)
-      Plan.initialize(self, agent, parameters)
+    PlanClass.initialize = function(self, bdi, parameters)
+      Plan.initialize(self, bdi, parameters)
       self.name = name
       self.thread = coroutine.create(self.body)
       self.conditions = ManualTrigger(data.conditions)
@@ -70,10 +70,9 @@ return function(loader)
     return loader.class(plan_class_prefix..name, Plan)
   end
 
-  function Plan:initialize(agent, parameters, goal) assert(agent)
+  function Plan:initialize(bdi, parameters)
+    self.bdi = bdi
     self.parameters = parameters or {}
-    self.goal = goal
-    self.agent = agent
     self.status = Plan.Status.New
     self.step_count = 0
     self.results = {history = {}, last = nil}
@@ -155,13 +154,13 @@ return function(loader)
   end
 
   function Plan:pushSubGoal(goal, parameters)
-    local goal_instance = self.agent.bdi:pushGoal(goal, parameters, self.intention)
+    local goal_instance = self.bdi:pushGoal(goal, parameters, self.intention)
     self:yield()
     return goal_instance.result
   end
 
   function Plan:pushSubPlan(plan, parameters)
-    local plan_instance = self.agent.bdi:pushPlan(plan, parameters, self.intention)
+    local plan_instance = self.bdi:pushPlan(plan, parameters, self.intention)
     self:yield()
     return plan_instance.results.last
   end
@@ -199,7 +198,7 @@ return function(loader)
   end
 
   function Plan:record(result, state, max)
-    local bb = self.agent.bdi.belief_base
+    local bb = self.bdi.belief_base
     local history = bb:get(self.history_path)
 
     if not history then

@@ -241,7 +241,6 @@ return function(loader)
   end
 
   function GM:executeAction(c, a, ...) assert(c and a)
-    log.i("Executing action ["..a.."].")
     if not c.actions:isset(a) then
       log.fw("Character %s is trying to use the action [%s] which cannot use.",
         c.id, a)
@@ -253,7 +252,6 @@ return function(loader)
       return false
     end
     local action = self.actions[a]
-    log.i("ACTION "..a, ...)
     return action:execute(self, c, ...)
   end
 

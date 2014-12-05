@@ -9,17 +9,16 @@ return function(loader)
 
   IntentionBase = loader.class("IntentionBase", Observable)
 
-  function IntentionBase:initialize(agent) assert(agent)
+  function IntentionBase:initialize(bdi) assert(bdi)
     Observable.initialize(self)
 
-    self.agent = agent
+    self.bdi = bdi
     self.intentions = {}
     self.log = log.tag("IB")
   end
 
   function IntentionBase:add(intention)
     self.intentions[intention.id] = intention
-    intention.agent = self.agent
   end
 
   function IntentionBase:drop(intention)
@@ -73,7 +72,7 @@ return function(loader)
     self.log.i("--[[INTENTION BASE DUMP START]]--")
     self.log.i()
     for _,intention in pairs(self.intentions) do
-      self.log.fi("%s / %d", intention, intention:getPriority())
+      self.log.i(intention)
       local i = 1
       for _,element in pairs(intention.stack.elements) do
         local indent = string.rep("-", i)
@@ -83,6 +82,14 @@ return function(loader)
     end
     self.log.i()
     self.log.i("--[[INTENTION BASE DUMP END]]--")
+  end
+
+  function IntentionBase:getGoalCount(goal)
+    local goal_count = 0
+    for _, intention in pairs(self.intentions) do
+      goal_count = goal_count + intention:getGoalCount(goal)
+    end
+    return goal_count
   end
 
   function IntentionBase:isEmpty()

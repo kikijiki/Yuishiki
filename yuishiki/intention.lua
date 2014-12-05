@@ -13,7 +13,8 @@ return function(loader)
 
   local generateId = uti.makeIdGenerator("I")
 
-  function Intention:initialize()
+  function Intention:initialize(bdi)
+    self.bdi = bdi
     self.stack = Stack()
     self.id = generateId()
     self.log = log.tag(self.id)
@@ -69,7 +70,7 @@ return function(loader)
   function Intention:stepGoal(goal)
     self.log.i("Stepping in goal", goal)
     if goal.status == Goal.Status.Active then
-      local plan = self.agent.bdi:processGoal(goal, self)
+      local plan = self.bdi:processGoal(goal, self)
       if plan then
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
@@ -104,7 +105,7 @@ return function(loader)
 
     -- context condition
     if not plan.conditions.default(true).context() then
-      self.log.fi("Plan [%s] context condition, popping %d elements",
+      self.log.fi("Plan [%s] context condition failed, popping %d elements",
         plan.name, sub_count)
       self:popn(sub_count, true)
       self:dump()
@@ -236,15 +237,15 @@ return function(loader)
       return
         top.conditions.default(false).wait() or
         top.status == Plan.Status.Waiting
-    else
-      return false
+    elseif top:getYsType() == "goal" then
+      return top.status == Goal.Status.WaitingAvailability
     end
   end
 
-  function Intention:getGoalCount(name)
+  function Intention:getGoalCount(goal_name)
     local count = 0
     for _,v in self.stack:pairs() do
-      if v:getYsType() == "goal" and v.name == name then
+      if v:getYsType() == "goal" and v.name == goal_name then
         count = count + 1
       end
     end
@@ -252,7 +253,12 @@ return function(loader)
   end
 
   function Intention:__tostring()
-    return "[I] "..self.id.."("..self.stack.size..")"
+    local top = self:top()
+    if top then
+      return string.format("[I](%s) <%s(%d)> %d", top.status, self.id, self.stack.size, self:getPriority())
+    else
+      return string.format("[I] <%s(%d)> %d", self.id, self.stack.size, self:getPriority())
+    end
   end
 
   function Intention:getPriority()
@@ -260,6 +266,16 @@ return function(loader)
       if v:getYsType() == "goal" then return v:getPriority() end
     end
     return 0
+  end
+
+  function Intention:resume(bdi)
+    if self:isEmpty() then return end
+    local top = self:top()
+    if top:getYsType() == "goal" then
+      if top.status == Goal.Status.WaitingAvailability then
+        bdi.goal_base:reserve(top, self)
+      end
+    end
   end
 
   function Intention:dump()

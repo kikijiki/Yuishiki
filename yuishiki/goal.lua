@@ -10,7 +10,7 @@ return function(loader)
 
   Goal = loader.class("Goal")
 
-  Goal.static.Status = uti.makeEnum("New", "Active", "Succeeded", "Failed")
+  Goal.static.Status = uti.makeEnum("New", "Active", "Succeeded", "Failed", "WaitingAvailability")
   Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)

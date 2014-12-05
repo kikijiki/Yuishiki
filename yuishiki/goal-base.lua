@@ -12,23 +12,28 @@ return function(loader)
 
   GoalBase = loader.class("GoalBase", Observable)
 
-  function GoalBase:initialize(agent) assert(agent)
+  function GoalBase:initialize(bdi) assert(bdi)
     Observable.initialize(self)
 
-    self.agent = agent
-    self.goal_schemas = {}
+    self.bdi = bdi
+    self.schemas = {}
     self.inhibited = {}
     self.triggers = {}
+    self.instances = {}
     self.log = log.tag("GB")
   end
 
   function GoalBase:register(schema) assert(schema and schema.name)
-    self.goal_schemas[schema.name] = schema
+    self.schemas[schema.name] = schema
     if schema.trigger then table.insert(self.triggers, schema) end
+    self.instances[schema.name] = {
+      count = 0,
+      list = setmetatable({}, {__mode="k"})
+    }
   end
 
   function GoalBase:instance(name, parameters) assert(name)
-    local schema = self.goal_schemas[name]
+    local schema = self.schemas[name]
 
     if not schema then
       self.log.w("Could not find the goal <"..name..">.")
@@ -45,36 +50,68 @@ return function(loader)
   function GoalBase:canInstance(schema) assert(schema)
     if self.inhibited[schema.name] then return false end
     if schema.enabled and not self.enabled() then return false end
-
-    if schema.limit then
-      local ib = self.agent.bdi.intention_base
-      local goal_count = 0
-      for _, intention in pairs(ib) do
-        goal_count = goal_count + intention:getGoalCount(schema.name)
-      end
-      if goal_count > schema.limit then return false end
-    end
-
     return true
   end
 
   function GoalBase:onEvent(event)
     for _,schema in pairs(self.triggers) do
       if schema.trigger:check(event) and self:canInstance(schema) then
-        self.agent.bdi:pushGoal(schema.name, event.parameters)
+        self.bdi:pushGoal(schema.name, event.parameters)
+      end
+    end
+  end
+
+  function GoalBase:reserve(goal, intention)
+    -- goal has no constraints
+    if not goal.limit then return end
+
+    local inst = self.instances[goal.name]
+
+    -- this intention has already reserved the goal, ok.
+    if inst.list[intention] then return end
+
+    -- if there is still room, reserve another one.
+    if inst.count < goal.limit then
+      inst.count = inst.count + 1
+      inst.list[intention] = true
+    else
+      goal.status = Goal.Status.WaitingAvailability
+    end
+  end
+
+  function GoalBase:release(goal_name, intention)
+    local inst = self.instances[goal_name]
+    if inst.list[intention] then
+      inst.list[intention] = nil
+      inst.count = inst.count - 1
+    end
+  end
+
+  function GoalBase:update()
+    local ib = self.bdi.intention_base
+    for goal_name, instance_data in pairs(self.instances) do
+      for intention,_ in pairs(instance_data.list) do
+        if intention:getGoalCount(goal_name) == 0 then
+          self:release(goal_name, intention)
+        end
       end
     end
   end
 
   function GoalBase:dump()
-    if not next(self.goal_schemas) then
+    if not next(self.schemas) then
       self.log.i("--[[GOAL BASE EMPTY]]--")
       return
     end
     self.log.i("--[[GOAL BASE DUMP START]]--")
     self.log.i()
-    for _,goal in pairs(self.goal_schemas) do
-      self.log.i(goal.name)
+    for _,goal in pairs(self.schemas) do
+      if goal.limit then
+        self.log.fi("%s (%d/%d)",
+          goal.name, self.instances[goal.name].count, goal.limit)
+      else
+        self.log.i(goal.name)
+      end
     end
     self.log.i()
     self.log.i("--[[GOAL BASE DUMP END]]--")

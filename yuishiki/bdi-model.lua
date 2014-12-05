@@ -22,10 +22,11 @@ return function(loader)
     self.log = log.tag("BDI")
 
     self.belief_base    = BeliefBase()
-    self.goal_base      = GoalBase(agent)
-    self.plan_base      = PlanBase(agent)
-    self.intention_base = IntentionBase(agent)
-    self.functions = {}
+    self.goal_base      = GoalBase(self)
+    self.plan_base      = PlanBase(self)
+    self.intention_base = IntentionBase(self)
+    self.actuator       = agent.actuator
+    self.functions      = {}
 
     local dispatcher = function(...) return self:dispatch(...) end
     self.belief_base   :addObserver(self, dispatcher)
@@ -35,7 +36,7 @@ return function(loader)
 
     self.export = {
       beliefs = self.belief_base.interface,
-      actuator = self.agent.actuator.interface
+      actuator = self.actuator.interface
     }
   end
 
@@ -54,9 +55,10 @@ return function(loader)
     local highest
     local highest_priority
     for _,intention in pairs(self.intention_base.intentions) do
-      if not intention:waiting() then
-        local priority = intention:getPriority()
-        if not highest_priority or priority > highest_priority then
+      local priority = intention:getPriority()
+      if not highest_priority or priority > highest_priority then
+        intention:resume(self)
+        if not intention:waiting() then
           highest_priority = priority
           highest = intention
         end
@@ -109,8 +111,9 @@ return function(loader)
   end
 
   function BDIModel:step()
+    self.goal_base:update()
     self.intention_base:update()
-    
+
     if self.intention_base:isEmpty()
       or self.intention_base:allWaiting() then
       self.log.i("No active intentions.")
@@ -131,16 +134,17 @@ return function(loader)
       goal,
       parameters,
       self.belief_base.interface,
-      self.agent.actuator.interface)
+      self.actuator.interface)
 
     if intention then
       intention:push(goal)
     else
-      intention = Intention()
+      intention = Intention(self)
       intention:push(goal)
       self.intention_base:add(intention)
     end
 
+    self.goal_base:reserve(goal, intention)
     return goal
   end
 
@@ -152,12 +156,12 @@ return function(loader)
       plan,
       plan.parameters,
       self.belief_base.interface,
-      self.agent.actuator.interface)
+      self.actuator.interface)
 
     if intention then
       intention:push(plan)
     else
-      intention = Intention()
+      intention = Intention(self)
       intention:push(plan)
       self.intention_base:add(intention)
     end

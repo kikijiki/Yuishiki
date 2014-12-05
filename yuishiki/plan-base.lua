@@ -10,10 +10,10 @@ return function(loader)
 
   PlanBase = loader.class("PlanBase", Observable)
 
-  function PlanBase:initialize(agent) assert(agent)
+  function PlanBase:initialize(bdi) assert(bdi)
     Observable.initialize(self)
 
-    self.agent = agent
+    self.bdi = bdi
     self.schemas = {}
     self.log = log.tag("PB")
   end
@@ -32,7 +32,7 @@ return function(loader)
     end
 
     if self:canInstance(schema, parameters) then
-      return schema(self.agent, parameters)
+      return schema(self.bdi, parameters)
     end
   end
 
@@ -41,8 +41,8 @@ return function(loader)
       return schema.enabled(
         schema,
         parameters,
-        self.agent.bdi.belief_base.interface,
-        self.agent.actuator.interface)
+        self.bdi.belief_base.interface,
+        self.bdi.actuator.interface)
     else return true end
   end
 
@@ -52,8 +52,8 @@ return function(loader)
       return schema.efficiency(
         schema,
         goal.parameters,
-        self.agent.bdi.belief_base.interface,
-        self.agent.actuator.interface)
+        self.bdi.belief_base.interface,
+        self.bdi.actuator.interface)
     else return 0 end
   end
 
@@ -79,7 +79,7 @@ return function(loader)
         and self:canInstance(schema) then
 
         local plan = self:instance(schema, event.parameters)
-        goal_base.agent.bdi:addIntention(plan)
+        goal_base.bdi:addIntention(plan)
       end
     end
   end
