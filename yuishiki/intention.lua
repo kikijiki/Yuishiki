@@ -192,7 +192,7 @@ return function(loader)
 
   function Intention:pushGoal(goal)
     self.stack:push(goal)
-    goal:activate()
+    goal:prepare()
     self.log.i("Pushed new goal ", goal)
     self:dump()
   end
@@ -255,9 +255,10 @@ return function(loader)
   function Intention:__tostring()
     local top = self:top()
     if top then
-      return string.format("[I](%s) <%s(%d)> %d", top.status, self.id, self.stack.size, self:getPriority())
+      return string.format("[I](%s) <%s(%d)> %05.2f",
+        top.status, self.id, self.stack.size, self:getPriority())
     else
-      return string.format("[I] <%s(%d)> %d", self.id, self.stack.size, self:getPriority())
+      return string.format("[I] <%s(empty)>", self.id)
     end
   end
 

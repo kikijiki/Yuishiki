@@ -51,21 +51,22 @@ return function(loader)
       return self.functions.selectIntention(self, self.intention_base)
     end
 
-    --Default
-    local highest
-    local highest_priority
+    -- Default
+    -- Get the highest priority intention wich is not waiting.
+    local sorted_intentions = {}
     for _,intention in pairs(self.intention_base.intentions) do
-      local priority = intention:getPriority()
-      if not highest_priority or priority > highest_priority then
-        intention:resume(self)
-        if not intention:waiting() then
-          highest_priority = priority
-          highest = intention
-        end
-      end
+      table.insert(sorted_intentions, intention)
     end
+    
+    table.sort(sorted_intentions,
+      function(a, b)
+        return a:getPriority() > b:getPriority()
+      end)
 
-    return highest
+    for _,intention in ipairs(sorted_intentions) do
+      intention:resume(self)
+      if not intention:waiting() then return intention end
+    end
   end
 
   function BDIModel:selectPlan(goal, options)
@@ -114,13 +115,18 @@ return function(loader)
     self.goal_base:update()
     self.intention_base:update()
 
-    if self.intention_base:isEmpty()
-      or self.intention_base:allWaiting() then
-      self.log.i("No active intentions.")
+    if self.intention_base:isEmpty() then
+      self.log.i("No intentions to execute.")
       return false
     end
 
     local intention = self:selectIntention()
+
+    if not intention then
+      self.log.i("No active intentions.")
+      return false
+    end
+
     self.log.fi("Executing intention %s", intention)
     self.intention_base:execute(intention)
     return true
@@ -144,7 +150,6 @@ return function(loader)
       self.intention_base:add(intention)
     end
 
-    self.goal_base:reserve(goal, intention)
     return goal
   end
 

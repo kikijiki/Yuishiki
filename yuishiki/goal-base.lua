@@ -63,23 +63,24 @@ return function(loader)
 
   function GoalBase:reserve(goal, intention)
     -- goal has no constraints
-    if not goal.limit then return end
+    if not goal.limit then return goal:activate() end
 
     local inst = self.instances[goal.name]
 
     -- this intention has already reserved the goal, ok.
-    if inst.list[intention] then return end
+    if inst.list[intention] then return goal:activate() end
 
     -- if there is still room, reserve another one.
-    if inst.count < goal.limit then
+    if inst.count < goal.limit then                                             print("RESERVE", goal.name, intention)
       inst.count = inst.count + 1
       inst.list[intention] = true
+      goal:activate()
     else
       goal.status = Goal.Status.WaitingAvailability
     end
   end
 
-  function GoalBase:release(goal_name, intention)
+  function GoalBase:release(goal_name, intention)                               print("RELEASE", goal_name, intention)
     local inst = self.instances[goal_name]
     if inst.list[intention] then
       inst.list[intention] = nil

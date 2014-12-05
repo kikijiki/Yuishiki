@@ -10,8 +10,10 @@ return function(loader)
 
   Goal = loader.class("Goal")
 
-  Goal.static.Status = uti.makeEnum("New", "Active", "Succeeded", "Failed", "WaitingAvailability")
-  Goal.static.FailReason = uti.makeEnum("Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
+  Goal.static.Status = uti.makeEnum(
+    "New", "Active", "Succeeded", "Failed", "WaitingAvailability")
+  Goal.static.FailReason = uti.makeEnum(
+    "Dropped", "PlanFailed", "NoPlansAvailable", "ConditionFailed", "unknown")
 
   function Goal.static.define(name, data)
     local GoalClass = loader.class("G-"..name, Goal)
@@ -65,15 +67,25 @@ return function(loader)
   end
 
   function Goal:activate()
-    self.status = Goal.Status.Active
-    self.on.activation()
+    if self.status ~= Goal.Status.Active then
+      self.status = Goal.Status.Active
+      self.on.activation()
+    end
+  end
+
+  function Goal:prepare()
+    self.status = Goal.Status.WaitingAvailability
+  end
+
+  function Goal:wait()
   end
 
   function Goal:__tostring()
     if self.describe then
-      return "[G]("..self.status..") <"..self.name.."> {"..self:describe(self.parameters).."}"
+      return string.format("[G](%s) <%s> {%s}",
+        self.status, self.name, self:describe(self.parameters))
     else
-      return "[G]("..self.status..") <"..self.name..">"
+      return string.format("[G](%s) <%s>", self.status, self.name)
     end
   end
 
