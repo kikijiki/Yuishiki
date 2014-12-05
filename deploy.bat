@@ -26,4 +26,4 @@ cd %~dp0
 copy platforms\android\bin\love_android_sdl2-debug.apk bin\yuishiki-and.apk > nul
 
 echo Deploying android apk...
-adb install -r bin\yuishiki.apk
+adb install -r bin\yuishiki-and.apk
