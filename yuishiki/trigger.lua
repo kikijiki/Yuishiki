@@ -35,16 +35,16 @@ return function(loader)
   BeliefTrigger.static.conditions = {
     ["equal"]         = function(e, new, old, p)      return new == p                end,
     ["changed"]       = function(e, new, old)         return new ~= old              end,
-    ["at least"]      = function(e, new, old, p)      return new >= p                end,
-    ["at most"]       = function(e, new, old, p)      return new <= p                end,
-    ["more than"]     = function(e, new, old, p)      return new >  p                end,
-    ["less than"]     = function(e, new, old, p)      return new <  p                end,
+    ["at-least"]      = function(e, new, old, p)      return new >= p                end,
+    ["at-most"]       = function(e, new, old, p)      return new <= p                end,
+    ["more-than"]     = function(e, new, old, p)      return new >  p                end,
+    ["less-than"]     = function(e, new, old, p)      return new <  p                end,
     ["increased"]     = function(e, new, old)         return new >  old              end,
     ["decreased"]     = function(e, new, old)         return old >  new              end,
-    ["not increased"] = function(e, new, old)         return new <= old              end,
-    ["not decreased"] = function(e, new, old)         return old >= new              end,
+    ["not-increased"] = function(e, new, old)         return new <= old              end,
+    ["not-decreased"] = function(e, new, old)         return old >= new              end,
     ["range"]         = function(e, new, old, p1, p2) return new <= p2 and new >= p1 end,
-    ["range ex"]      = function(e, new, old, p1, p2) return new <  p2 and new >  p1 end,
+    ["range-ex"]      = function(e, new, old, p1, p2) return new <  p2 and new >  p1 end,
   }
 
   function BeliefTrigger:initialize(path, condition, ...)
@@ -69,7 +69,9 @@ return function(loader)
   function BeliefTrigger:condition(condition, ...)
     if not condition then return end
     if type(condition) == "function" then self.condition = condition end
-    if type(condition) == "string" then self.condition = BeliefTrigger.conditions[condition] end
+    if type(condition) == "string" then
+      self.condition = BeliefTrigger.conditions[condition]
+    end
     self.parameters = {...}
     return self
   end
@@ -77,8 +79,12 @@ return function(loader)
   function BeliefTrigger:check(event)
     -- Check path
     local path = event.name[2]
-    if self.path_start and not uti.startsWith(path, self.path_start) then return false end
-    if self.path_end and not uti.endsWith(path, self.path_end) then return false end
+    if self.path_start and not uti.startsWith(path, self.path_start) then
+      return false
+    end
+    if self.path_end and not uti.endsWith(path, self.path_end) then
+      return false
+    end
 
     -- Check conditions
     if self.condition then
