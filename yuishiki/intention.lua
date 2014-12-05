@@ -182,6 +182,8 @@ return function(loader)
     if e.getYsType() == "goal" then self:pushGoal(e)
     elseif e.getYsType() == "plan" then self:pushPlan(e)
     else self.log.w("Intention:push ignored (not a plan nor a goal).") end
+
+    if self.stack.size > 1 then self:dump() end
   end
 
   function Intention:pop(nodump)
@@ -194,7 +196,6 @@ return function(loader)
     self.stack:push(goal)
     goal:prepare()
     self.log.i("Pushed new goal ", goal)
-    self:dump()
   end
 
   function Intention:popGoal(nodump)
@@ -210,7 +211,6 @@ return function(loader)
     plan.on.activation()
     self.stack:push(plan)
     self.log.i("Pushed new plan ", plan)
-    self:dump()
   end
 
   function Intention:popPlan(nodump)
@@ -255,7 +255,7 @@ return function(loader)
   function Intention:__tostring()
     local top = self:top()
     if top then
-      return string.format("[I](%s) <%s(%d)> %05.2f",
+      return string.format("[I](%s) <%s(%d)> priority: %05.2f",
         top.status, self.id, self.stack.size, self:getPriority())
     else
       return string.format("[I] <%s(empty)>", self.id)
@@ -280,7 +280,7 @@ return function(loader)
   end
 
   function Intention:dump()
-    self.log.fi("Dump of %s", self)
+    self.log.i(self)
     local i = 1
     for _,element in pairs(self.stack.elements) do
       local indent = string.rep("-", i)
