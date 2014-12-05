@@ -4,6 +4,8 @@ return function(loader)
   if log then return log end
 
   local ansicolors = loader.require "ansicolors".noReset
+  local format = string.format
+  local concat = table.concat
 
   log = {
     Verbosity     = {all = 3, debug = 2, errors = 1, disabled = 0},
@@ -75,7 +77,7 @@ return function(loader)
   local function buildBuffer(...)
     local buffer = {}
     for _,data in pairs({...}) do table.insert(buffer, tostring(data)) end
-    return table.concat(buffer, " ")
+    return concat(buffer, " ")
   end
 
   local function writeToLog(severity_name, tag, ...)
@@ -91,7 +93,8 @@ return function(loader)
 
     local timestamp = ""
     if log.showTime then
-      timestamp = "["..data.time.hour..":"..data.time.min..":"..data.time.sec.."]"
+      timestamp = format("[%d:%d:%d]",
+        data.time.hour, data.time.min, data.time.sec)
     end
 
     local tagstamp = ""
@@ -115,7 +118,7 @@ return function(loader)
         "(", tostring(data.info.currentline), ") "}
     end
 
-    data.meta = table.concat(data.meta)
+    data.meta = concat(data.meta)
 
     local buffer = timestamp..severity..tagstamp.." "
     if log.showInfo then
@@ -141,25 +144,27 @@ return function(loader)
   end
 
   function log.p(tag, ...)       writeToLog("p", tag, ...) end
-  function log.fp(tag, fmt, ...) writeToLog("p", tag, string.format(fmt, ...)) end
+  function log.fp(tag, fmt, ...) writeToLog("p", tag, format(fmt, ...)) end
 
   function log.i(tag, ...)       writeToLog("i", tag, ...) end
-  function log.fi(tag, fmt, ...) writeToLog("i", tag, string.format(fmt, ...)) end
+  function log.fi(tag, fmt, ...) writeToLog("i", tag, format(fmt, ...)) end
 
   function log.d(tag, ...)       writeToLog("d", tag, ...) end
-  function log.fd(tag, fmt, ...) writeToLog("d", tag, string.format(fmt, ...)) end
+  function log.fd(tag, fmt, ...) writeToLog("d", tag, format(fmt, ...)) end
 
   function log.w(tag, ...)       writeToLog("w", tag, ...) end
-  function log.fw(tag, fmt, ...) writeToLog("w", tag, string.format(fmt, ...)) end
+  function log.fw(tag, fmt, ...) writeToLog("w", tag, format(fmt, ...)) end
 
   function log.e(tag, ...)       writeToLog("e", tag, ...) end
-  function log.fe(tag, fmt, ...) writeToLog("e", tag, string.format(fmt, ...)) end
+  function log.fe(tag, fmt, ...) writeToLog("e", tag, format(fmt, ...)) end
 
   function log.f(tag, ...)       writeToLog("f", tag, ...) end
-  function log.ff(tag, fmt, ...) writeToLog("f", tag, string.format(fmt, ...)) end
+  function log.ff(tag, fmt, ...) writeToLog("f", tag, format(fmt, ...)) end
 
   function log.check(tag, value, ...) if not value then log.e(tag, ...) end end
-  function log.fcheck(tag, value, fmt, ...) if not value then log.fe(tag, fmt, ...) end end
+  function log.fcheck(tag, value, fmt, ...)
+    if not value then log.fe(tag, fmt, ...) end
+  end
 
   function log.tag(tag)
     return setmetatable({}, {
