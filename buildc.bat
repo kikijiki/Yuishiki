@@ -2,9 +2,11 @@
 echo Packaging game...
 
 set bin=bin
+set tmp=%bin%\tmp
 
 cd %~dp0
 call :Clear
+call :Compile
 call :Archive
 call :Windows
 call :Mac
@@ -13,18 +15,29 @@ call :Love
 goto :End
 
 :Clear
-rmdir %bin% /S /Q  > nul 2>&1
+rmdir %bin% /S /Q
 mkdir %bin%
+mkdir %tmp%
+exit /B
+
+:Compile
+echo|set /p= "> Compiling with luajit..."
+rem create temporary copy of the code
+robocopy .        %tmp%          *.lua >nul
+robocopy game     %tmp%\game     /S /E >nul
+robocopy lib      %tmp%\lib      /S /E >nul
+robocopy summon   %tmp%\summon   /S /E >nul
+robocopy yuishiki %tmp%\yuishiki /S /E >nul
+
+rem compile lua files (overwrites)
+for /r %%x in (%tmp%\*.lua) do luajit -b "%%x" "%%x"
+echo done
 exit /B
 
 :Archive
 echo|set /p= "> Creating game archive..."
-winrar a -afzip -ibck    %bin%\game.love .
 winrar a -afzip -ibck -r %bin%\game.love assets
-winrar a -afzip -ibck -r %bin%\game.love game
-winrar a -afzip -ibck -r %bin%\game.love lib
-winrar a -afzip -ibck -r %bin%\game.love summon
-winrar a -afzip -ibck -r %bin%\game.love yuishiki
+winrar a -afzip -ibck -r -ep1 %bin%\game.love %tmp%\*
 echo done
 exit /B
 
