@@ -12,6 +12,7 @@ call :Windows
 call :Mac
 call :Android
 call :Love
+call :Clean
 goto :End
 
 :Clear
@@ -30,7 +31,7 @@ robocopy summon   %tmp%\summon   /S /E >nul
 robocopy yuishiki %tmp%\yuishiki /S /E >nul
 
 rem compile lua files (overwrites)
-for /r %%x in (%tmp%\*.lua) do luajit -b "%%x" "%%x"
+for /r %tmp% %%x in (*.lua) do luajit -b "%%x" "%%x"
 echo done
 exit /B
 
@@ -69,6 +70,10 @@ exit /B
 echo|set /p= "> Building love package..."
 move bin\game.love bin\yuishiki.love > nul
 echo done
+exit /B
+
+:Clean
+rmdir %tmp% /S /Q
 exit /B
 
 :End
