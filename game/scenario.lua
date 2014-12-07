@@ -22,6 +22,17 @@ function Scenario:initialize(data)
     title = summon.AssetLoader.load("font", "ipamp.ttf@120")
   }
 
+  self.text = {
+    start = {
+      en = "Start",
+      ja = "スタート"
+    },
+    back = {
+      en = "Back",
+      ja = "戻る"
+    }
+  }
+
 end
 
 function Scenario:onResume()
@@ -52,34 +63,38 @@ end
 
 function Scenario:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
-  
+
   self.vp = vec(w, h)
 end
 
 function Scenario:draw()
+  local locale = self.game.locale
+
   sg.setBackgroundColor(20, 20, 20)
 
   sg.setColor(0, 200, 255)
   self.font.title:apply()
-  sg.printf(self.name, 60, 60, self.vp.x - 60, "center")
+  sg.printf(self.name[locale], 60, 60, self.vp.x - 60, "center")
 
   sg.setColor(200, 200, 200)
   self.font.normal:apply()
-  sg.printf(self.description, 60, 250, self.vp.x - 60, "left")
+  sg.printf(self.description[locale], 60, 250, self.vp.x - 60, "left")
 
   gui.core.draw()
 end
 
 function Scenario:update(dt)
+  local locale = self.game.locale
+
   local width = self.vp.x
   local height = self.vp.y
 
   self.font.normal:apply()
   gui.group{grow = "right", pos = {0, height - 160}, function()
     if gui.Button{
-      text = "START", size = {width - 200, 100}} then self:play() end
+      text = self.text.start[locale], size = {width - 200, 100}} then self:play() end
     if gui.Button{
-      text = "Back", size = {200, 100}} then self.game:pop() end
+      text = self.text.back[locale], size = {200, 100}} then self.game:pop() end
   end}
 end
 

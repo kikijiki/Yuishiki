@@ -21,6 +21,13 @@ function Phase:initialize(data)
     title = summon.AssetLoader.load("font", "ipamp.ttf@"..self.title_size),
   }
 
+  self.text = {
+    next = {
+      en = "Next",
+      ja = "次へ"
+    }
+  }
+
   for _,stage_data in pairs(data.stages) do
     local stage = Stage(stage_data)
     table.insert(self.stages, {stage, {}})
@@ -60,12 +67,14 @@ function Phase:drawStageBorder(stage, color)
 end
 
 function Phase:draw()
+  local locale = self.game.locale
+
   sg.setColor(200, 200, 200)
   self.font.title:apply()
-  sg.print(self.title or "", self.padding, self.padding)
+  sg.print(self.title[locale] or "", self.padding, self.padding)
 
   self.font.description:apply()
-  sg.print(self.description or "",
+  sg.print(self.description[locale] or "",
     self.padding, self.title_size + self.padding * 2)
 
   for _,stage in pairs(self.stages) do
@@ -80,9 +89,11 @@ function Phase:draw()
 end
 
 function Phase:update(dt)
+  local locale = self.game.locale
+
   self.font.description:apply()
   if gui.Button{
-    text = "次へ",
+    text = self.text.next[locale],
     pos = {self.vp.x - self.padding - 120, self.padding},
     size = {120, self.title_size + self.description_size}} then
       self:pop()

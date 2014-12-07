@@ -27,6 +27,7 @@ summon.fs.getDirectoryItems(scenarios_path, function(file)
 end)
 
 local game = summon.Game()
+game.locale = "ja"
 
 function love.load()
   console:resize(summon.graphics.getDimensions())

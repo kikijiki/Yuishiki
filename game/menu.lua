@@ -13,7 +13,11 @@ function Menu:initialize(scenarios)
   self.logo.elapsed = 0
   self.logo.w = self.logo.texture.data:getWidth()
   self.logo.h = self.logo.texture.data:getHeight()
-  self.fonts = {title = summon.AssetLoader.load("font", "ipamp.ttf@200")}
+  self.fonts = {
+    title = summon.AssetLoader.load("font", "ipamp.ttf@200"),
+    ui    = summon.AssetLoader.load("font", "ipamp.ttf@60")
+  }
+
   self.elapsed = 0
 end
 
@@ -33,10 +37,10 @@ function Menu:draw()
   gui.core.draw()
 end
 
-function addScenario(menu, data)
+function addScenario(menu, data, locale)
   if gui.Button{
-      text = data.name,
-      size = {menu.btnw, menu.button_height}}
+      text = data.name[locale],
+      size = {menu.w, menu.button_height}}
   then
     menu.game:push(Scenario(data))
   end
@@ -45,13 +49,29 @@ end
 function Menu:update(dt)
   self.elapsed = self.elapsed + dt
 
+  local locale = self.game.locale
+  self.fonts.ui:apply()
+  if gui.Button{
+      text = locale,
+      pos = {20, 20},
+      size = {self.fonts.ui_size * 2, self.fonts.ui_size * 2}
+    }
+  then
+    if self.game.locale == "ja" then
+      self.game.locale = "en"
+    else
+      self.game.locale = "ja"
+    end
+    self:resize()
+  end
+
   gui.group{
     grow = "down",
-    pos = {self.btnl, self.title_offset},
+    pos = {0, self.title_offset},
     spacing = self.spacing,
     function()
       self.fonts.normal:apply()
-      for _,data in pairs(self.scenarios) do addScenario(self, data) end
+      for _,data in pairs(self.scenarios) do addScenario(self, data, locale) end
     end
   }
 end
@@ -70,7 +90,7 @@ end
 
 function Menu:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
-  
+
   self.w = w
   self.h = h
   local title_size = math.min(320, h / 4)
@@ -91,15 +111,9 @@ function Menu:resize(w, h)
   fonts.normal = summon.AssetLoader.load("font", "ipamp.ttf@"..font_size)
   fonts.title_size = title_size
   fonts.title = summon.AssetLoader.load("font", "ipamp.ttf@"..title_size)
+  fonts.ui_size = title_size / 3
+  fonts.ui = summon.AssetLoader.load("font", "ipamp.ttf@"..fonts.ui_size)
   self.fonts = fonts
-
-  local maxw = 0
-  for _,v in pairs(self.scenarios) do
-    maxw = math.max(maxw, fonts.normal:getWidth(v.name))
-  end
-
-  self.btnw = math.min(w, maxw * 1.5)
-  self.btnl =(w - self.btnw) /  2
 end
 
 return Menu
