@@ -45,9 +45,9 @@ exit /B
 :Android
 echo|set /p= "> Building android apk..."
 copy %bin%\game.love platforms\android\assets\  > nul
-cd platforms\android
+pushd platforms\android
 call ant -q debug > nul
-cd %~dp0
+popd
 copy platforms\android\%bin%\love_android_sdl2-debug.apk %bin%\yuishiki-and.apk > nul
 echo done
 exit /B

@@ -23,14 +23,14 @@ exit /B
 
 :Compile
 echo|set /p= "> Compiling with luajit..."
-rem create temporary copy of the code
+:: create temporary copy of the code
 robocopy .        %tmp%          *.lua >nul
 robocopy game     %tmp%\game     /S /E >nul
 robocopy lib      %tmp%\lib      /S /E >nul
 robocopy summon   %tmp%\summon   /S /E >nul
 robocopy yuishiki %tmp%\yuishiki /S /E >nul
 
-rem compile lua files (overwrites)
+:: compile lua files (overwrites)
 for /r %tmp% %%x in (*.lua) do luajit -b "%%x" "%%x"
 echo done
 exit /B
@@ -59,9 +59,9 @@ exit /B
 :Android
 echo|set /p= "> Building android apk..."
 copy %bin%\game.love platforms\android\assets\  > nul
-cd platforms\android
+pushd platforms\android
 call ant -q debug > nul
-cd %~dp0
+popd
 copy platforms\android\%bin%\love_android_sdl2-debug.apk %bin%\yuishiki-and.apk > nul
 echo done
 exit /B
