@@ -23,27 +23,8 @@ return function (base_path)
 
   ys = {}
 
-  ys.uti           = loader.load ("uti")
   ys.log           = loader.load ("log")
-  ys.PriorityQueue = loader.load ("priority-queue")
-  ys.Stack         = loader.load ("stack")
-  ys.ManualTrigger = loader.load ("manual-trigger")
-  ys.Observable    = loader.load ("observable")
-
   ys.Agent         = loader.load ("agent")
-  ys.Event         = loader.load ("event")
-  ys.Actuator      = loader.load ("actuator")
-
-  ys.BDIModel      = loader.load ("bdi-model")
-  ys.Belief        = loader.load ("belief")
-  ys.BeliefBase    = loader.load ("belief-base")
-  ys.Plan          = loader.load ("plan")
-  ys.PlanBase      = loader.load ("plan-base")
-  ys.Goal          = loader.load ("goal")
-  ys.GoalBase      = loader.load ("goal-base")
-  ys.Intention     = loader.load ("intention")
-  ys.IntentionBase = loader.load ("intention-base")
-  ys.Trigger       = loader.load ("trigger")
 
   ys._VERSION = "0.0.1"
   ys._DESCRIPTION = "A game-oriented BDI multi agent system."
