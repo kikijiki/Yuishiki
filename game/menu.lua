@@ -50,18 +50,16 @@ function Menu:update(dt)
   self.elapsed = self.elapsed + dt
 
   local locale = self.game.locale
+  local margin = self.title_offset / 2 - self.fonts.ui_size
+
   self.fonts.ui:apply()
   if gui.Button{
       text = locale,
-      pos = {20, 20},
+      pos = {margin, margin},
       size = {self.fonts.ui_size * 2, self.fonts.ui_size * 2}
     }
   then
-    if self.game.locale == "ja" then
-      self.game.locale = "en"
-    else
-      self.game.locale = "ja"
-    end
+    self.game.locale = (self.game.locale == "ja") and "en" or "ja"
     self:resize()
   end
 
