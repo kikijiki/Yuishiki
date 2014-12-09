@@ -162,6 +162,10 @@ return function(loader)
     return goal_instance.result
   end
 
+  function Plan:addGoal(goal, parameters)
+    self.bdi:pushGoal(goal, parameters)
+  end
+
   function Plan:pushSubPlan(plan, parameters)
     local plan_instance = self.bdi:pushPlan(plan, parameters, self.intention)
     self:yield()
