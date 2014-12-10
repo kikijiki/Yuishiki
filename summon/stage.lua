@@ -34,10 +34,11 @@ return function(loader)
       MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
 
     -- Minimal GUI
-    self.buttons = {}
-    self.buttons.play = Gui.PlayButton(0, 0, 40, function() self.gm:resume() end)
-    self.buttons.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
-    self.buttons.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
+    self.gui_elements = {}
+    self.gui_elements.play = Gui.PlayButton(0, 0, 40, function() self.gm:resume() end)
+    self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
+    self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
+    self.gui_elements.chatlog = Gui.Chatlog(200, 6, 3)
 
     -- Initialize GM
     self:listenToGM(self.gm)
@@ -71,6 +72,7 @@ return function(loader)
       function(c)
         c:listen(self, "dialog",
           function(character, message, duration, position)
+            self.gui_elements.chatlog:log(character, message)
             self.messageRenderer:dialog(
               character.sprite, message, duration, position)
           end)
@@ -81,10 +83,10 @@ return function(loader)
           end)
       end)
     self.gm:listen(self, "resume",
-      function() self.buttons.play:stop() end)
+      function() self.gui_elements.play:stop() end)
 
     self.gm:listen(self, "pause",
-      function() self.buttons.play:play() end)
+      function() self.gui_elements.play:play() end)
   end
 
   function Stage:resize(w, h)
@@ -93,21 +95,22 @@ return function(loader)
     self.camera:resize(w, h)
     self.canvas = sg.newCanvas(w, h)
 
-    local btn = self.buttons
+    local gui = self.gui_elements
     local gui_size = 40 * w / 1000
 
-    btn.play.size = gui_size
-    btn.play.x = w - btn.play.size - 20
-    btn.play.y = h - btn.play.size - 20
+    gui.play.size = gui_size
+    gui.play.x = w - gui.play.size - 20
+    gui.play.y = h - gui.play.size - 20
 
-    btn.zoom_out:resize(gui_size)
-    btn.zoom_out.x = w - btn.zoom_out.size - 20
-    btn.zoom_out.y = btn.play.y - btn.zoom_out.size * 2 - 20
+    gui.zoom_out:resize(gui_size)
+    gui.zoom_out.x = w - gui.zoom_out.size - 20
+    gui.zoom_out.y = gui.play.y - gui.zoom_out.size * 2 - 20
 
-    btn.zoom_in:resize(gui_size)
-    btn.zoom_in.x = w - btn.zoom_in.size - 20
-    btn.zoom_in.y = btn.zoom_out.y - btn.zoom_in.size * 2 - 20
+    gui.zoom_in:resize(gui_size)
+    gui.zoom_in.x = w - gui.zoom_in.size - 20
+    gui.zoom_in.y = gui.zoom_out.y - gui.zoom_in.size * 2 - 20
 
+    gui.chatlog:resize(w, h)
     self:dispatch("resize", w, h)
   end
 
@@ -130,7 +133,7 @@ return function(loader)
     self.messageRenderer:drawDialogs()
     self.interface:draw()
 
-    for _,btn in pairs(self.buttons) do btn:draw() end
+    for _,element in pairs(self.gui_elements) do element:draw() end
 
     sg.setCanvas()
     sg.pop()
@@ -142,7 +145,11 @@ return function(loader)
     self.camera:update(dt, self.mouse)
     self.messageRenderer:update(dt)
 
-    for _,btn in pairs(self.buttons) do btn:update(dt) end
+    for _,element in pairs(self.gui_elements) do
+      if element.update then
+        element:update(dt)
+      end
+    end
 
     if self.gm.activeCharacter then
       self.interface:setCursor(self.gm.activeCharacter.sprite:getTag("head"))
@@ -187,8 +194,10 @@ return function(loader)
 
   function Stage:mousereleased(x, y, button)
     if button == "l" then self.camera:stopDrag() end
-    for _,btn in pairs(self.buttons) do
-      btn:mousereleased(x, y, button)
+    for _,element in pairs(self.gui_elements) do
+      if element.mousereleased then
+        element:mousereleased(x, y, button)
+      end
     end
     self:dispatch("mousereleased", x, y, button)
   end

@@ -8,6 +8,68 @@ return function(loader)
 
   Gui = {}
 
+  local Chatlog = loader.class("Gui.Chatlog")
+  Gui.Chatlog = Chatlog
+
+  function Chatlog:initialize(w, limit, fade)
+    self.x = 0
+    self.y = y or 10
+    self.w = w
+    self.buffer = {}
+    self.size = 0
+    self.limit = limit or 3
+    self.font_size = 24
+    self.spacing = 6
+    self.font = AssetLoader.load("font", "ipamp.ttf@"..self.font_size)
+  end
+
+  function Chatlog:resize(w, h)
+    self.w = w
+    self.y = h - (self.font_size + self.spacing) * self.limit
+  end
+
+  function Chatlog:log(character, text)
+    table.insert(self.buffer, {character.id, text, 5000})
+    self.size = self.size + 1
+  end
+
+  function Chatlog:draw()
+    local y = self.y
+    local s = self.spacing
+    local s2 = self.spacing / 2
+
+    if self.size == 0 then return end
+
+    self.font:apply()
+    local last = math.max(1, self.size - self.limit)
+    for i = self.size, last, -1 do
+      local entry = self.buffer[i]
+
+      if entry[3] > 0 then
+        local text = string.format("%s - %s", entry[1], entry[2])
+        local w = self.font:getWidth(text)
+        local x = self.x + (self.w - w) / 2
+
+        sg.setColor(128, 128, 128, math.min(128, entry[3]))
+        sg.rectangle("fill", x - s2, y - s2, w + s, self.font_size + s)
+
+        sg.setColor(255, 255, 255, math.min(255, entry[3]))
+        sg.printf(text, self.x, y, self.w, "center")
+        y = y + self.font_size + self.spacing
+      else
+        return
+      end
+    end
+  end
+
+  function Chatlog:update(dt)
+    local last = math.max(1, self.size - self.limit)
+    for i = self.size, last, -1 do
+      local entry = self.buffer[i]
+      if entry[3] > 0 then entry[3] = entry[3] - dt * 1000 end
+    end
+  end
+
   local RoundButton = loader.class("Gui.RoundButton")
   Gui.RoundButton = RoundButton
 
