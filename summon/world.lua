@@ -46,7 +46,7 @@ return function(loader)
     end
   end
 
-  function World:placeCharacter(char, x, y)
+  function World:placeCharacter(char, x, y, direction)
     local pos
     if type(char) == "string" then char = self.characters[char] end
 
@@ -58,6 +58,7 @@ return function(loader)
     end
     char.status.position:set(pos)
     char.sprite:setPositionFromTile(self.map, pos)
+    if direction then char.sprite:setDirection(direction) end
   end
 
   function World:draw()
