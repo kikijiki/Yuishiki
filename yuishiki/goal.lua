@@ -25,13 +25,13 @@ return function(loader)
       self.name = name
       self.on = ManualTrigger(data.on)
       self.conditions = ManualTrigger(data.conditions)
+      self.retry = data.retry
     end
 
     if data.trigger then
       GoalClass.trigger = Trigger.fromData(table.unpack(data.trigger))
     end
     GoalClass.limit = data.limit
-    GoalClass.retry = data.retry
     GoalClass.priority = data.priority
     GoalClass.describe = data.describe
     GoalClass.log = log.tag ("G-"..name)
@@ -41,7 +41,7 @@ return function(loader)
 
   function Goal:initialize(parameters)
     self.parameters = parameters
-    self.past = {history = {}, plans = {}, last = nil}
+    self.past = {history = {}, plans = {}, length = 0, last = nil}
   end
 
   function Goal.getYsType()
@@ -91,11 +91,14 @@ return function(loader)
 
   function Goal:getPriority()
     local priority = self.priority
-    if type(priority) == "number" then return priority end
+    if not priority then priority = 0 end
+
     if type(priority) == "function" then
-      return priority(table.unpack(self.exported))
+      priority = priority(table.unpack(self.exported))
     end
-    return 0
+
+    priority = priority - self.past.length --penalize failed goals priority
+    return priority
   end
 
   return Goal
