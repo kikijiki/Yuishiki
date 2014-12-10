@@ -71,7 +71,7 @@ return function(loader)
     if inst.list[intention] then return goal:activate() end
 
     -- if there is still room, reserve another one.
-    if inst.count < goal.limit then                                             print("RESERVE", goal.name, intention)
+    if inst.count < goal.limit then
       inst.count = inst.count + 1
       inst.list[intention] = true
       goal:activate()
@@ -80,7 +80,7 @@ return function(loader)
     end
   end
 
-  function GoalBase:release(goal_name, intention)                               print("RELEASE", goal_name, intention)
+  function GoalBase:release(goal_name, intention)
     local inst = self.instances[goal_name]
     if inst.list[intention] then
       inst.list[intention] = nil

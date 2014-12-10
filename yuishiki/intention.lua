@@ -61,6 +61,9 @@ return function(loader)
       if not goal then return end
       if not goal.retry then
         goal:fail(Goal.FailReason.PlanFailed)
+      else                                                                      self.log.d("RETRYING GOAL", goal)
+        self.bdi.goal_base:release(goal.name, self)
+        goal.status = Goal.Status.WaitingAvailability
       end
     else
       plan:step()
