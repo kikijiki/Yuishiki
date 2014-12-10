@@ -59,11 +59,11 @@ return function(loader)
       self:pop()
       local goal = self:top()
       if not goal then return end
-      if not goal.retry then
-        goal:fail(Goal.FailReason.PlanFailed)
-      else                                                                      self.log.d("RETRYING GOAL", goal)
+      if goal.retry then
         self.bdi.goal_base:release(goal.name, self)
         goal.status = Goal.Status.WaitingAvailability
+      else
+        goal:fail(Goal.FailReason.PlanFailed)
       end
     else
       plan:step()
@@ -77,6 +77,7 @@ return function(loader)
       if plan then
         table.insert(goal.past.history, plan)
         goal.past.plans[plan.name] = true
+        goal.past.length = goal.past.length + 1
         goal.past.last = plan
       else
         self.log.i("Could not find any plan")
