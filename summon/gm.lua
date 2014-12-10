@@ -287,9 +287,10 @@ return function(loader)
         break
       end
     end
-    
+
     self.world:removeCharacter(character)
     self.world.map:setWalkable(character.status.position:get(), true)
+    self:dispatch("character-removed", character)
   end
 
   function GM:killCharacter(character)
