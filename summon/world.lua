@@ -31,12 +31,13 @@ return function(loader)
     self:propagateEvent(character, {"character", "new"})
   end
 
-  function World:removeCharacter(char)
-    if type(char) == "table" then
-      if char.id then self.characters[char.id] = nil end
+  function World:removeCharacter(character)
+    if type(character) == "table" then
+      if character.id then self.characters[character.id] = nil end
     else
-      self.characters[char] = nil
+      self.characters[character] = nil
     end
+    self:propagateEvent(character, {"character", "removed"})
   end
 
   function World:start()
