@@ -277,7 +277,22 @@ return function(loader)
     return math.abs(co1.x - co2.x) + math.abs(co1.y - co2.y)
   end
 
-  function GM:kill(character)
+  function GM:removeCharacter(character)
+    local init = self.initiative
+    for i = 1, #init.list do
+      local entry = init.list[i]
+      if entry.character == character then
+        table.remove(init.list, i)
+        if init.current > i then init.current = init.current - 1 end
+        break
+      end
+    end
+    
+    self.world:removeCharacter(character)
+    self.world.map:setWalkable(character.status.position:get(), true)
+  end
+
+  function GM:killCharacter(character)
     local init = self.initiative
     for i = 1, #init.list do
       local entry = init.list[i]
