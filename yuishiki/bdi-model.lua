@@ -57,7 +57,7 @@ return function(loader)
     for _,intention in pairs(self.intention_base.intentions) do
       table.insert(sorted_intentions, intention)
     end
-    
+
     table.sort(sorted_intentions,
       function(a, b)
         return a:getPriority() > b:getPriority()
@@ -138,7 +138,7 @@ return function(loader)
 
     goal:bind(
       goal,
-      parameters,
+      parameters or {},
       self.belief_base.interface,
       self.actuator.interface)
 
@@ -159,7 +159,7 @@ return function(loader)
 
     plan:bind(
       plan,
-      plan.parameters,
+      plan.parameters or {},
       self.belief_base.interface,
       self.actuator.interface)
 
