@@ -33,7 +33,7 @@ return function(loader)
     p = {
       normal = "",
       color  = "",
-      level  = 3,
+      level  = 2,
       die    = false},
     i = {
       normal = "[INF]",
