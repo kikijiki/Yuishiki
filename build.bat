@@ -6,7 +6,8 @@ set bin=bin
 cd %~dp0
 call :Clear
 call :Archive
-call :Windows
+call :Win32
+call :Win64
 call :Mac
 call :Android
 call :Love
@@ -28,9 +29,21 @@ winrar a -afzip -ibck -r %bin%\game.love yuishiki
 echo done
 exit /B
 
-:Windows
-echo|set /p= "> Building windows..."
-copy /b platforms\windows\love.exe+%bin%\game.love %bin%\yuishiki-win.exe > nul
+:Win32
+echo|set /p= "> Building windows 32bit..."
+copy /b platforms\win32\love.exe+%bin%\game.love %bin%\yuishiki.exe > nul
+winrar a -afzip -ibck -ep1 %bin%\yuishiki-win32.zip %bin%\yuishiki.exe
+winrar a -afzip -ibck -r -ep1 %bin%\yuishiki-win32.zip platforms\win32\*.dll
+del %bin%\yuishiki.exe
+echo done
+exit /B
+
+:Win64
+echo|set /p= "> Building windows 64bit..."
+copy /b platforms\win64\love.exe+%bin%\game.love %bin%\yuishiki.exe > nul
+winrar a -afzip -ibck -ep1 %bin%\yuishiki-win64.zip %bin%\yuishiki.exe
+winrar a -afzip -ibck -r -ep1 %bin%\yuishiki-win64.zip platforms\win64\*.dll
+del %bin%\yuishiki.exe
 echo done
 exit /B
 
