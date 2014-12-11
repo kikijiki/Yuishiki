@@ -1,7 +1,7 @@
 function love.conf(t)
   t.identity = nil
   t.version = "0.9.0"
-  t.console = true
+  t.console = false
 
   t.window.title = "Testbed"
   t.window.icon = nil
@@ -11,8 +11,8 @@ function love.conf(t)
   t.window.resizable = true
   t.window.minwidth = 1
   t.window.minheight = 1
-  t.window.fullscreen = false
-  t.window.fullscreentype = "normal"
+  t.window.fullscreen = true
+  t.window.fullscreentype = "desktop"
   t.window.vsync = true
   t.window.fsaa = 0
   t.window.display = 1
