@@ -182,7 +182,7 @@ return function(loader)
   function BeliefBase:save()
     local data = {}
     for path, belief in pairs(self.lookup) do
-      if belief.source == "internal" and belief.storage == "long" then
+      if belief.source == "internal" and belief.retention == "long" then
         data[path] = belief
       end
     end
