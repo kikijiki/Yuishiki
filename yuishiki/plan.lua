@@ -210,7 +210,22 @@ return function(loader)
     local history = bb:get(self.history_path)
 
     if not history then
-      history = {}
+      history = setmetatable({}, {
+        __tostring = function(t)
+          local ret = {"{\n"}
+          for _,v in pairs(t) do
+            table.insert(ret, " - "..v.result)
+            table.insert(ret, "->")
+            local states = {}
+            for k,s in pairs(v.state) do
+              table.insert(states, k.."="..s)
+            end
+            table.insert(ret, table.concat(states, ",").."\n")
+          end
+          table.insert(ret, "}")
+          return table.concat(ret)
+        end
+      })
       bb:setLT(history, self.history_path)
     else
       history = history:get()
