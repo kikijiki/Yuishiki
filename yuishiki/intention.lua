@@ -182,7 +182,9 @@ return function(loader)
       return
     end
 
+    e.intention = self
     if self.stack:isEmpty() then self.name = e.name end
+
     if e.getYsType() == "goal" then self:pushGoal(e)
     elseif e.getYsType() == "plan" then self:pushPlan(e)
     else self.log.w("Intention:push ignored (not a plan nor a goal).") end
