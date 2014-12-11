@@ -215,7 +215,7 @@ return function(loader)
           local ret = {"{\n"}
           for _,v in pairs(t) do
             table.insert(ret, " - "..v.result)
-            table.insert(ret, "->")
+            table.insert(ret, " \t-> \t")
             local states = {}
             for k,s in pairs(v.state) do
               table.insert(states, k.."="..s)
