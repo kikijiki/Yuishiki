@@ -69,10 +69,6 @@ return function(loader)
     return PlanClass
   end
 
-  function Plan.static.extend(name)
-    return loader.class(plan_class_prefix..name, Plan)
-  end
-
   function Plan:initialize(bdi, parameters)
     self.bdi = bdi
     self.parameters = parameters or {}
