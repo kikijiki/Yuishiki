@@ -153,6 +153,10 @@ return function(loader)
   end
 
   function GM:nextCharacter()
+    if self.activeCharacter then
+      self.activeCharacter.agent:sendEvent("game", "turn-end")
+    end
+
     local init = self.initiative
     init.current = init.current + 1
     if init.current > #init.list then return false end
@@ -277,6 +281,11 @@ return function(loader)
     return math.abs(co1.x - co2.x) + math.abs(co1.y - co2.y)
   end
 
+  function GM:getDistance(c, target)
+    local position = c.status.position:get()
+    return math.abs(position.x - target.x) + math.abs(position.y - target.y)
+  end
+
   function GM:removeCharacter(character)
     local init = self.initiative
     for i = 1, #init.list do
@@ -315,11 +324,11 @@ return function(loader)
   end
 
   function GM.logc(c, ...)
-    log.i("["..c.name.."] ", ...)
+    log.d("["..c.name.."] ", ...)
   end
 
   function GM.logcc(c, target, ...)
-    log.i("["..c.name.."]->["..target.name.."] ", ...)
+    log.d("["..c.name.."]->["..target.name.."] ", ...)
   end
 
   function GM:roll(v1, v2)
