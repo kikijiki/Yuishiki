@@ -38,6 +38,10 @@ return function(loader)
     })
   end
 
+  function Event.game(event, data)
+    return Event({"game", event}, data)
+  end
+
   function Event.system(name, parameters)
     return Event({"system", name}, parameters)
   end
