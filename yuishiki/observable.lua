@@ -6,7 +6,7 @@ return function(loader)
   Observable = loader.class("Observable")
 
   function Observable:initialize()
-    self.observers = setmetatable({}, {__mode="k"})
+    self:reset()
   end
 
   function Observable:addObserver(l, c)
@@ -17,6 +17,10 @@ return function(loader)
     for _,observer in pairs(self.observers) do
       observer(...)
     end
+  end
+
+  function Observable:reset()
+    self.observers = setmetatable({}, {__mode="k"})
   end
 
   return Observable

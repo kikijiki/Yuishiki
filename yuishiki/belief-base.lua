@@ -45,11 +45,12 @@ return function(loader)
     }
   end
 
-  function BeliefBase:resolve(path, create)
+  function resolve(bb, path, create)
     if not path then return end
 
-    local belief = self.beliefs
+    local belief = bb.beliefs
     local last
+
     for token in string.gmatch(path, PATH_TRAVERSER_PATTERN) do
       last = token
       if belief[token] then
@@ -67,48 +68,46 @@ return function(loader)
     return belief, last
   end
 
-  function BeliefBase.static.parsePath(path)
-    if not path then return end
-    local from, to = path:find(PATH_SPLITTER_PATTERN)
+  function parsePath(...)
+    local raw_path = {...}
+    if #raw_path == 0 then return end
+
+    local path = {}
+    path.full = table.concat(raw_path, PATH_SEPARATOR)
+
+    local from, to = path.full:find(PATH_SPLITTER_PATTERN)
+
     if from then
-      return path:sub(1, from - 1), path:sub(from + 1)
+      path.base = path.full:sub(1, from - 1)
+      path.name = path.full:sub(from + 1)
     else
-      return path
+      path.name = path.full
     end
+
+    return path
   end
 
-  function BeliefBase.static.appendPath(a, b)
+  function appendPath(a, b)
     return a..PATH_SEPARATOR..b
   end
 
-  function set(bb, source, retention, data, ...)
-    local full_path = table.concat({...}, PATH_SEPARATOR)
-    local base_path, name = BeliefBase.parsePath(full_path)
+  function raw_set(bb, belief)
+    local path = belief.path
 
-    local belief = Belief(data, name, full_path, retention, source)
-    belief:addObserver(bb, bb.observer)
-
-    bb.lookup[full_path] = belief
-    local root = bb:resolve(base_path, true)
-    root[name] = belief
-
-    local event = Event.belief(belief, Belief.Status.new, belief:get())
-    bb:notify(event)
-
-    return belief
-  end
-
-  function raw_set(bb, path, belief)
-    local base_path, name = BeliefBase.parsePath(path)
-    local root = bb:resolve(base_path, true)
-
-    root[name] = belief
-    bb.lookup[path] = belief
+    bb.lookup[path.full] = belief
+    local root = resolve(bb, path.base, true)
+    root[path.name] = belief
 
     belief:addObserver(bb, bb.observer)
     bb:notify(Event.belief(belief, Belief.Status.new, belief:get()))
 
     return belief
+  end
+
+  function set(bb, source, retention, data, ...)
+    local path = parsePath(...)
+    local belief = Belief(data, path, retention, source)
+    return raw_set(bb, belief)
   end
 
   function BeliefBase:set(retention, ...)
@@ -181,17 +180,18 @@ return function(loader)
 
   function BeliefBase:save()
     local data = {}
-    for path, belief in pairs(self.lookup) do
+    for _, belief in pairs(self.lookup) do
       if belief.source == "internal" and belief.retention == "long" then
-        data[path] = belief
+        table.insert(data, belief)
       end
     end
     return data
   end
 
   function BeliefBase:restore(data)
-    for path, belief in pairs(data) do print("restoring", path)
-      raw_set(self, path, belief)
+    for _, belief in pairs(data) do self.log.i("restoring", belief.path.full)
+      belief:reset()
+      raw_set(self, belief)
     end
   end
 

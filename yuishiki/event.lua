@@ -29,7 +29,7 @@ return function(loader)
   end
 
   function Event.belief(belief, status, new, old, ...)
-    return Event({"belief", belief.path}, {
+    return Event({"belief", belief.path.full}, {
       belief = belief,
       status = status,
       new = new,

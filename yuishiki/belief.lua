@@ -8,10 +8,10 @@ return function(loader)
 
   Belief.static.Status = uti.makeEnum("changed", "new", "deleted")
 
-  function Belief:initialize(value, name, path, retention, source)
+  function Belief:initialize(value, path, retention, source)
     Observable.initialize(self)
 
-    self.name = name
+    self.name = path.name
     self.path = path
 
     self.value  = value
@@ -35,7 +35,7 @@ return function(loader)
 
   function Belief:set(value)
     if self.source == "external" then
-      log.fw("Trying to write the external belief [%s].", self.path)
+      log.fw("Trying to write the external belief [%s].", self.path.full)
       return
     end
 
