@@ -171,7 +171,7 @@ return function(loader)
       local source, storage
       if belief.source == "internal" then source = "I" else source = "E" end
       if belief.retention == "short" then storage = "S" else storage = "L" end
-      local skip = longest - lengths[path]
+      local skip = longest - lengths[path] - 1
       self.log.fi("[%s%s] %s %s %s",
         source, storage, path, string.rep(".", skip), tostring(belief))
     end
