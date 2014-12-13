@@ -70,10 +70,8 @@ end
 function love.keypressed(key)
   if console:keypressed(key) then return end
 
-  if love.window.getFullscreen() then
-    love.window.setFullscreen(false)
-  else
-    love.window.setFullscreen(true, "desktop")
+  if key == "escape" then
+    love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
   end
 
   --if key == "escape" then love.event.quit() end
