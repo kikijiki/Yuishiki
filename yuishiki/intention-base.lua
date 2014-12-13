@@ -64,24 +64,25 @@ return function(loader)
     return true
   end
 
-  function IntentionBase:dump()
+  function IntentionBase:dump(level)
+    level = level or "d"
     if not next(self.intentions) then
-      self.log.i("--[[INTENTION BASE EMPTY]]--")
+      self.log[level]("--[[INTENTION BASE EMPTY]]--")
       return
     end
-    self.log.i("--[[INTENTION BASE DUMP START]]--")
-    self.log.i()
+    self.log[level]("--[[INTENTION BASE DUMP START]]--")
+    self.log[level]()
     for _,intention in pairs(self.intentions) do
-      self.log.i(intention)
+      self.log[level](intention)
       local i = 1
       for _,element in pairs(intention.stack.elements) do
         local indent = string.rep("-", i)
-        self.log.fi("%s %s", indent, tostring(element))
+        self.log["f"..level]("%s %s", indent, tostring(element))
         i = i + 1
       end
     end
-    self.log.i()
-    self.log.i("--[[INTENTION BASE DUMP END]]--")
+    self.log[level]()
+    self.log[level]("--[[INTENTION BASE DUMP END]]--")
   end
 
   function IntentionBase:getGoalCount(goal)

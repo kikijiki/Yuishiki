@@ -124,13 +124,13 @@ return function(loader)
 
     if not intention then
       self.log.i("No active intentions.")
-      self.intention_base:dump()
+      self.intention_base:dump("i")
       return false
     end
 
     self.log.fi("Executing intention %s", intention)
     self.intention_base:execute(intention)
-    self.intention_base:dump()
+    self.intention_base:dump("i")
     return true
   end
 
