@@ -13,9 +13,8 @@ return function(loader)
 
   Trigger = loader.class("Trigger")
 
-  function Trigger:initialize(event) assert(event)
-    if type(event) ~= "table" then event = {event} end
-    self.event = event
+  function Trigger:initialize(...)
+    self.event = {...}
   end
 
   function Trigger:check(event)
@@ -26,8 +25,8 @@ return function(loader)
     return true
   end
 
-  function Trigger.goal(goal) return Trigger({"goal", goal}) end
-  function Trigger.actuator(id) return Trigger({"actuator", id}) end
+  function Trigger.goal(goal) return Trigger("goal", goal) end
+  function Trigger.actuator(id) return Trigger("actuator", id) end
 
   local BeliefTrigger = loader.class("BeliefTrigger", Trigger)
   Trigger.belief = BeliefTrigger
@@ -48,7 +47,7 @@ return function(loader)
   }
 
   function BeliefTrigger:initialize(path, condition, ...)
-    Trigger.initialize(self, {"belief", path})
+    Trigger.initialize(self, "belief", path)
     self.path_start = path
     self.path_end = path
     self:condition(condition, ...)

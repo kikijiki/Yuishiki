@@ -132,11 +132,11 @@ return function(loader)
     end
   end
 
-  function Plan:waitForEvent(name)
+  function Plan:waitForEvent(...)
     if not name then
       return self:yield()
     else
-      return self:waitForTrigger(Trigger(name))
+      return self:waitForTrigger(Trigger(...))
     end
   end
 
