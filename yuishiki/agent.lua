@@ -43,10 +43,10 @@ return function(loader)
   function Agent:addAction(action) return self.actuator:addAction(action)  end
   function Agent:pushGoal(...)     return self.bdi:pushGoal(...)           end
 
-  function Agent:waiting() return self.bdi:waiting() end
+  function Agent:waiting()       return self.bdi:waiting() end
   function Agent:dispatch(event) self.bdi:dispatch(event) end
-  function Agent:onEvent(e) self.bdi:dispatch(e) end
-  function Agent:sendEvent(...) self:onEvent(Event.fromData(...)) end
+  function Agent:onEvent(e)      self.bdi:dispatch(e) end
+  function Agent:sendEvent(...)  self:onEvent(Event.fromData(...)) end
 
   function Agent:resetStepCounter(step_limit)
     self.step_limit = step_limit

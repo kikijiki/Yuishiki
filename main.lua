@@ -28,13 +28,13 @@ console = summon.Console(1, 1)
 
 ys.log.showTime = false
 ys.log.showInfo = false
-ys.log.verbosity = ys.log.Verbosity.debug
+ys.log.verbosity = ys.log.Verbosity.all
 ys.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
 summon.log.showTime = false
 summon.log.showInfo = false
-summon.log.verbosity = summon.log.Verbosity.debug
+summon.log.verbosity = summon.log.Verbosity.all
 summon.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
