@@ -41,6 +41,7 @@ function Scenario:onResume()
 end
 
 function Scenario:play()
+  self.game:pop()
   local phases = self.data.phases
   local next_battle_phase
   for i = #phases, 1, -1 do
