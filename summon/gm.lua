@@ -4,6 +4,7 @@ return function(loader)
   if GM then return GM end
 
   local log             = loader.load "log"
+  local random          = loader.require "random"
   local Value           = loader.load "value"
   local Character       = loader.load "character"
   local Action          = loader.load "action"
@@ -14,7 +15,6 @@ return function(loader)
   local AssetLoader     = loader.load "asset-loader"
 
   GM = loader.class("GM", EventDispatcher)
-  GM.uti = {}
   log = log.tag("GM")
 
   local max_steps_per_update = 1
@@ -27,6 +27,9 @@ return function(loader)
     self.rules   = {}
     self.actions = {}
     self.items   = {}
+
+    local twister = random.twister()
+    self.rng = function(...) return twister:random(...) end
 
     self.turn_count      = 0
     self.paused          = true
@@ -324,20 +327,20 @@ return function(loader)
   end
 
   function GM.logc(c, ...)
-    log.d("["..c.name.."] ", ...)
+    log.i("["..c.id.."] ", ...)
   end
 
   function GM.logcc(c, target, ...)
-    log.d("["..c.name.."]->["..target.name.."] ", ...)
+    log.i("["..c.id.."]->["..target.id.."] ", ...)
   end
 
   function GM:roll(v1, v2)
     local ret
     if not v2 then
-      ret = math.random(v1)
+      ret = self.rng(v1)
       log.i("Roll [1, "..v1.."] -> "..ret)
     else
-      ret = math.random(v1, v2)
+      ret = self.rng(v1, v2)
       log.i("Roll ["..v1..", "..v2.."] -> "..ret)
     end
     return ret
@@ -353,7 +356,7 @@ return function(loader)
     self:dispatch("resume")
   end
 
-  function GM.uti.newValue(...)
+  function GM:newValue(...)
     return Value.fromData(...)
   end
 
