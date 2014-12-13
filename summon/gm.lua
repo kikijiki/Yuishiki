@@ -156,16 +156,14 @@ return function(loader)
   end
 
   function GM:nextCharacter()
-    if self.activeCharacter then
-      self.activeCharacter.agent:sendEvent("game", "turn-end")
-    end
+    local current = self.activeCharacter
 
     local init = self.initiative
     init.current = init.current + 1
     if init.current > #init.list then return false end
 
     self.activeCharacter = init.list[init.current].character
-    self:dispatch("next-character", self.activeCharacter)
+    self:dispatch("next-character", self.activeCharacter, current)
     self.activeCharacter.agent:resetStepCounter(max_steps_per_turn)
     return self.activeCharacter
   end
@@ -183,6 +181,7 @@ return function(loader)
       local busy = char:updateAI(self.world)
       if not char.commands:isEmpty() then return end
       if not busy then
+        char.agent:sendEvent("game", "turn-end")
         if self.auto_pause then self:pause() end
         if not self:nextCharacter() then
           self:nextTurn()
