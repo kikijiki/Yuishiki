@@ -133,11 +133,7 @@ return function(loader)
   end
 
   function Plan:waitForEvent(...)
-    if not name then
-      return self:yield()
-    else
-      return self:waitForTrigger(Trigger(...))
-    end
+    return self:waitForTrigger(Trigger(...))
   end
 
   function Plan:waitForBelief(...)
