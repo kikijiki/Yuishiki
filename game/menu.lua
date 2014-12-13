@@ -15,7 +15,19 @@ function Menu:initialize(scenarios)
   self.logo.h = self.logo.texture.data:getHeight()
   self.fonts = {
     title = summon.AssetLoader.load("font", "ipamp.ttf@200"),
-    ui    = summon.AssetLoader.load("font", "ipamp.ttf@60")
+    ui    = summon.AssetLoader.load("font", "ipamp.ttf@60"),
+    small = summon.AssetLoader.load("font", "ipamp.ttf@36"),
+  }
+
+  self.keys = {
+    en = {
+      "Esc -> toggle fullscreen",
+      "Space -> next turn"
+    },
+    ja = {
+      "Esc -> フルスクリーンの切り替え",
+      "Space -> 次のターン"
+    }
   }
 
   self.elapsed = 0
@@ -27,11 +39,18 @@ function Menu:onResume()
 end
 
 function Menu:draw()
+  local locale = self.game.locale
+
   sg.setBackgroundColor(40, 40, 40)
 
-  fonts.title:apply()
+  self.fonts.title:apply()
   sg.setColor(0, 200, 255)
   sg.printf("YS", 0, self.title_spacing, self.w, "center")
+
+  self.fonts.small:apply()
+  local margin = self.title_offset / 2 - self.fonts.ui_size
+  margin = (margin - self.fonts.small_size) / 2
+  sg.print(self.keys[locale][1], margin, margin)
 
   self:drawLogo()
   gui.core.draw()
@@ -104,13 +123,15 @@ function Menu:resize(w, h)
   self.spacing = math.max(self.spacing, 1)
   font_size = math.max(font_size, 10)
 
-  fonts = {}
+  local fonts = {}
   fonts.normal_size = font_size
   fonts.normal = summon.AssetLoader.load("font", "ipamp.ttf@"..font_size)
   fonts.title_size = title_size
   fonts.title = summon.AssetLoader.load("font", "ipamp.ttf@"..title_size)
   fonts.ui_size = title_size / 3
   fonts.ui = summon.AssetLoader.load("font", "ipamp.ttf@"..fonts.ui_size)
+  fonts.small_size = fonts.ui_size / 3
+  fonts.small = summon.AssetLoader.load("font", "ipamp.ttf@"..fonts.small_size)
   self.fonts = fonts
 end
 
