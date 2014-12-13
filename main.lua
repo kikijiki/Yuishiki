@@ -28,13 +28,13 @@ console = summon.Console(1, 1)
 
 ys.log.showTime = false
 ys.log.showInfo = false
-ys.log.verbosity = ys.log.Verbosity.all
+ys.log.verbosity = ys.log.Verbosity.debug
 ys.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
 summon.log.showTime = false
 summon.log.showInfo = false
-summon.log.verbosity = summon.log.Verbosity.all
+summon.log.verbosity = summon.log.Verbosity.debug
 summon.log.addOutput(
   function(data) console[data.severity](console, data.full) end)
 
@@ -74,7 +74,15 @@ function love.keypressed(key)
     love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
   end
 
-  --if key == "escape" then love.event.quit() end
+  if key == "1" then
+    if ys.log.verbosity == ys.log.Verbosity.debug then
+      ys.log.verbosity = ys.log.Verbosity.all
+      print("all")
+    else
+      ys.log.verbosity = ys.log.Verbosity.debug
+      print("debug")
+    end
+  end
 
   if key == "f12" then
     local ss = love.graphics.newScreenshot()
