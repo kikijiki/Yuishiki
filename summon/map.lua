@@ -27,6 +27,7 @@ return function(loader)
     self.height = 0
     self.visible = data[2] or true
     self.walkable = data[3] or true
+    self.highlight = false
     self.sync = data[4] or false
     self.neighbors = {all = {}}
     self.id = tile_id_generator()
@@ -61,7 +62,11 @@ return function(loader)
       local cnt = frame.source.center
       local height = frame.source.height
       local quad = frame.source.quad
-      setColor(255, 255, 255, 255)
+      if self.highlight then
+        setColor(100, 100, 255)
+      else
+        setColor(255, 255, 255, 255)
+      end
       draw(self.texture.data,
         quad, pos.x - cnt.x,
         pos.y - cnt.y - height)
@@ -335,6 +340,19 @@ return function(loader)
     end
 
     return nearest, min_dist
+  end
+
+  function Map:highlightPath(path)
+    for _,co in pairs(path) do
+      local tile = self:getTile(co)
+      if tile then tile.highlight = true end
+    end
+  end
+
+  function Map:clearHighlight()
+    for _, tile in pairs(self.tiles) do
+      tile.highlight = false
+    end
   end
 
   return Map

@@ -203,6 +203,10 @@ return function(loader)
   end
 
   function Character:move(path)
+    local map = self.world.map
+    map:highlightPath({self.status.position:get()})
+    map:highlightPath(path)
+    self:push(function() map:clearHighlight() end)
     self:pushCommand("animation", "idle")
     for i = #path, 1, -1 do
       self:pushCommand("step", path[i])
