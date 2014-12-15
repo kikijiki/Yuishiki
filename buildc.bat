@@ -17,9 +17,9 @@ call :Clean
 goto :End
 
 :Clear
-rmdir %bin% /S /Q
-mkdir %bin%
-mkdir %tmp%
+rmdir %bin% /S /Q > nul 2>&1
+mkdir %bin% > nul 2>&1
+mkdir %tmp% > nul 2>&1
 exit /B
 
 :Compile
