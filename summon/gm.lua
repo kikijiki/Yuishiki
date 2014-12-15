@@ -36,6 +36,7 @@ return function(loader)
     self.initiative      = {list = {}, current = 0}
     self.activeCharacter = nil
     self.auto_pause      = true
+    self.wait            = -1
   end
 
   function GM:loadRuleset(ruleset)
@@ -158,6 +159,8 @@ return function(loader)
   function GM:nextCharacter()
     local current = self.activeCharacter
 
+    if not self.auto_pause then self.wait = 0.5 end
+
     local init = self.initiative
     init.current = init.current + 1
     if init.current > #init.list then return false end
@@ -170,6 +173,11 @@ return function(loader)
 
   function GM:update(dt)
     self.world:update(dt)
+
+    if self.wait and self.wait > 0 then
+      self.wait = self.wait - dt
+      if self.wait > 0 then return end
+    end
 
     local char = self.activeCharacter
     if not char then return end

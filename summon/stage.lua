@@ -24,7 +24,7 @@ return function(loader)
 
     local map = AssetLoader.load("map", data.map)
     self.world = World(map)
-    self.gm = GM(self.world)
+    self.gm = GM(self.world) self.gm.auto_pause = false
     self.camera = Camera()
     self.camera:zoom(2)
     self.interface = BattleInterface(self)
@@ -35,7 +35,13 @@ return function(loader)
 
     -- Minimal GUI
     self.gui_elements = {}
-    self.gui_elements.play = Gui.PlayButton(0, 0, 40, function() self.gm:resume() end)
+    self.gui_elements.play = Gui.PlayButton(0, 0, 40, function()
+      if self.gm.paused then
+        self.gm:resume()
+      else
+        self.gm:pause()
+      end
+    end)
     self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
     self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
     self.gui_elements.chatlog = Gui.Chatlog(200, 6, 3)
