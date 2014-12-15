@@ -111,6 +111,10 @@ return function(loader)
     return self.intention_base:allWaiting()
   end
 
+  function BDIModel:isActive()
+    return not self.intention_base:isEmpty()
+  end
+
   function BDIModel:step()
     self.goal_base:update()
     self.intention_base:update()

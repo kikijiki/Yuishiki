@@ -37,6 +37,7 @@ return function(loader)
     self.activeCharacter = nil
     self.auto_pause      = true
     self.wait            = -1
+    self.inactivity      = {count = 0, status = {}, max = 3}
   end
 
   function GM:loadRuleset(ruleset)
@@ -81,6 +82,28 @@ return function(loader)
   end
 
   function GM:nextTurn()
+    local active = false
+    for _,c in pairs(self.world.characters) do
+      if c.agent:isActive() or self.inactivity.status[c] then
+        active = true
+        break
+      end
+    end
+
+    if active then
+      self.inactivity.count = 0
+    else
+      self.inactivity.count = self.inactivity.count + 1
+    end
+
+    if self.inactivity.count > self.inactivity.max then
+      self:pause()
+      self:dispatch("game-over")
+      return
+    end
+
+    self.inactivity.status = {}
+
     self.turn_count = self.turn_count + 1
     self.initiative.current = 0
     self.activeCharacter = nil
@@ -171,6 +194,19 @@ return function(loader)
     return self.activeCharacter
   end
 
+  local function updateCharacter(gm, char)
+    local active = false
+
+    for _ = 1, max_steps_per_update do
+      if not char.commands:isEmpty() then return true end
+      local busy = char:updateAI(gm.world)
+      if busy then active = true
+      else return active end
+    end
+
+    return true
+  end
+
   function GM:update(dt)
     self.world:update(dt)
 
@@ -179,23 +215,20 @@ return function(loader)
       if self.wait > 0 then return end
     end
 
+    if self.paused then return end
+
     local char = self.activeCharacter
     if not char then return end
 
-    if self.paused then return end
-    if not char.commands:isEmpty() then return end
+    local active = updateCharacter(self, char)
+    self.inactivity.status[char] = active
 
-    for _ = 1, max_steps_per_update do
-      local busy = char:updateAI(self.world)
-      if not char.commands:isEmpty() then return end
-      if not busy then
-        char.agent:sendEvent("game", "turn-end")
-        if self.auto_pause then self:pause() end
-        if not self:nextCharacter() then
-          self:nextTurn()
-          self:nextCharacter()
-        end
-        return
+    if not active then
+      char.agent:sendEvent("game", "turn-end")
+      if self.auto_pause then self:pause() end
+      if not self:nextCharacter() then
+        self:nextTurn()
+        self:nextCharacter()
       end
     end
   end

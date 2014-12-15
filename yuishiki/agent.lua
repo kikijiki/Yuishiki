@@ -44,6 +44,7 @@ return function(loader)
   function Agent:pushGoal(...)     return self.bdi:pushGoal(...)           end
 
   function Agent:waiting()       return self.bdi:waiting() end
+  function Agent:isActive()      return self.bdi:isActive() end
   function Agent:dispatch(event) self.bdi:dispatch(event) end
   function Agent:onEvent(e)      self.bdi:dispatch(e) end
   function Agent:sendEvent(...)  self:onEvent(Event.fromData(...)) end
