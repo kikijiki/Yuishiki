@@ -25,6 +25,8 @@ return function(loader)
     local map = AssetLoader.load("map", data.map)
     self.world = World(map)
     self.gm = GM(self.world) self.gm.auto_pause = false
+    self.status = "active"
+    self.speed = 1
     self.camera = Camera()
     self.camera:zoom(2)
     self.interface = BattleInterface(self)
@@ -45,6 +47,7 @@ return function(loader)
     self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
     self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
     self.gui_elements.chatlog = Gui.Chatlog(200, 6, 3)
+    self.font = AssetLoader.load("font", "ipamp.ttf@60")
 
     -- Initialize GM
     self:listenToGM(self.gm)
@@ -93,6 +96,9 @@ return function(loader)
 
     self.gm:listen(self, "pause",
       function() self.gui_elements.play:play() end)
+
+    self.gm:listen(self, "game-over",
+      function() self.status = "over" end)
   end
 
   function Stage:resize(w, h)
@@ -144,13 +150,24 @@ return function(loader)
     sg.setCanvas()
     sg.pop()
     sg.draw(self.canvas)
+
+    if self.status == "over" then
+      sg.setColor(0, 0, 0, 180)
+      sg.rectangle("fill", 0, 0, self.width, self.height)
+      sg.setColor(255, 255, 255, 255)
+      self.font:apply()
+      sg.printf("STAGE OVER",
+        0, (self.height - self.font:getHeight()) / 2, self.width, "center")
+    end
   end
 
   function Stage:update(dt)
+    dt = dt * self.speed
     self.gm:update(dt)
     self.camera:update(dt, self.mouse)
     self.messageRenderer:update(dt)
 
+    if self.status == "over" then return end
     for _,element in pairs(self.gui_elements) do
       if element.update then
         element:update(dt)
@@ -165,6 +182,8 @@ return function(loader)
   end
 
   function Stage:keypressed(key)
+    if self.status == "over" then return end
+
     local ac = self.gm.activeCharacter
     if key == "x" and ac then
       ac.agent.bdi.belief_base:dump()
@@ -174,11 +193,17 @@ return function(loader)
     end
 
     if key == " " then self.gm:resume() end
+    if key == "kp+" then self.speed = self.speed * 2 end
+    if key == "kp-" then self.speed = self.speed / 2 end
+    if self.speed > 16 then self.speed = 16 end
+    if self.speed < 1/16 then self.speed = 1/16 end
 
     self:dispatch("keypressed", key)
   end
 
   function Stage:mousepressed(x, y, button)
+    if self.status == "over" then return end
+
     if button == "l" then
       self.camera:startDrag(vec(x, y))
     end
@@ -199,12 +224,16 @@ return function(loader)
   end
 
   function Stage:mousereleased(x, y, button)
+    if self.status == "over" then return end
+
     if button == "l" then self.camera:stopDrag() end
+
     for _,element in pairs(self.gui_elements) do
       if element.mousereleased then
         element:mousereleased(x, y, button)
       end
     end
+
     self:dispatch("mousereleased", x, y, button)
   end
 

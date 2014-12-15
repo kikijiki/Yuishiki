@@ -87,7 +87,7 @@ return function(loader)
     if len * self._scale < self.tolerance then
       cnt = trg
     else
-      cnt = cnt + diff * self.speed * dt
+      cnt = cnt + diff * math.min(1, self.speed * dt)
     end
 
     self.center = -cnt
@@ -96,7 +96,7 @@ return function(loader)
     if math.abs(diff) / self.scale < self.scaletolerance then
       self._scale = self.scale
     else
-      self._scale = self._scale + diff * self.scalespeed * dt
+      self._scale = self._scale + diff * math.min(1, self.scalespeed * dt)
     end
 
     if mouse then
