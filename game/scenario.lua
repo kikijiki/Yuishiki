@@ -21,6 +21,7 @@ function Scenario:initialize(data)
     normal = summon.AssetLoader.load("font", "ipamp.ttf@60"),
     title = summon.AssetLoader.load("font", "ipamp.ttf@120")
   }
+  self.margin = 60
 
   self.text = {
     start = {
@@ -62,6 +63,10 @@ function Scenario:play()
   end
 end
 
+function Scenario:onPush(game, prev)
+  self.game = game
+end
+
 function Scenario:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
 
@@ -75,11 +80,11 @@ function Scenario:draw()
 
   sg.setColor(0, 200, 255)
   self.font.title:apply()
-  sg.printf(self.name[locale], 60, 60, self.vp.x - 60, "center")
+  sg.printf(self.name[locale], self.margin, self.margin, self.vp.x - self.margin, "center")
 
   sg.setColor(200, 200, 200)
   self.font.normal:apply()
-  sg.printf(self.description[locale], 60, 250, self.vp.x - 60, "left")
+  sg.printf(self.description[locale], self.margin, 250, self.vp.x - self.margin, "left")
 
   gui.core.draw()
 end

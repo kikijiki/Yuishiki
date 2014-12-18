@@ -24,7 +24,8 @@ return function(loader)
 
     local map = AssetLoader.load("map", data.map)
     self.world = World(map)
-    self.gm = GM(self.world) self.gm.auto_pause = false
+    self.gm = GM(self.world)
+    self.gm.auto_pause = false
     self.status = "active"
     self.speed = 1
     self.camera = Camera()
@@ -32,6 +33,7 @@ return function(loader)
     self.interface = BattleInterface(self)
     self.mouse = vec()
     self.background = {0, 0, 0}
+    self.locale = "en"
     self.messageRenderer =
       MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
 
@@ -70,6 +72,11 @@ return function(loader)
     self.gm:start()
     self.gm:nextTurn()
     self.gm:nextCharacter()
+  end
+
+  function Stage:setLocale(locale)
+    self.locale = locale
+    self.messageRenderer:setLocale(locale)
   end
 
   function Stage:listenToGM(gm)

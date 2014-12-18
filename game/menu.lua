@@ -33,6 +33,10 @@ function Menu:initialize(scenarios)
   self.elapsed = 0
 end
 
+function Menu:onPush(game, prev)
+  self.game = game
+end
+
 function Menu:onResume()
   self:resize(sg.getDimensions())
   gui.keyboard.clearFocus()

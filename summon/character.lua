@@ -24,7 +24,7 @@ return function(loader)
     self.modules = data.modules
     self.aimod   = data.aimod
 
-    self.log = log.tag("CHAR "..self.name)
+    self.log = log.tag("CHAR")
 
     self.sprite   = AssetLoader.load("sprite", data.sprite)
     self.commands = Stack()
@@ -99,7 +99,7 @@ return function(loader)
   function Character:setWorld(world, id)
     self.world = world
     self.id = id
-
+    self.log = log.tag("CHAR "..self.id)
     self.agent:importBelief(id, "self.id")
 
     self.log = log.tag("CHAR "..self.id)

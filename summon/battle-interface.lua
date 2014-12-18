@@ -63,6 +63,17 @@ return function(loader)
     self.cursor:draw()
   end
 
+  function getLocalizedText(data, locale)
+    if type(data) == "table" then
+      if data[locale] then return data[locale]
+      elseif data["en"] then return data["en"]
+      elseif select(2, next(data)) then return select(2, next(data))
+      else return "" end
+    else
+      return data
+    end
+  end
+
   function BattleInterface:drawTurnOrder(x, y)
     local init = self.stage.gm.initiative
     local turnc = self.stage.gm.turnCount
@@ -73,7 +84,8 @@ return function(loader)
     sg.setColor(255, 255, 255, 255)
 
     for i = 1, #init.list do
-      local name = init.list[i].character.name
+      local name =
+        getLocalizedText(init.list[i].character.name, self.stage.locale)
       local value = init.list[i].value
       local text = i..". "..name.."("..value..")"
       if i == init.current then
@@ -126,7 +138,7 @@ return function(loader)
     sg.setColor(255, 255, 255, 255)
     self.fonts.normal:apply()
 
-    sg.printf(char.name, x, y, w, "center")
+    sg.printf(getLocalizedText(char.name, self.stage.locale), x, y, w, "center")
     y = y + spacing
 
     drawBar(

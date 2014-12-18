@@ -113,6 +113,11 @@ function Phase:update(dt)
   for _,stage in pairs(self.stages) do stage[1]:update(dt) end
 end
 
+function Phase:onPush(game, prev)
+  self.game = game
+  for _,stage in pairs(self.stages) do stage[1]:setLocale(game.locale) end
+end
+
 function Phase:keypressed(key)
   if self.activeStage then self.activeStage[1]:keypressed(key) end
 end

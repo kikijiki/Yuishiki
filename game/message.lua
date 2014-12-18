@@ -24,6 +24,10 @@ function Message:initialize(data)
   }
 end
 
+function Message:onPush(game, prev)
+  self.game = game
+end
+
 function Message:onResume()
   self:resize(sg.getDimensions())
 end

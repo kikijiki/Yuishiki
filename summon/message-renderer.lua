@@ -12,6 +12,8 @@ return function(loader)
   MessageRenderer = loader.class("MessageRenderer")
 
   function MessageRenderer:initialize(mfont, msize, bfont, bsize, camera)
+    self.locale = "en"
+
     self.dialog_data = {
       fontsize = msize or 28,
       fontname = mfont or "ipamp.ttf",
@@ -46,6 +48,10 @@ return function(loader)
     self.world = sp.newWorld(0, 1000, true)
   end
 
+  function MessageRenderer:setLocale(locale)
+    self.locale = locale
+  end
+
   function MessageRenderer:update(dt)
   self.world:update(dt)
 
@@ -59,9 +65,22 @@ return function(loader)
     sg.setColor(255, 255, 255)
   end
 
+  function getLocalizedText(data, locale)
+    if type(data) == "table" then
+      if data[locale] then return data[locale]
+      elseif data["en"] then return data["en"]
+      elseif select(2, next(data)) then return select(2, next(data))
+      else return "" end
+    else
+      return data
+    end
+  end
+
   function MessageRenderer:dialog(source, content, duration, position)
     local s = self.dialog_data
-    local text = split(content, "\n")
+
+    text = split(getLocalizedText(content, self.locale), "\n")
+
     local size = vec(0, (s.fontsize + s.interline) * #text - s.interline)
 
     for _,v in pairs(text) do size.x = math.max(size.x, s.font:getWidth(v)) end
@@ -163,6 +182,7 @@ return function(loader)
 
   function MessageRenderer:bubble(id, message, position, direction, color)
     local b = self.bubble_data
+    message = getLocalizedText(message, self.locale)
     local width = b.font:getWidth(message)
     directon = direction or 0
 

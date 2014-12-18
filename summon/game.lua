@@ -20,14 +20,16 @@ return function(loader)
   end
 
   function Game:push(state)
-    state.game = self
+    local top = self.states:top()
+    if state.onPush then state:onPush(self, top) end
     self.states:push(state)
     if state and state.onResume then state:onResume() end
   end
 
   function Game:pop()
-    self.states:pop()
+    local state = self.states:pop()
     local top = self.states:top()
+    if state.onPop then state:onPop(self, top) end
     if not top then return end
     if top.resize then top:resize() end
     if top.onResume then top:onResume() end
