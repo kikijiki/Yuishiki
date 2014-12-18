@@ -14,6 +14,7 @@ call :Mac
 call :Android
 call :Love
 call :Clean
+call :Dropbox
 goto :End
 
 :Clear
@@ -88,6 +89,12 @@ exit /B
 
 :Clean
 rmdir %tmp% /S /Q
+exit /B
+
+:Dropbox
+echo|set /p= "> Updating dropbox shared folder..."
+robocopy.exe bin x:\dropbox\share\ys /NFL /NDL /NJH /NJS /nc /ns /np > nul 2>&1
+echo done
 exit /B
 
 :End
