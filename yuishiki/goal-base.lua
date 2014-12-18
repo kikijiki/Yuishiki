@@ -99,23 +99,24 @@ return function(loader)
     end
   end
 
-  function GoalBase:dump()
+  function GoalBase:dump(level)
+    level = level or "i"
     if not next(self.schemas) then
-      self.log.i("--[[GOAL BASE EMPTY]]--")
+      self.log[level]("--[[GOAL BASE EMPTY]]--")
       return
     end
-    self.log.i("--[[GOAL BASE DUMP START]]--")
-    self.log.i()
+    self.log[level]("--[[GOAL BASE DUMP START]]--")
+    self.log[level]()
     for _,goal in pairs(self.schemas) do
       if goal.limit then
-        self.log.fi("%s (%d/%d)",
+        self.log["f"..level]("%s (%d/%d)",
           goal.name, self.instances[goal.name].count, goal.limit)
       else
-        self.log.i(goal.name)
+        self.log[level](goal.name)
       end
     end
-    self.log.i()
-    self.log.i("--[[GOAL BASE DUMP END]]--")
+    self.log[level]()
+    self.log[level]("--[[GOAL BASE DUMP END]]--")
   end
 
   return GoalBase

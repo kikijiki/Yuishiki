@@ -144,9 +144,10 @@ return function(loader)
     if b then return b:get() end
   end
 
-  function BeliefBase:dump()
+  function BeliefBase:dump(level)
+    level = level or "i"
     if not next(self.lookup) then
-      self.log.i("--[[BELIEF BASE EMPTY]]--")
+      self.log[level]("--[[BELIEF BASE EMPTY]]--")
       return
     end
 
@@ -163,19 +164,19 @@ return function(loader)
 
     table.sort(paths)
 
-    self.log.i("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
-    self.log.i()
+    self.log[level]("--[[BELIEF BASE DUMP START]]--[["..#paths.." elements]]--")
+    self.log[level]()
     for _,path in pairs(paths) do
       local belief = self.lookup[path]
       local source, storage
       if belief.source == "internal" then source = "I" else source = "E" end
       if belief.retention == "short" then storage = "S" else storage = "L" end
       local skip = longest - lengths[path] - 1
-      self.log.fi("[%s%s] %s %s %s",
+      self.log["f"..level]("[%s%s] %s %s %s",
         source, storage, path, string.rep(".", skip), tostring(belief))
     end
-    self.log.i()
-    self.log.i("--[[BELIEF BASE DUMP END]]--")
+    self.log[level]()
+    self.log[level]("--[[BELIEF BASE DUMP END]]--")
   end
 
   function BeliefBase:save()

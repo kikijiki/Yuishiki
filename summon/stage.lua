@@ -193,10 +193,10 @@ return function(loader)
 
     local ac = self.gm.activeCharacter
     if key == "x" and ac then
-      ac.agent.bdi.belief_base:dump()
-      ac.agent.bdi.goal_base:dump()
-      ac.agent.bdi.plan_base:dump()
-      ac.agent.bdi.intention_base:dump()
+      ac.agent.bdi.belief_base:dump("d")
+      ac.agent.bdi.goal_base:dump("d")
+      ac.agent.bdi.plan_base:dump("d")
+      ac.agent.bdi.intention_base:dump("d")
     end
 
     if key == " " then self.gm:resume() end

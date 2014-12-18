@@ -84,18 +84,19 @@ return function(loader)
     end
   end
 
-  function PlanBase:dump()
+  function PlanBase:dump(level)
+    level = level or "i"
     if not next(self.schemas) then
-      self.log.i("--[[PLAN BASE EMPTY]]--")
+      self.log[level]("--[[PLAN BASE EMPTY]]--")
       return
     end
-    self.log.i("--[[PLAN BASE DUMP START]]--")
-    self.log.i()
+    self.log[level]("--[[PLAN BASE DUMP START]]--")
+    self.log[level]()
     for _,plan in pairs(self.schemas) do
-      self.log.i(plan.name)
+      self.log[level](plan.name)
     end
-    self.log.i()
-    self.log.i("--[[PLAN BASE DUMP END]]--")
+    self.log[level]()
+    self.log[level]("--[[PLAN BASE DUMP END]]--")
   end
 
   return PlanBase

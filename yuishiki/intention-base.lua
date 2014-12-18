@@ -65,7 +65,7 @@ return function(loader)
   end
 
   function IntentionBase:dump(level)
-    level = level or "d"
+    level = level or "i"
     if not next(self.intentions) then
       self.log[level]("--[[INTENTION BASE EMPTY]]--")
       return
