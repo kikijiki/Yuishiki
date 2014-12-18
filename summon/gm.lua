@@ -37,7 +37,7 @@ return function(loader)
     self.activeCharacter = nil
     self.auto_pause      = true
     self.wait            = -1
-    self.inactivity      = {count = 0, status = {}, max = 3}
+    self.inactivity      = {count = 0, status = {}, max = 1}
   end
 
   function GM:loadRuleset(ruleset)
