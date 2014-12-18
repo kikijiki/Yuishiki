@@ -20,7 +20,12 @@ return function(loader)
     self.limit = limit or 3
     self.font_size = 24
     self.spacing = 6
+    self.locale = "en"
     self.font = AssetLoader.load("font", "ipamp.ttf@"..self.font_size)
+  end
+
+  function Chatlog:setLocale(locale)
+    self.locale = locale
   end
 
   function Chatlog:resize(w, h)
@@ -28,8 +33,24 @@ return function(loader)
     self.y = h - (self.font_size + self.spacing) * self.limit
   end
 
+  function getLocalizedText(data, locale)
+    if type(data) == "table" then
+      if data[locale] then return data[locale]
+      elseif data["en"] then return data["en"]
+      elseif select(2, next(data)) then return select(2, next(data))
+      else return "" end
+    else
+      return data
+    end
+  end
+
   function Chatlog:log(character, text)
-    table.insert(self.buffer, {character.id, text, 5000})
+    table.insert(self.buffer,
+      {
+        getLocalizedText(character.name, self.locale),
+        getLocalizedText(text, self.locale),
+        5000
+      })
     self.size = self.size + 1
   end
 

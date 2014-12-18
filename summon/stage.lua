@@ -77,6 +77,7 @@ return function(loader)
   function Stage:setLocale(locale)
     self.locale = locale
     self.messageRenderer:setLocale(locale)
+    self.gui_elements.chatlog:setLocale(locale)
   end
 
   function Stage:listenToGM(gm)
