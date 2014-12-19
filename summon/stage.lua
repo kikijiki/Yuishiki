@@ -30,8 +30,8 @@ return function(loader)
     self.speed = 1
     self.camera = Camera()
     self.camera:zoom(2)
+    self.mouse = {x = 0, y = 0}
     self.interface = BattleInterface(self)
-    self.mouse = vec()
     self.background = {0, 0, 0}
     self.locale = "en"
     self.messageRenderer =

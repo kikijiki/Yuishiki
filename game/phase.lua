@@ -30,7 +30,7 @@ function Phase:initialize(data)
 
   for _,stage_data in pairs(data.stages) do
     local stage = Stage(stage_data)
-    table.insert(self.stages, {stage, {}})
+    table.insert(self.stages, {instance = stage, mouse = {}, vp = {}})
   end
 
   self:resize()
@@ -49,14 +49,14 @@ function Phase:resize(w, h)
   local y = header
 
   for _,stage in pairs(self.stages) do
-    stage[1]:resize(sw, sh)
-    stage[2] = {x = x, y = y, w = sw, h = sh}
+    stage.instance:resize(sw, sh)
+    stage.vp = {x = x, y = y, w = sw, h = sh}
     x = x + sw + self.padding
   end
 end
 
 function Phase:drawStageBorder(stage, color)
-    local vp = stage[2]
+    local vp = stage.vp
     local p = self.padding
     local p2 = p * 2
     sg.setColor(color)
@@ -80,12 +80,32 @@ function Phase:draw()
   for _,stage in pairs(self.stages) do
     self:drawStageBorder(stage, {64, 64, 64})
     sg.push()
-    sg.translate(stage[2].x, stage[2].y)
-    stage[1]:draw()
+    sg.translate(stage.vp.x, stage.vp.y)
+    stage.instance:draw()
     sg.pop()
   end
 
   gui.core.draw()
+end
+
+local function setLocalCoordinates(stage, x, y)
+  local mx = x - stage.vp.x
+  if mx < 0 then mx = 0 end
+  if mx > stage.vp.w then mx = stage.vp.w end
+  stage.mouse.x = mx
+
+  local my = y - stage.vp.y
+  if my < 0 then my = 0 end
+  if my > stage.vp.h then my = stage.vp.h end
+  stage.mouse.y = my
+
+  stage.instance.mouse.x = stage.mouse.x
+  stage.instance.mouse.y = stage.mouse.y
+end
+
+local function isInStage(stage, x, y)
+  return x >= stage.vp.x and x < (stage.vp.x + stage.vp.w) and
+    y >= stage.vp.y and y < (stage.vp.y + stage.vp.h)
 end
 
 function Phase:update(dt)
@@ -100,60 +120,53 @@ function Phase:update(dt)
     end
 
   if gui.Button{
-    text = ".",
-    pos = {self.vp.x - self.padding -180, self.padding + 80},
-    size = {40, 40}} then
-      console:flip()
-    end
-
-  if self.activeStage then
-    self.activeStage[1].mouse.x = love.mouse.getX() - self.activeStage[2].x
-    self.activeStage[1].mouse.y = love.mouse.getY() - self.activeStage[2].y
+      text = ".",
+      pos = {self.vp.x - self.padding -180, self.padding + 80},
+      size = {40, 40}}
+    then
+    console:flip()
   end
-  for _,stage in pairs(self.stages) do stage[1]:update(dt) end
+
+  local mx, my = love.mouse.getPosition()
+
+  for _,stage in pairs(self.stages) do
+    if isInStage(stage, mx, my) then
+      self.activeStage = stage
+    end
+    setLocalCoordinates(stage, mx, my)
+    stage.instance:update(dt)
+  end
 end
 
 function Phase:onPush(game, prev)
   self.game = game
-  for _,stage in pairs(self.stages) do stage[1]:setLocale(game.locale) end
+  for _,stage in pairs(self.stages) do stage.instance:setLocale(game.locale) end
 end
 
 function Phase:keypressed(key)
-  if self.activeStage then self.activeStage[1]:keypressed(key) end
-end
-
-function Phase:updateStageMouse(stage, x, y)
-  stage.mouse.x = x
-  stage.mouse.y = y
+  if self.activeStage then self.activeStage.instance:keypressed(key) end
 end
 
 function Phase:mousepressed(x, y, button)
-  for _,stage in pairs(self.stages) do
-    if x >= stage[2].x and x < (stage[2].x + stage[2].w) and
-       y >= stage[2].y and y < (stage[2].y + stage[2].h) then
-        self.activeStage = stage
-        x = x - stage[2].x
-        y = y - stage[2].y
-        self:updateStageMouse(stage[1], x, y)
-        stage[1]:mousepressed(x, y, button)
-        return
-    end
+  local as = self.activeStage
+  if as then
+    setLocalCoordinates(as, x, y)
+    as.instance:mousepressed(as.mouse.x, as.mouse.y, button)
   end
 end
 
 function Phase:mousereleased(x, y, button)
-  if self.activeStage then
-    x = x - self.activeStage[2].x
-    y = y - self.activeStage[2].y
-    self:updateStageMouse(self.activeStage[1], x, y)
-    self.activeStage[1]:mousereleased(x, y, button)
+  local as = self.activeStage
+  if as then
+    setLocalCoordinates(as, x, y)
+    as.instance:mousereleased(as.mouse.x, as.mouse.y, button)
   end
 end
 
 function Phase:pop()
   local data = {}
   for i, stage in ipairs(self.stages) do
-    data[i] = stage[1]:export()
+    data[i] = stage.instance:export()
   end
   if self.next_phase then self.next_phase:import(data) end
   self.game:pop()
@@ -161,7 +174,7 @@ end
 
 function Phase:import(data)
   for i, stage in ipairs(self.stages) do
-    stage[1]:import(data[i])
+    stage.instance:import(data[i])
   end
 end
 
