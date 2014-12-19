@@ -1,4 +1,4 @@
-if os.time() > os.time({year = 2015, month = 1, day = 1}) then
+if os.time() > os.time({year = 2015, month = 2, day = 1}) then
   local x, y = 0, 0
   local w = love.graphics.getWidth()
   local c = love.graphics.newCanvas()
