@@ -11,16 +11,6 @@ function Phase:initialize(data)
   self.activeStage = nil
   self.title = data.title
   self.description = data.description
-  self.vp = vec(0, 0)
-  self.padding = 10
-  self.title_size = 80
-  self.description_size = 40
-  self.font = {
-    description =
-      summon.AssetLoader.load("font", "ipamp.ttf@"..self.description_size),
-    title = summon.AssetLoader.load("font", "ipamp.ttf@"..self.title_size),
-  }
-
   self.text = {
     next = {
       en = "Next",
@@ -37,8 +27,22 @@ function Phase:initialize(data)
   self.activeStage = self.stages[1]
 end
 
+function Phase:onPush(game, prev)
+  local locale = game.locale
+  self.next_w = self.font.description:getWidth(self.text.next[locale]) * 1.5
+end
+
 function Phase:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
+  local size = math.min(w, h)
+
+  self.padding = size / 100
+  self.title_size = size / 15
+  self.description_size = size / 20
+  self.font = {
+    description = summon.AssetLoader.load("font", "ipamp.ttf@"..self.description_size),
+    title = summon.AssetLoader.load("font", "ipamp.ttf@"..self.title_size),
+  }
 
   self.vp = vec(w, h)
   local header = self.title_size + self.description_size + self.padding * 3
@@ -47,6 +51,13 @@ function Phase:resize(w, h)
   local sh = h - header - self.padding
   local x = self.padding
   local y = header
+
+  local locale
+
+  if self.game then locale = self.game.locale
+  else locale = "en" end
+
+  self.next_w = self.font.description:getWidth(self.text.next[locale]) * 1.5
 
   for _,stage in pairs(self.stages) do
     stage.instance:resize(sw, sh)
@@ -113,16 +124,17 @@ function Phase:update(dt)
 
   self.font.description:apply()
   if gui.Button{
-    text = self.text.next[locale],
-    pos = {self.vp.x - self.padding - 120, self.padding},
-    size = {120, self.title_size + self.description_size}} then
-      self:pop()
-    end
+      text = self.text.next[locale],
+      pos = {self.vp.x - self.padding - self.next_w, self.padding},
+      size = {self.next_w, self.title_size + self.description_size}} then
+    self:pop()
+  end
 
+  local size = (self.title_size + self.description_size) / 3
   if gui.Button{
-      text = ".",
-      pos = {self.vp.x - self.padding -180, self.padding + 80},
-      size = {40, 40}}
+      text = "",
+      pos = {self.vp.x - self.padding - self.next_w -size * 2, self.padding + size },
+      size = {size, size}}
     then
     console:flip()
   end

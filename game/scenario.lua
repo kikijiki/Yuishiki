@@ -15,13 +15,7 @@ function Scenario:initialize(data)
 
   self.name = data.name
   self.description = data.description
-  self.vp = vec(sg.getDimensions())
   self.data = data
-  self.font = {
-    normal = summon.AssetLoader.load("font", "ipamp.ttf@60"),
-    title = summon.AssetLoader.load("font", "ipamp.ttf@120")
-  }
-  self.margin = 60
 
   self.text = {
     start = {
@@ -34,6 +28,7 @@ function Scenario:initialize(data)
     }
   }
 
+  self:resize()
 end
 
 function Scenario:onResume()
@@ -69,12 +64,25 @@ end
 
 function Scenario:resize(w, h)
   if not w or not h then w,h = sg.getDimensions() end
+  local size = math.min(w, h)
+
+  self.margin = size / 20
+  local normal_size = size / 15
+  local title_size = size / 10
+
+  self.font = {
+    normal_size = normal_size,
+    normal = summon.AssetLoader.load("font", "ipamp.ttf@"..normal_size),
+    title_size = title_size,
+    title = summon.AssetLoader.load("font", "ipamp.ttf@"..title_size)
+  }
 
   self.vp = vec(w, h)
 end
 
 function Scenario:draw()
   local locale = self.game.locale
+  local offset = self.font.title_size + self.margin * 2
 
   sg.setBackgroundColor(20, 20, 20)
 
@@ -84,7 +92,7 @@ function Scenario:draw()
 
   sg.setColor(200, 200, 200)
   self.font.normal:apply()
-  sg.printf(self.description[locale], self.margin, 250, self.vp.x - self.margin, "left")
+  sg.printf(self.description[locale], self.margin, offset, self.vp.x - self.margin, "left")
 
   gui.core.draw()
 end
@@ -94,13 +102,15 @@ function Scenario:update(dt)
 
   local width = self.vp.x
   local height = self.vp.y
+  local h = self.font.title_size * 1.5
+  local w = self.font.title:getWidth(self.text.back[locale]) * 1.5
 
-  self.font.normal:apply()
-  gui.group{grow = "right", pos = {0, height - 160}, function()
+  gui.group{grow = "right", pos = {0, height - h - self.margin}, function()
+    self.font.title:apply()
     if gui.Button{
-      text = self.text.start[locale], size = {width - 200, 100}} then self:play() end
+      text = self.text.start[locale], size = {width - w, h}} then self:play() end
     if gui.Button{
-      text = self.text.back[locale], size = {200, 100}} then self.game:pop() end
+      text = self.text.back[locale], size = {w, h}} then self.game:pop() end
   end}
 end
 
