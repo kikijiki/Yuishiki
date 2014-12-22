@@ -131,6 +131,7 @@ return function(loader)
     gui.zoom_in.y = gui.zoom_out.y - gui.zoom_in.size * 2 - 20
 
     gui.chatlog:resize(w, h)
+    self.interface:resize(w, h)
     self:dispatch("resize", w, h)
   end
 
@@ -151,7 +152,7 @@ return function(loader)
 
     self.camera:finish()
     self.messageRenderer:drawDialogs()
-    self.interface:draw()
+    self.interface:draw(self.gm.activeCharacter)
 
     for _,element in pairs(self.gui_elements) do element:draw() end
 
@@ -189,15 +190,21 @@ return function(loader)
     self.interface:update(dt)
   end
 
-  function Stage:keypressed(key)
-    if self.status == "over" then return end
-
+  function Stage:dumpActiveCharacter()
     local ac = self.gm.activeCharacter
-    if key == "x" and ac then
+    if ac then
       ac.agent.bdi.belief_base:dump("d")
       ac.agent.bdi.goal_base:dump("d")
       ac.agent.bdi.plan_base:dump("d")
       ac.agent.bdi.intention_base:dump("d")
+    end
+  end
+
+  function Stage:keypressed(key)
+    if self.status == "over" then return end
+
+    if key == "x" then
+      self:dumpActiveCharacter()
     end
 
     if key == " " then self.gm:resume() end
