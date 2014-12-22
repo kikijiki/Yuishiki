@@ -96,6 +96,10 @@ function Phase:draw()
     sg.pop()
   end
 
+  if self.activeStage then
+    self:drawStageBorder(self.activeStage, {128, 128, 128})
+  end
+
   gui.core.draw()
 end
 
@@ -142,13 +146,7 @@ function Phase:update(dt)
     end
   end
 
-  local mx, my = love.mouse.getPosition()
-
   for _,stage in pairs(self.stages) do
-    if isInStage(stage, mx, my) then
-      self.activeStage = stage
-    end
-    setLocalCoordinates(stage, mx, my)
     stage.instance:update(dt)
   end
 end
@@ -162,11 +160,20 @@ function Phase:keypressed(key)
   if self.activeStage then self.activeStage.instance:keypressed(key) end
 end
 
+function Phase:updateMouse(x, y)
+  for _,stage in pairs(self.stages) do
+    setLocalCoordinates(stage, x, y)
+  end
+end
+
 function Phase:mousepressed(x, y, button)
-  local as = self.activeStage
-  if as then
-    setLocalCoordinates(as, x, y)
-    as.instance:mousepressed(as.mouse.x, as.mouse.y, button)
+  for _,stage in pairs(self.stages) do
+    if isInStage(stage, x, y) then
+      self.activeStage = stage
+      setLocalCoordinates(stage, x, y)
+      stage.instance:mousepressed(stage.mouse.x, stage.mouse.y, button)
+      return
+    end
   end
 end
 
@@ -175,6 +182,13 @@ function Phase:mousereleased(x, y, button)
   if as then
     setLocalCoordinates(as, x, y)
     as.instance:mousereleased(as.mouse.x, as.mouse.y, button)
+  end
+end
+
+function Phase:touchgestured(x, y, theta, distance, touchcount)
+  local as = self.activeStage
+  if as then
+    as.instance:touchgestured(as.mouse.x, as.mouse.y, theta, distance, touchcount)
   end
 end
 

@@ -55,8 +55,8 @@ return function(loader)
     end
   end
 
-  function Camera:pinch(distance)
-    local newscale = self.scale + distance
+  function Camera:pinch(k)
+    local newscale = self.scale + k
     if newscale > self.min_scale and newscale < self.max_scale then
       self.scale = newscale
     end

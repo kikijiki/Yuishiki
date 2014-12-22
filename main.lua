@@ -56,10 +56,63 @@ function love.load()
 
   local menu = require "game.menu"(scenarios)
   game:push(menu)
-end
 
-function love.update(dt)
-  game.on.update(dt)
+  if love.window.isTouchScreen and love.window.isTouchScreen() then
+    local tid
+    function love.touchpressed(id, x, y, pressure)
+      if tid then return end
+      tid = id
+      local cx = x * love.graphics.getWidth()
+      local cy = y * love.graphics.getHeight()
+      if not console:mousepressed(cx, cy, "l") then
+        game.on.mousepressed(cx, cy, "l")
+      end
+    end
+
+    function love.touchreleased(id, x, y, pressure)
+      if id ~= tid then return end
+      tid = nil
+      local cx = x * love.graphics.getWidth()
+      local cy = y * love.graphics.getHeight()
+      if not console:mousereleased(cx, cy, "l") then
+        game.on.mousereleased(cx, cy, "l")
+      end
+    end
+
+    function love.touchgestured(x, y, theta, distance, touchcount)
+      local cx = x * love.graphics.getWidth()
+      local cy = y * love.graphics.getHeight()
+      game.on.touchgestured(cx, cy, theta, distance, touchcount)
+    end
+
+    function love.touchmoved(id, x, y)
+      if id ~= tid then return end
+      local cx = x * love.graphics.getWidth()
+      local cy = y * love.graphics.getHeight()
+      game.on.updateMouse(cx, cy)
+    end
+
+    function love.update(dt)
+      game.on.update(dt)
+    end
+  else
+    function love.mousepressed(x, y, button)
+      if not console:mousepressed(x, y, button) then
+        game.on.mousepressed(x, y, button)
+      end
+    end
+
+    function love.mousereleased(x, y, button)
+      if not console:mousereleased(x, y, button) then
+        game.on.mousereleased(x, y, button)
+      end
+    end
+
+    function love.update(dt)
+      game.on.updateMouse(love.mouse.getPosition())
+      game.on.update(dt)
+    end
+  end
 end
 
 function love.resize(w, h)
@@ -98,16 +151,6 @@ function love.keyreleased(key)
   if key == "delete" then
     console:clear()
   end
-end
-
-function love.mousepressed(x, y, button)
-  if not console:mousepressed(x, y, button) then
-    game.on.mousepressed(x, y, button)
-  end
-end
-
-function love.mousereleased(x, y, button)
-  game.on.mousereleased(x, y, button)
 end
 
 function love.draw()
