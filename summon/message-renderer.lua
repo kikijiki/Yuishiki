@@ -76,6 +76,19 @@ return function(loader)
     end
   end
 
+  local function getPosition(position, source, camera)
+    local p
+    if type(position) == "function" then
+      p = position(source)
+    elseif position.getPosition then
+      p = position:getPosition()
+    else
+      p = position
+    end
+
+    return camera:gameToScreen(p)
+  end
+
   function MessageRenderer:dialog(source, content, duration, position)
     local s = self.dialog_data
 
@@ -91,6 +104,7 @@ return function(loader)
     local msg = {
       source = source,
       position = position,
+      current_pos = getPosition(position, source, self.camera),
       text = text,
       size = size,
       duration = duration}
@@ -103,14 +117,25 @@ return function(loader)
     local s = self.dialog_data
     for _,queue in pairs(s.queues) do
       local t = dt
+      local dialog
       while t > 0 and #queue > 0 do
-        local dialog = queue[1]
+        dialog = queue[1]
         if dialog.duration < t then
           t = t - dialog.duration
           table.remove(queue, 1)
         else
           dialog.duration = dialog.duration - t
           t = -1
+        end
+      end
+      if dialog then
+        local position = getPosition(dialog.position, dialog.source, self.camera)
+        local diff = position - dialog.current_pos
+        if diff:len() < 2 then
+          dialog.current_pos.x = position.x
+          dialog.current_pos.y = position.y
+        else
+          dialog.current_pos = dialog.current_pos + diff * dt * 10
         end
       end
     end
@@ -127,13 +152,8 @@ return function(loader)
       if #queue > 0 then
         local dialog = queue[1]
         local size = dialog.size
-        local position = dialog.position
 
-        if type(position) == "function" then position = position(dialog.source)
-        elseif position.getPosition then position = position:getPosition() end
-
-        position = self.camera:gameToScreen(position)
-        local o = position:clone()
+        local o = dialog.current_pos:clone()
 
         o.x = o.x + s.arrow.offset
 
