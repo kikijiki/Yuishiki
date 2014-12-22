@@ -3,7 +3,7 @@ function love.conf(t)
   t.version = "0.9.0"
   t.console = false
 
-  t.window.title = "Testbed"
+  t.window.title = "YS"
   t.window.icon = nil
   t.window.width = 1200
   t.window.height = 800
