@@ -48,7 +48,7 @@ return function(loader)
     end)
     self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
     self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
-    self.gui_elements.chatlog = Gui.Chatlog(200, 6, 3)
+    self.gui_elements.chatlog = Gui.Chatlog(200, 4, 3)
     self.font = AssetLoader.load("font", "ipamp.ttf@60")
 
     -- Initialize GM

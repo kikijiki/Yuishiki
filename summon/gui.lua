@@ -18,10 +18,7 @@ return function(loader)
     self.buffer = {}
     self.size = 0
     self.limit = limit or 3
-    self.font_size = 24
-    self.spacing = 6
     self.locale = "en"
-    self.font = AssetLoader.load("font", "ipamp.ttf@"..self.font_size)
   end
 
   function Chatlog:setLocale(locale)
@@ -29,6 +26,12 @@ return function(loader)
   end
 
   function Chatlog:resize(w, h)
+    local size = math.min(w, h)
+
+    self.font_size = size / 20
+    self.spacing = self.font_size / 4
+    self.font = AssetLoader.load("font", "ipamp.ttf@"..self.font_size)
+
     self.w = w
     self.y = h - (self.font_size + self.spacing) * self.limit
   end
