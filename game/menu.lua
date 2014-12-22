@@ -82,6 +82,7 @@ function Menu:update(dt)
       size = {self.fonts.ui_size * 2, self.fonts.ui_size * 2}
     }
   then
+    if love.system.vibrate then love.system.vibrate(0.2) end
     self.game.locale = (self.game.locale == "ja") and "en" or "ja"
     self:resize()
   end
