@@ -66,7 +66,7 @@ return function(loader)
     return consumed
   end
 
-    function Console:mousepressed(x, y, button )
+  function Console:mousepressed(x, y, button)
   	if not self.visible then return false end
 
     local consumed = false
@@ -79,6 +79,10 @@ return function(loader)
     if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
 
   	return consumed
+  end
+
+  function Console:mousereleased(x, y, button)
+    return false
   end
 
   function Console:draw()
