@@ -24,6 +24,74 @@ return function(loader)
     "Success", "Failure", "Context", "Completion")
   Plan.static.history_path = "history.plan"
 
+  local ResultHistory = loader.class("ResultHistory")
+
+  function ResultHistory:initialize(max)
+    self.data = {}
+    self.max = max
+  end
+
+  function ResultHistory:record(result, state, max)
+    table.insert(self.data, {result = result, state = state})
+    self:trim(max)
+  end
+
+  function ResultHistory:trim(max)
+    max = max or self.max
+    if max then
+      while #self.data > max do table.remove(self.data, 1) end
+    end
+  end
+
+  function ResultHistory:match(state)
+    if #self.data == 0 then return 0, 0 end
+
+    local state_count = 0
+    for _,_ in pairs(state) do state_count = state_count + 1 end
+    local best = {matches = 0, records = {}}
+
+    for _,record in pairs(self.data) do
+      local matches = 0
+      for k,v in pairs(state) do
+        if record.state[k] == v then matches = matches + 1 end
+      end
+      if matches > 0 then
+        if matches > best.matches then
+          best.matches = matches
+          best.records = {record}
+        elseif matches == best.matches then
+          table.insert(best.records, record)
+        end
+      end
+    end
+
+    if best.matches == 0 then return 0, 0 end
+
+    local average = 0
+    for _,record in pairs(best.records) do
+      average = average + record.result
+    end
+    average = average / #best.records
+    local matches = best.matches / state_count
+
+    return matches, average
+  end
+
+  function ResultHistory:__tostring()
+    local ret = {"{\n"}
+    for _,v in pairs(self.data) do
+      table.insert(ret, " > "..v.result)
+      table.insert(ret, " \t-> \t")
+      local states = {}
+      for k,s in pairs(v.state) do
+        table.insert(states, k.."="..s)
+      end
+      table.insert(ret, table.concat(states, ",").."\n")
+    end
+    table.insert(ret, "}")
+    return table.concat(ret)
+  end
+
   --- Create a new plan class from the definition data.
   -- The following can be specified:
   --
@@ -197,73 +265,27 @@ return function(loader)
     end
   end
 
-  function Plan:record(result, state, max)
+  function Plan:record(...)
     local bb = self.bdi.belief_base
     local history = bb:get(self.history_path)
 
     if not history then
-      history = setmetatable({}, {
-        __tostring = function(t)
-          local ret = {"{\n"}
-          for _,v in pairs(t) do
-            table.insert(ret, " - "..v.result)
-            table.insert(ret, " \t-> \t")
-            local states = {}
-            for k,s in pairs(v.state) do
-              table.insert(states, k.."="..s)
-            end
-            table.insert(ret, table.concat(states, ",").."\n")
-          end
-          table.insert(ret, "}")
-          return table.concat(ret)
-        end
-      })
+      history = ResultHistory()
       bb:setLT(history, self.history_path)
     else
       history = history:get()
     end
 
-    table.insert(history, {result = result, state = state})
-
-    if max then
-      while #history > max do table.remove(history, 1) end
-    end
+    history:record(...)
   end
 
-  function Plan.static.matchHistory(plan, bb, state)
+  function Plan.static.match(plan, bb, ...)
     local history = bb.get(plan.history_path)
-
-    if not history or #history == 0 then return 0, 0 end
-
-    local state_count = 0
-    for _,_ in pairs(state) do state_count = state_count + 1 end
-    local best = {matches = 0, records = {}}
-
-    for _,record in pairs(history) do
-      local matches = 0
-      for k,v in pairs(state) do
-        if record.state[k] == v then matches = matches + 1 end
-      end
-      if matches > 0 then
-        if matches > best.matches then
-          best.matches = matches
-          best.records = {record}
-        elseif matches == best.matches then
-          table.insert(best.records, record)
-        end
-      end
+    if not history then
+      return 0, 0
+    else
+      return history:match(...)
     end
-
-    if best.matches == 0 then return 0, 0 end
-
-    local average = 0
-    for _,record in pairs(best.records) do
-      average = average + record.result
-    end
-    average = average / #best.records
-    local matches = best.matches / state_count
-
-    return matches, average
   end
 
   return Plan
