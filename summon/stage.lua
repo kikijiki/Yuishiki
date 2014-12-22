@@ -46,8 +46,16 @@ return function(loader)
         self.gm:pause()
       end
     end)
-    self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function() self.camera:zoomIn() end)
-    self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function() self.camera:zoomOut() end)
+
+    local max_speed = 4
+    self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function()
+      self.speed = self.speed * 2
+      if self.speed > max_speed then self.speed = max_speed end
+    end)
+    self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function()
+      self.speed = self.speed / 2
+      if self.speed < 1/max_speed then self.speed = 1/max_speed end
+    end)
     self.gui_elements.chatlog = Gui.Chatlog(200, 4, 3)
     self.font = AssetLoader.load("font", "ipamp.ttf@60")
 
@@ -250,6 +258,10 @@ return function(loader)
     end
 
     self:dispatch("mousereleased", x, y, button)
+  end
+
+  function Stage:touchgestured(x, y, theta, distance, touchcount)
+    self.camera:pinch(distance * 50)
   end
 
   function Stage:export()
