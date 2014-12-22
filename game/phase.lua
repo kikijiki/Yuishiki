@@ -137,6 +137,9 @@ function Phase:update(dt)
       size = {size, size}}
     then
     console:flip()
+    if console.visible then
+      if self.activeStage then self.activeStage.instance:dumpActiveCharacter() end
+    end
   end
 
   local mx, my = love.mouse.getPosition()
