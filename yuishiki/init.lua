@@ -23,10 +23,10 @@ return function (base_path)
 
   ys = {}
 
-  ys.log           = loader.load ("log")
-  ys.Agent         = loader.load ("agent")
+  ys.log   = loader.load "log"
+  ys.Agent = loader.load "agent"
 
-  ys._VERSION = "0.0.1"
+  ys._VERSION = "0.3.0"
   ys._DESCRIPTION = "A game-oriented BDI multi agent system."
   ys._AUTHOR = "Matteo Bernacchia <kikijikispaccaspecchi@gmail.com>"
   ys._COPYRIGHT = "Copyright (c) 2013-2014 Matteo Bernacchia"
