@@ -52,7 +52,7 @@ exit /B
 echo|set /p= "> Building mac..."
 del %bin%\yuishiki-mac.zip > nul 2>&1
 copy %bin%\game.love platforms\mac\yuishiki.app\Contents\Resources > nul
-winrar a -afzip -ibck -r %bin%\yuishiki-mac.zip platforms\mac > nul
+winrar a -afzip -ibck -r -ep1 %bin%\yuishiki-mac.zip platforms\mac\ > nul
 echo done
 exit /B
 
