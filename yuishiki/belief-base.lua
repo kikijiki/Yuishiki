@@ -30,23 +30,28 @@ return function(loader)
 
     self.interface = {
       d = self.beliefs,
-      set = function(...) return self:set(...) end,
-      get = function(...) return self:getValue(...) end,
+      setLT = function(...) return self:setLT(...)      end,
+      setST = function(...) return self:setST(...)      end,
+      get   = function(...) return self:getValue(...) end,
 
       isTrue         = function(   ...) return self:getValue(...) ==  true end,
       isFalse        = function(   ...) return self:getValue(...) == false end,
       isNil          = function(   ...) return self:getValue(...) ==   nil end,
       isDefined      = function(   ...) return self:getValue(...) ~=   nil end,
-      isEqual        = function(x, ...) return self:getValue(...) == x end,
-      isGreater      = function(x, ...) return self:getValue(...) >  x end,
-      isGreaterEqual = function(x, ...) return self:getValue(...) >= x end,
-      isLess         = function(x, ...) return self:getValue(...) <  x end,
-      isLessEqual    = function(x, ...) return self:getValue(...) <= x end,
+      isEqual        = function(x, ...) return self:getValue(...) ==     x end,
+      isGreater      = function(x, ...) return self:getValue(...) >      x end,
+      isGreaterEqual = function(x, ...) return self:getValue(...) >=     x end,
+      isLess         = function(x, ...) return self:getValue(...) <      x end,
+      isLessEqual    = function(x, ...) return self:getValue(...) <=     x end,
+
+      --TODO more setters (increase, add, sub, mul, ...)
     }
   end
 
   function resolve(bb, path, create)
-    if not path then return end
+    if not path then
+      return bb.beliefs
+    end
 
     local belief = bb.beliefs
     local last
@@ -106,8 +111,14 @@ return function(loader)
 
   function set(bb, source, retention, data, ...)
     local path = parsePath(...)
-    local belief = Belief(data, path, retention, source)
-    return raw_set(bb, belief)
+    local belief = bb.lookup[path.full]
+    if belief then
+      belief:set(data)
+    else
+      belief = Belief(data, path, retention, source)
+      raw_set(bb, belief)
+    end
+    return belief
   end
 
   function BeliefBase:set(retention, ...)
