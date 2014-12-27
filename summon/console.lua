@@ -11,8 +11,7 @@ return function(loader)
   function Console:initialize(rw, rh, x, y)
     self.visible       = false
     self.enable_key    = "`"
-    self.buffer        = {}
-    self.buffer_length = 0
+    self.buffer        = {length = 0}
     self.font_size     = 20
     self.font          = AssetLoader.load("font", "msmincho.ttc@"..self.font_size)
     self.current_line  = 1
@@ -44,7 +43,7 @@ return function(loader)
     else self.current_line = self.current_line + l end
 
     if self.current_line < 1 then self.current_line = 1 end
-    if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
+    if self.current_line > self.buffer.length then self.current_line = self.buffer.length end
   end
 
   function Console:show() self.visible = true end
@@ -76,7 +75,7 @@ return function(loader)
     if button ==  "m" then self:scroll( 0) consumed = true end
 
     if self.current_line < 1 then self.current_line = 1 end
-    if self.current_line > self.buffer_length then self.current_line = self.buffer_length end
+    if self.current_line > self.buffer.length then self.current_line = self.buffer.length end
 
   	return consumed
   end
@@ -94,17 +93,17 @@ return function(loader)
   	sg.setColor(self.colors.back)
   	sg.rectangle("fill", self.x, self.y, self.width, self.height)
 
-    if self.buffer_length == 0 then return end
+    if self.buffer.length == 0 then return end
 
   	self.font:apply()
 
-    local index = self.current_line
+    local index = self.current_line or 1
     local lx = self.margin
     local ly = self.y + self.height - self.margin
     local lw = math.max(0, self.width - self.margin * 2)
 
-    while index > 0 and index <= self.buffer_length do
-      local data = self.buffer[self.buffer_length - index + 1]
+    while index > 0 and index <= self.buffer.length do
+      local data = self.buffer[self.buffer.length - index + 1]
       local width, lines = self.font:getWrap(data[2], lw)
       lines = math.max(1, lines)
       ly = ly - lines * (self.font_size + self.padding)
@@ -119,16 +118,28 @@ return function(loader)
   end
 
   function Console:clear()
-    self.buffer_length = 0
     self.current_line = 1
-    self.buffer = {}
+    self.buffer = {length = 0}
+  end
+
+  function lines(str)
+    local t = {}
+    local function helper(line) table.insert(t, line) return "" end
+    helper((str:gsub("(.-)\r?\n", helper)))
+    return t
+  end
+
+  local function insert(buf, level, str, noindex)
+    table.insert(buf, {level, string.format("[%05d]> %s", (buf.length + 1), str)})
+    buf.length = buf.length + 1
   end
 
   local function log(self, level, msg)
-    --local NBSP = "\194\160"
-    --msg = msg:gsub(" ", NBSP)
-    table.insert(self.buffer, {level, string.format("[%05d]> %s", (self.buffer_length + 1), msg)})
-    self.buffer_length = self.buffer_length + 1
+    local l = lines(msg)
+    insert(self.buffer, level, l[1])
+    if #l > 1 then
+      for i = 2, #l do insert(self.buffer, level, l[i]) end
+    end
     if self.current_line > 1 then self.current_line = self.current_line + 1 end
   end
 
