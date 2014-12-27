@@ -6,7 +6,7 @@ return function(loader)
   local sg          = loader.require "graphics"
   local sp          = loader.require "physics"
   local vec         = loader.require "vector"
-  local split       = loader.load("uti").split
+  local uti         = loader.load "uti"
   local AssetLoader = loader.load "asset-loader"
 
   MessageRenderer = loader.class("MessageRenderer")
@@ -92,7 +92,7 @@ return function(loader)
   function MessageRenderer:dialog(source, content, duration, position)
     local s = self.dialog_data
 
-    text = split(getLocalizedText(content, self.locale), "\n")
+    text = uti.lines(getLocalizedText(content, self.locale))
 
     local size = vec(0, (s.fontsize + s.interline) * #text - s.interline)
 

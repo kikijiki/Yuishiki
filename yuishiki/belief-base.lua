@@ -32,7 +32,7 @@ return function(loader)
       d = self.beliefs,
       setLT = function(...) return self:setLT(...)      end,
       setST = function(...) return self:setST(...)      end,
-      get   = function(...) return self:getValue(...) end,
+      get   = function(...) return self:getValue(...)   end,
 
       isTrue         = function(   ...) return self:getValue(...) ==  true end,
       isFalse        = function(   ...) return self:getValue(...) == false end,

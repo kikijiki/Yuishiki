@@ -4,6 +4,7 @@ return function(loader)
   if Console then return Console end
 
   local sg          = loader.require "graphics"
+  local uti         = loader.load "uti"
   local AssetLoader = loader.load "asset-loader"
 
   Console = loader.class("Console")
@@ -70,8 +71,8 @@ return function(loader)
 
     local consumed = false
 
-    if button == "wu" then self:scroll( 1) consumed = true end
-    if button == "wd" then self:scroll(-1) consumed = true end
+    if button == "wu" then self:scroll( 3) consumed = true end
+    if button == "wd" then self:scroll(-3) consumed = true end
     if button ==  "m" then self:scroll( 0) consumed = true end
 
     if self.current_line < 1 then self.current_line = 1 end
@@ -122,20 +123,13 @@ return function(loader)
     self.buffer = {length = 0}
   end
 
-  function lines(str)
-    local t = {}
-    local function helper(line) table.insert(t, line) return "" end
-    helper((str:gsub("(.-)\r?\n", helper)))
-    return t
-  end
-
   local function insert(buf, level, str, noindex)
-    table.insert(buf, {level, string.format("[%05d]> %s", (buf.length + 1), str)})
+    table.insert(buf, {level, str})
     buf.length = buf.length + 1
   end
 
   local function log(self, level, msg)
-    local l = lines(msg)
+    local l = uti.lines(msg)
     insert(self.buffer, level, l[1])
     if #l > 1 then
       for i = 2, #l do insert(self.buffer, level, l[i]) end

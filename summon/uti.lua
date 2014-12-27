@@ -32,6 +32,14 @@ return function(loader)
     return fields
   end
 
+  function Uti.lines(str)
+    local lines = {}
+    if str then
+      for line in str:gmatch("[^\r\n]+") do table.insert(lines, line) end
+    end
+    return lines
+  end
+
   function Uti.shallowCopy(source, dest, MT)
     if type(source) == "table" then
       for k,v in pairs(source) do dest[k] = v end

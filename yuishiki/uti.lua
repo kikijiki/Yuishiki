@@ -48,12 +48,16 @@ return function(loader)
     return enum
   end
 
-  function uti.startsWith(String, Start)
-    return string.sub(String, 1, string.len(Start)) == Start
+  function uti.startsWith(str, value)
+    if not str then return false end
+    if not value or string.len(value) == 0 then return true end
+    return string.sub(str, 1, string.len(value)) == value
   end
 
-  function uti.endsWith(String, End)
-    return End == '' or string.sub(String,-string.len(End)) == End
+  function uti.endsWith(str, value)
+    if not str then return false end
+    if not value or string.len(value) == 0 then return true end
+    return value == '' or string.sub(str, -string.len(value)) == value
   end
 
   return uti

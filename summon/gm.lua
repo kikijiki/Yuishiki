@@ -15,13 +15,14 @@ return function(loader)
   local AssetLoader     = loader.load "asset-loader"
 
   GM = loader.class("GM", EventDispatcher)
-  log = log.tag("GM")
 
   local max_steps_per_update = 1
   local max_steps_per_turn = 100
 
   function GM:initialize(world)
     EventDispatcher.initialize(self)
+
+    self.log = log.tag("GM")
 
     self.world   = world
     self.rules   = {}
