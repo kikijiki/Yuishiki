@@ -31,7 +31,7 @@ return function(loader)
     if not self.triggers then return end
     for _, trigger in pairs(self.triggers) do
       world:addObserver(
-        self,
+        self.character,
         trigger.event,
         function(...) trigger.body(self, ...) end)
     end
