@@ -23,6 +23,7 @@ return function(loader)
   Plan.static.history_path = "history.plan"
 
   local ResultHistory = loader.class("ResultHistory")
+  Plan.ResultHistory = ResultHistory
 
   function ResultHistory:initialize(max)
     self.data = {}
