@@ -41,13 +41,19 @@ return function(loader)
 
     local old = self:get()
 
-    if type(self.value) == "table" and self.value.set then
-      self.value:set(value)
+    if type(self.value) == "table" then
+      if self.value.set then
+        self.value:set(value)
+      else
+        self.value = value
+      end
+      self:notify(self, value, old)
     else
-      self.value = value
+      if self.value ~= value then
+        self.value = value
+        self:notify(self, value, old)
+      end
     end
-
-    self:notify(self, value, old)
   end
 
   function Belief:__tostring()
