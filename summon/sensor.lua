@@ -20,12 +20,13 @@ return function(loader)
   function Sensor:link(character, agent)
     self.character = character
     self.agent = agent
-    self.belief_base = agent.bdi.belief_base
+    self.belief_base = agent.bdi.belief_base.interface
     self.beliefs = agent.bdi.belief_base.interface
   end
 
   function Sensor:register(world)
     self.world = world
+    if not self.triggers then return end
     for _, trigger in pairs(self.triggers) do
       world:addObserver(
         self.character,
