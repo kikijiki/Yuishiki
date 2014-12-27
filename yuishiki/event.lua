@@ -8,8 +8,8 @@ return function(loader)
   function Event:initialize(name, parameters) assert(name)
     if type(name) ~= "table" then name = {name} end
     self.name = name
-    self.parameters = parameters
     if parameters then
+      self.parameters = parameters
       for k,v in pairs(parameters) do self[k] = v end
     end
   end
@@ -17,7 +17,7 @@ return function(loader)
   function Event:getType() return self.name[1] end
 
   function Event.goal(goal)
-    return Event({"goal", goal.name}, {goal = goal})
+    return Event({"goal", goal.name}, goal.parameters)
   end
 
   function Event.message(message)
