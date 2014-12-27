@@ -32,11 +32,18 @@ return function(loader)
   Trigger.belief = BeliefTrigger
 
   BeliefTrigger.static.conditions = {
+    ["zero"]          = function(e, new, old)         return new == 0                end,
+    ["undefined"]     = function(e, new, old)         return new == nil              end,
+    ["defined"]       = function(e, new, old)         return new ~= nil              end,
     ["equal"]         = function(e, new, old, p)      return new == p                end,
     ["changed"]       = function(e, new, old)         return new ~= old              end,
     ["at-least"]      = function(e, new, old, p)      return new >= p                end,
     ["at-most"]       = function(e, new, old, p)      return new <= p                end,
     ["more-than"]     = function(e, new, old, p)      return new >  p                end,
+    ["positive"]      = function(e, new, old)         return new >  0                end,
+    ["negative"]      = function(e, new, old)         return new <  0                end,
+    ["non-negative"]  = function(e, new, old)         return new >= 0                end,
+    ["non-positive"]  = function(e, new, old)         return new <= 0                end,
     ["less-than"]     = function(e, new, old, p)      return new <  p                end,
     ["increased"]     = function(e, new, old)         return new >  old              end,
     ["decreased"]     = function(e, new, old)         return old >  new              end,
@@ -102,10 +109,16 @@ return function(loader)
     if trigger_type == "belief"   then
       local args = {...}
       local trigger = Trigger.belief(args[1])
-      if args["begins"] then trigger:begins(args["begins"]) end
-      if args["ends"] then trigger:ends(args["ends"]) end
-      if args["condition"] then
-        trigger:condition(table.unpack(args["condition"]))
+      local data = args[2]
+      if data then
+        if data["begins"] then trigger:begins(data["begins"]) end
+        if data["ends"] then trigger:ends(data["ends"]) end
+        local condition = data["condition"]
+        if type(condition) == "table" then
+          trigger:condition(table.unpack(condition))
+        elseif type(condition) == "string" then
+          trigger:condition(condition)
+        end
       end
       return trigger
     end
