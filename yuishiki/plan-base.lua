@@ -77,9 +77,7 @@ return function(loader)
       if schema.trigger
         and schema.trigger:check(event)
         and self:canInstance(schema) then
-
-        local plan = self:instance(schema, event.parameters)
-        goal_base.bdi:addIntention(plan)
+        self.bdi:pushPlan(schema.name, event.parameters)
       end
     end
   end
