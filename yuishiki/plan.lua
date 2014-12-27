@@ -20,8 +20,6 @@ return function(loader)
     "New", "Active", "Waiting", "Succeeded", "Failed", "Error")
   Plan.static.FailReason = uti.makeEnum(
     "Dropped", "BodyFailed", "SubgoalFailed", "ConditionFailed", "Unknown")
-  Plan.static.Condition = uti.makeEnum(
-    "Success", "Failure", "Context", "Completion")
   Plan.static.history_path = "history.plan"
 
   local ResultHistory = loader.class("ResultHistory")
@@ -126,6 +124,7 @@ return function(loader)
     PlanClass.body = data.body
     PlanClass.meta = data.meta or false
     PlanClass.efficiency = data.efficiency
+    PlanClass.enabled = data.enabled
     if data.trigger then
       PlanClass.trigger = Trigger.fromData(table.unpack(data.trigger))
     end
