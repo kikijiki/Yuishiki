@@ -28,6 +28,7 @@ return function(loader)
   function ResultHistory:initialize(max)
     self.data = {}
     self.max = max
+    self.skip = 1
   end
 
   function ResultHistory:record(result, state, max)
@@ -46,34 +47,36 @@ return function(loader)
     if #self.data == 0 then return 0, 0 end
 
     local state_count = 0
-    for _,_ in pairs(state) do state_count = state_count + 1 end
-    local best = {matches = 0, records = {}}
+    local sorted = {}
+    for _,_ in pairs(state) do
+      state_count = state_count + 1
+      sorted[state_count] = {}
+    end
 
     for _,record in pairs(self.data) do
       local matches = 0
       for k,v in pairs(state) do
         if record.state[k] == v then matches = matches + 1 end
       end
-      if matches > 0 then
-        if matches > best.matches then
-          best.matches = matches
-          best.records = {record}
-        elseif matches == best.matches then
-          table.insert(best.records, record)
+      table.insert(sorted[matches], record.result)
+    end
+
+    local skip = 0
+    for i = state_count, 1, -1 do
+      local entry = sorted[i]
+      if #entry > 0 then
+        if #entry <= self.skip then return 0, 0 end
+        local average = 0
+        table.sort(entry)
+        for _,v in pairs(entry) do
+          if skip < self.skip then skip = skip + 1
+          else average = average + v end
         end
+        average = average / #entry
+        return i, average
       end
     end
-
-    if best.matches == 0 then return 0, 0 end
-
-    local average = 0
-    for _,record in pairs(best.records) do
-      average = average + record.result
-    end
-    average = average / #best.records
-    local matches = best.matches / state_count
-
-    return matches, average
+    return 0, 0
   end
 
   function ResultHistory:__tostring()
