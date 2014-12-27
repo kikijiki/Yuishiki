@@ -3,9 +3,11 @@ local Sensor
 return function(loader)
   if Sensor then return Sensor end
   local AssetLoader = loader.load "asset-loader"
+  local Log         = loader.load "log"
 
   Sensor = loader.class("Sensor")
 
+  Sensor.log = Log.tag("SENSOR")
   function Sensor:initialize()
   end
 
@@ -29,7 +31,7 @@ return function(loader)
     if not self.triggers then return end
     for _, trigger in pairs(self.triggers) do
       world:addObserver(
-        self.character,
+        self,
         trigger.event,
         function(...) trigger.body(self, ...) end)
     end
