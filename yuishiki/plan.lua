@@ -27,20 +27,17 @@ return function(loader)
 
   function ResultHistory:initialize(max)
     self.data = {}
-    self.max = max
+    self.max = max or 10
     self.skip = 1
   end
 
-  function ResultHistory:record(result, state, max)
+  function ResultHistory:record(result, state)
     table.insert(self.data, {result = result, state = state})
-    self:trim(max)
+    self:trim()
   end
 
-  function ResultHistory:trim(max)
-    max = max or self.max
-    if max then
-      while #self.data > max do table.remove(self.data, 1) end
-    end
+  function ResultHistory:trim()
+    while #self.data > self.max do table.remove(self.data, 1) end
   end
 
   function ResultHistory:match(state)
@@ -124,6 +121,7 @@ return function(loader)
       self.thread = coroutine.create(self.body)
       self.conditions = ManualTrigger(data.conditions)
       self.on = ManualTrigger(data.on)
+      self.schema = PlanClass
     end
 
     PlanClass.body = data.body
@@ -269,22 +267,22 @@ return function(loader)
     end
   end
 
-  function Plan:record(...)
-    local bb = self.bdi.belief_base
-    local history = bb:get(self.history_path)
-
-    if not history then
-      history = ResultHistory()
-      bb:setLT(history, self.history_path)
-    else
-      history = history:get()
-    end
-
+  function Plan:record(beliefs, ...)
+    local history = self:getHistory(beliefs)
     history:record(...)
   end
 
-  function Plan.static.match(plan, bb, ...)
-    local history = bb.get(plan.history_path)
+  function Plan:getHistory(beliefs)
+    local history = beliefs.get(self.schema.history_path)
+    if not history then
+      history = ResultHistory()
+      beliefs.setLT(history, self.schema.history_path)
+    end
+    return history
+  end
+
+  function Plan.static.match(plan, beliefs, ...)
+    local history = beliefs.get(plan.history_path)
     if not history then
       return 0, 0
     else
