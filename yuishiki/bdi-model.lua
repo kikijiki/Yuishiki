@@ -97,13 +97,25 @@ return function(loader)
     local plan_schema
 
     -- TODO: check retry flag and plan history
+    local meta = true
     if metaplans then plan_schema = self:selectPlan(goal, metaplans) end
-    if not plan_schema then plan_schema = self:selectPlan(goal, plans) end
+    if not plan_schema then
+      plan_schema = self:selectPlan(goal, plans)
+      meta = false
+    end
 
     if not plan_schema then
       self.log.i("No plans could be selected for the goal <"..goal.name..">.")
     else
-      return self:pushPlan(plan_schema, goal.parameters, intention)
+      if meta then
+        return self:pushPlan(plan_schema, {
+          goal = goal,
+          plans = plans,
+          plan_base = self.plan_base
+        }, intention)
+      else
+        return self:pushPlan(plan_schema, goal.parameters, intention)
+      end
     end
   end
 
