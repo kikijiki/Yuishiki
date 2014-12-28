@@ -64,16 +64,17 @@ return function(loader)
     local skip = 0
     for i = state_count, 1, -1 do
       local entry = sorted[i]
+      table.sort(entry)
+      for i = 1, (self.skip or 0) do table.remove(entry) end
       if #entry > 0 then
-        if #entry <= self.skip then return 0, 0 end
         local average = 0
-        table.sort(entry)
         for _,v in pairs(entry) do
-          if skip < self.skip then skip = skip + 1
-          else average = average + v end
+          average = average + v
         end
         average = average / #entry
         return i, average
+      else
+        return 0, 0
       end
     end
     return 0, 0
