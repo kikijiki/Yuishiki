@@ -41,6 +41,10 @@ return function(loader)
       isEqual        = function(x, ...) return self:getValue(...) ==     x end,
       isGreater      = function(x, ...) return self:getValue(...) >      x end,
       isGreaterEqual = function(x, ...) return self:getValue(...) >=     x end,
+      isPositive     = function(   ...) return self:getValue(...) >      0 end,
+      isNegative     = function(   ...) return self:getValue(...) <      0 end,
+      isNonPositive  = function(   ...) return self:getValue(...) <=     0 end,
+      isNonNegative  = function(   ...) return self:getValue(...) >=     0 end,
       isLess         = function(x, ...) return self:getValue(...) <      x end,
       isLessEqual    = function(x, ...) return self:getValue(...) <=     x end,
 
