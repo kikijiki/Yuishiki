@@ -21,7 +21,7 @@ exit /B
 
 :Archive
 echo|set /p= "> Creating game archive..."
-winrar a -afzip -ibck    %bin%\game.love .
+winrar a -afzip -ibck    %bin%\game.love *.lua
 winrar a -afzip -ibck -r %bin%\game.love assets
 winrar a -afzip -ibck -r %bin%\game.love game
 winrar a -afzip -ibck -r %bin%\game.love lib

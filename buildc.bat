@@ -31,6 +31,7 @@ robocopy game     %tmp%\game     /S /E >nul
 robocopy lib      %tmp%\lib      /S /E >nul
 robocopy summon   %tmp%\summon   /S /E >nul
 robocopy yuishiki %tmp%\yuishiki /S /E >nul
+robocopy assets   %tmp%\assets   /S /E >nul
 
 :: compile lua files (overwrites)
 for /r %tmp% %%x in (*.lua) do luajit -b "%%x" "%%x"
@@ -39,7 +40,6 @@ exit /B
 
 :Archive
 echo|set /p= "> Creating game archive..."
-winrar a -afzip -ibck -r %bin%\game.love assets
 winrar a -afzip -ibck -r -ep1 %bin%\game.love %tmp%\*
 echo done
 exit /B
