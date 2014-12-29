@@ -38,8 +38,8 @@ return function(loader)
       MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
 
     -- Minimal GUI
-    self.gui_elements = {}
-    self.gui_elements.play = Gui.PlayButton(0, 0, 40, function()
+    self.gui = {elements = {}}
+    self.gui.elements.play = Gui.PlayButton(0, 0, 40, function()
       if self.gm.paused then
         self.gm:resume()
       else
@@ -48,15 +48,28 @@ return function(loader)
     end)
 
     local max_speed = 4
-    self.gui_elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function()
+    local speed_label = {
+      en = "Speed",
+      ja = "再生スピード",
+      it = "Velocita'"
+    }
+    self.gui.elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function()
       self.speed = self.speed * 2
-      if self.speed > max_speed then self.speed = max_speed end
+      if self.speed > max_speed then
+        self.speed = max_speed
+      else
+        self.gui.elements.chatlog:log(speed_label, "x"..self.speed)
+      end
     end)
-    self.gui_elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function()
+    self.gui.elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function()
       self.speed = self.speed / 2
-      if self.speed < 1/max_speed then self.speed = 1/max_speed end
+      if self.speed < 1/max_speed then
+        self.speed = 1/max_speed
+      else
+        self.gui.elements.chatlog:log(speed_label, "x"..self.speed)
+      end
     end)
-    self.gui_elements.chatlog = Gui.Chatlog(200, 4, 3)
+    self.gui.elements.chatlog = Gui.Chatlog(200, 4, 3)
     self.font = AssetLoader.load("font", "ipamp.ttf@60")
 
     -- Initialize GM
@@ -85,7 +98,7 @@ return function(loader)
   function Stage:setLocale(locale)
     self.locale = locale
     self.messageRenderer:setLocale(locale)
-    self.gui_elements.chatlog:setLocale(locale)
+    self.gui.elements.chatlog:setLocale(locale)
   end
 
   function Stage:listenToGM(gm)
@@ -97,7 +110,7 @@ return function(loader)
       function(c)
         c:listen(self, "dialog",
           function(character, message, duration, position)
-            self.gui_elements.chatlog:log(character, message)
+            self.gui.elements.chatlog:logCharacter(character, message)
             self.messageRenderer:dialog(
               character.sprite, message, duration, position)
           end)
@@ -108,10 +121,10 @@ return function(loader)
           end)
       end)
     self.gm:listen(self, "resume",
-      function() self.gui_elements.play:stop() end)
+      function() self.gui.elements.play:stop() end)
 
     self.gm:listen(self, "pause",
-      function() self.gui_elements.play:play() end)
+      function() self.gui.elements.play:play() end)
 
     self.gm:listen(self, "game-over",
       function() self.status = "over" end)
@@ -123,22 +136,23 @@ return function(loader)
     self.camera:resize(w, h)
     self.canvas = sg.newCanvas(w, h)
 
-    local gui = self.gui_elements
+    local gui = self.gui
+    local e = gui.elements
     local gui_size = 40 * w / 1000
 
-    gui.play.size = gui_size
-    gui.play.x = w - gui.play.size - 20
-    gui.play.y = h - gui.play.size - 20
+    e.play.size = gui_size
+    e.play.x = w - e.play.size - 20
+    e.play.y = h - e.play.size - 20
 
-    gui.zoom_out:resize(gui_size)
-    gui.zoom_out.x = w - gui.zoom_out.size - 20
-    gui.zoom_out.y = gui.play.y - gui.zoom_out.size * 2 - 20
+    e.zoom_out:resize(gui_size)
+    e.zoom_out.x = w - e.zoom_out.size - 20
+    e.zoom_out.y = e.play.y - e.zoom_out.size * 2 - 20
 
-    gui.zoom_in:resize(gui_size)
-    gui.zoom_in.x = w - gui.zoom_in.size - 20
-    gui.zoom_in.y = gui.zoom_out.y - gui.zoom_in.size * 2 - 20
+    e.zoom_in:resize(gui_size)
+    e.zoom_in.x = w - e.zoom_in.size - 20
+    e.zoom_in.y = e.zoom_out.y - e.zoom_in.size * 2 - 20
 
-    gui.chatlog:resize(w, h)
+    e.chatlog:resize(w, h)
     self.interface:resize(w, h)
     self:dispatch("resize", w, h)
   end
@@ -162,7 +176,7 @@ return function(loader)
     self.messageRenderer:drawDialogs()
     self.interface:draw(self.gm.activeCharacter)
 
-    for _,element in pairs(self.gui_elements) do element:draw() end
+    for _,element in pairs(self.gui.elements) do element:draw() end
 
     sg.setCanvas()
     sg.pop()
@@ -185,7 +199,7 @@ return function(loader)
     self.messageRenderer:update(dt)
 
     if self.status == "over" then return end
-    for _,element in pairs(self.gui_elements) do
+    for _,element in pairs(self.gui.elements) do
       if element.update then
         element:update(dt)
       end
@@ -251,7 +265,7 @@ return function(loader)
 
     if button == "l" then self.camera:stopDrag() end
 
-    for _,element in pairs(self.gui_elements) do
+    for _,element in pairs(self.gui.elements) do
       if element.mousereleased then
         element:mousereleased(x, y, button)
       end

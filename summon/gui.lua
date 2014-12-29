@@ -47,7 +47,7 @@ return function(loader)
     end
   end
 
-  function Chatlog:log(character, text)
+  function Chatlog:logCharacter(character, text)
     table.insert(self.buffer,
       {
         getLocalizedText(character.name, self.locale),
@@ -56,6 +56,16 @@ return function(loader)
       })
     self.size = self.size + 1
   end
+
+  function Chatlog:log(tag, text)
+    table.insert(self.buffer,
+      {
+        getLocalizedText(tag, self.locale),
+        getLocalizedText(text, self.locale),
+        5000
+      })
+    self.size = self.size + 1
+    end
 
   function Chatlog:draw()
     local y = self.y
