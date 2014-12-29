@@ -84,7 +84,7 @@ return function (base_path)
   summon.AssetLoader.register("ai_module",   "ai/modules", summon.AssetLoader.loadRaw, false)
   summon.AssetLoader.register("sensor",      "ai/sensors", summon.Sensor.load,         false)
 
-  summon._VERSION     = "0.3.0"
+  summon._VERSION     = "0.4.0"
   summon._DESCRIPTION = "Support game engine."
   summon._AUTHOR      = "Matteo Bernacchia <kikijikispaccaspecchi@gmail.com>"
   summon._COPYRIGHT   = "Copyright (c) 2013-2014 Matteo Bernacchia"
