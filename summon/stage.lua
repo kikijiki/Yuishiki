@@ -58,7 +58,8 @@ return function(loader)
       if self.speed > max_speed then
         self.speed = max_speed
       else
-        self.gui.elements.chatlog:log(speed_label, "x"..self.speed)
+        self.gui.elements.chatlog:log(
+          self.game:getLocalizedString(speed_label), "x"..self.speed)
       end
     end)
     self.gui.elements.zoom_out = Gui.RoundButton(0, 0, 40, "-", function()
@@ -66,7 +67,8 @@ return function(loader)
       if self.speed < 1/max_speed then
         self.speed = 1/max_speed
       else
-        self.gui.elements.chatlog:log(speed_label, "x"..self.speed)
+        self.gui.elements.chatlog:log(
+          self.game:getLocalizedString(speed_label), "x"..self.speed)
       end
     end)
     self.gui.elements.chatlog = Gui.Chatlog(200, 4, 3)

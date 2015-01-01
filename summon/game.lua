@@ -71,7 +71,7 @@ return function(loader)
     end
   end
 
-  function Game:push(state) print(state, state.onPush)
+  function Game:push(state)
     local top = self.states:top()
     state.game = self
     if state.onPush then state:onPush(self, top) end
