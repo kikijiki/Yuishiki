@@ -49,7 +49,7 @@ summon.fs.getDirectoryItems(scenarios_path, function(file)
 end)
 
 local game = summon.Game()
-game:addLocale({"en", "ja", "it"})
+game:addLocale({"ja", "en", "it"})
 game:setLocale("ja")
 
 function love.load()

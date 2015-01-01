@@ -76,7 +76,7 @@ function Menu:update(dt)
 
   self.fonts.ui:apply()
   if gui.Button{
-      text = self.game.locale,
+      text = string.upper(self.game.locale),
       pos = {margin, margin},
       size = {self.fonts.ui_size * 3, self.fonts.ui_size}
     }
