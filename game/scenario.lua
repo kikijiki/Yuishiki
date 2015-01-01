@@ -20,11 +20,13 @@ function Scenario:initialize(data)
   self.text = {
     start = {
       en = "Start",
-      ja = "スタート"
+      ja = "スタート",
+      it = "Inizia"
     },
     back = {
       en = "Back",
-      ja = "戻る"
+      ja = "戻る",
+      it = "Esci"
     }
   }
 
@@ -81,36 +83,38 @@ function Scenario:resize(w, h)
 end
 
 function Scenario:draw()
-  local locale = self.game.locale
   local offset = self.font.title_size + self.margin * 2
 
   sg.setBackgroundColor(20, 20, 20)
 
   sg.setColor(0, 200, 255)
   self.font.title:apply()
-  sg.printf(self.name[locale], self.margin, self.margin, self.vp.x - self.margin, "center")
+  sg.printf(self.game:getLocalizedString(self.name),
+    self.margin, self.margin, self.vp.x - self.margin, "center")
 
   sg.setColor(200, 200, 200)
   self.font.normal:apply()
-  sg.printf(self.description[locale], self.margin, offset, self.vp.x - self.margin, "left")
+  sg.printf(self.game:getLocalizedString(self.description),
+    self.margin, offset, self.vp.x - self.margin, "left")
 
   gui.core.draw()
 end
 
 function Scenario:update(dt)
-  local locale = self.game.locale
-
   local width = self.vp.x
   local height = self.vp.y
   local h = self.font.title_size * 1.5
-  local w = self.font.title:getWidth(self.text.back[locale]) * 1.5
+  local w = self.font.title:getWidth(
+    self.game:getLocalizedString(self.text.back)) * 1.5
 
   gui.group{grow = "right", pos = {0, height - h - self.margin}, function()
     self.font.title:apply()
     if gui.Button{
-      text = self.text.start[locale], size = {width - w, h}} then self:play() end
+      text = self.game:getLocalizedString(self.text.start), size = {width - w, h}}
+      then self:play() end
     if gui.Button{
-      text = self.text.back[locale], size = {w, h}} then self.game:pop() end
+      text = self.game:getLocalizedString(self.text.back), size = {w, h}}
+    then self.game:pop() end
   end}
 end
 

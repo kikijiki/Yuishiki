@@ -49,7 +49,8 @@ summon.fs.getDirectoryItems(scenarios_path, function(file)
 end)
 
 local game = summon.Game()
-game.locale = "ja"
+game:addLocale({"en", "ja", "it"})
+game:setLocale("ja")
 
 function love.load()
   console:resize(summon.graphics.getDimensions())

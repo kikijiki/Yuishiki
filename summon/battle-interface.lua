@@ -41,6 +41,7 @@ return function(loader)
 
   function BattleInterface:initialize(stage)
     self.stage = stage
+    self.game = stage.game
     self.cursor = Cursor()
     self.mouse = {}
     self.console = {}
@@ -75,17 +76,6 @@ return function(loader)
     self.cursor:draw()
   end
 
-  function getLocalizedText(data, locale)
-    if type(data) == "table" then
-      if data[locale] then return data[locale]
-      elseif data["en"] then return data["en"]
-      elseif select(2, next(data)) then return select(2, next(data))
-      else return "" end
-    else
-      return data
-    end
-  end
-
   function BattleInterface:drawTurnOrder(x, y)
     local init = self.stage.gm.initiative
     local turnc = self.stage.gm.turnCount
@@ -97,8 +87,7 @@ return function(loader)
     sg.setColor(255, 255, 255, 255)
 
     for i = 1, #init.list do
-      local name =
-        getLocalizedText(init.list[i].character.name, self.stage.locale)
+      local name = self.game:getLocalizedString(init.list[i].character.name)
       local value = init.list[i].value
       local text = i..". "..name.."("..value..")"
       local textw = self.fonts.normal:getWidth(text)
@@ -138,7 +127,7 @@ return function(loader)
 
     local bar_width = math.max(
       self.fonts.small:getWidth("000/000"),
-      self.fonts.small:getWidth(getLocalizedText(char.name, self.stage.locale)))
+      self.fonts.small:getWidth(self.game:getLocalizedString(char.name)))
 
     bar_width = bar_width * 1.5
 
@@ -162,7 +151,7 @@ return function(loader)
     local fsize = self.fonts.small_size
     font:apply()
 
-    sg.printf(getLocalizedText(char.name, self.stage.locale), x, y, bar_width, "center")
+    sg.printf(self.game:getLocalizedString(char.name), x, y, bar_width, "center")
     y = y + spacing
 
     drawBar(

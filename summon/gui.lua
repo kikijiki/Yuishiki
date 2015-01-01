@@ -18,11 +18,6 @@ return function(loader)
     self.buffer = {}
     self.size = 0
     self.limit = limit or 3
-    self.locale = "en"
-  end
-
-  function Chatlog:setLocale(locale)
-    self.locale = locale
   end
 
   function Chatlog:resize(w, h)
@@ -36,32 +31,11 @@ return function(loader)
     self.y = h - (self.font_size + self.spacing) * self.limit
   end
 
-  function getLocalizedText(data, locale)
-    if type(data) == "table" then
-      if data[locale] then return data[locale]
-      elseif data["en"] then return data["en"]
-      elseif select(2, next(data)) then return select(2, next(data))
-      else return "" end
-    else
-      return data
-    end
-  end
-
-  function Chatlog:logCharacter(character, text)
-    table.insert(self.buffer,
-      {
-        getLocalizedText(character.name, self.locale),
-        getLocalizedText(text, self.locale),
-        5000
-      })
-    self.size = self.size + 1
-  end
-
   function Chatlog:log(tag, text)
     table.insert(self.buffer,
       {
-        getLocalizedText(tag, self.locale),
-        getLocalizedText(text, self.locale),
+        tag,
+        text,
         5000
       })
     self.size = self.size + 1

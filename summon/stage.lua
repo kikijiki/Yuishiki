@@ -19,8 +19,9 @@ return function(loader)
 
   Stage = loader.class("Stage", EventDispatcher)
 
-  function Stage:initialize(data)
+  function Stage:initialize(game, data)
     EventDispatcher.initialize(self)
+    self.game = game
 
     local map = AssetLoader.load("map", data.map)
     self.world = World(map)
@@ -33,9 +34,8 @@ return function(loader)
     self.mouse = {x = 0, y = 0}
     self.interface = BattleInterface(self)
     self.background = {0, 0, 0}
-    self.locale = "en"
     self.messageRenderer =
-      MessageRenderer("ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
+      MessageRenderer(game, "ipamp.ttf", 40, "ps2p.ttf", 30, self.camera)
 
     -- Minimal GUI
     self.gui = {elements = {}}
@@ -51,7 +51,7 @@ return function(loader)
     local speed_label = {
       en = "Speed",
       ja = "再生スピード",
-      it = "Velocita'"
+      it = "Velocità"
     }
     self.gui.elements.zoom_in = Gui.RoundButton(0, 0, 40, "+", function()
       self.speed = self.speed * 2
@@ -95,12 +95,6 @@ return function(loader)
     self.gm:nextCharacter()
   end
 
-  function Stage:setLocale(locale)
-    self.locale = locale
-    self.messageRenderer:setLocale(locale)
-    self.gui.elements.chatlog:setLocale(locale)
-  end
-
   function Stage:listenToGM(gm)
     self.gm:listen(self, "next-character", function(c)
       self.camera:follow(c.sprite)
@@ -110,7 +104,8 @@ return function(loader)
       function(c)
         c:listen(self, "dialog",
           function(character, message, duration, position)
-            self.gui.elements.chatlog:logCharacter(character, message)
+            self.gui.elements.chatlog:log(
+              self.game:getLocalizedString(character.name, message))
             self.messageRenderer:dialog(
               character.sprite, message, duration, position)
           end)

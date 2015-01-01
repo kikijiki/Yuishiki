@@ -20,13 +20,15 @@ function Menu:initialize(scenarios)
   }
 
   self.keys = {
-    en = {
-      "Esc -> toggle fullscreen",
-      "Space -> next turn"
+    fullscreen = {
+      en = "Esc -> toggle fullscreen",
+      ja = "Esc -> フルスクリーンの切り替え",
+      it = "Esc -> schermo intero"
     },
-    ja = {
-      "Esc -> フルスクリーンの切り替え",
-      "Space -> 次のターン"
+    exit = {
+      en = "Exit",
+      ja = "終了",
+      it = "Esci"
     }
   }
 
@@ -43,8 +45,6 @@ function Menu:onResume()
 end
 
 function Menu:draw()
-  local locale = self.game.locale
-
   sg.setBackgroundColor(40, 40, 40)
 
   self.fonts.title:apply()
@@ -52,17 +52,17 @@ function Menu:draw()
   sg.printf("YS", 0, self.title_spacing, self.w, "center")
 
   self.fonts.small:apply()
-  local margin = self.title_offset / 2 - self.fonts.ui_size
+  local margin = (self.title_offset - self.fonts.ui_size * 2) / 3
   margin = (margin - self.fonts.small_size) / 2
-  sg.print(self.keys[locale][1], margin, margin)
+  sg.print(self.game:getLocalizedString(self.keys.fullscreen), margin, margin)
 
   self:drawLogo()
   gui.core.draw()
 end
 
-function addScenario(menu, data, locale)
+function addScenario(menu, data)
   if gui.Button{
-      text = data.name[locale],
+      text = menu.game:getLocalizedString(data.name),
       size = {menu.w, menu.button_height}}
   then
     menu.game:push(Scenario(data))
@@ -72,19 +72,26 @@ end
 function Menu:update(dt)
   self.elapsed = self.elapsed + dt
 
-  local locale = self.game.locale
-  local margin = self.title_offset / 2 - self.fonts.ui_size
+  local margin = (self.title_offset - self.fonts.ui_size * 2) / 3
 
   self.fonts.ui:apply()
   if gui.Button{
-      text = locale,
+      text = self.game.locale,
       pos = {margin, margin},
-      size = {self.fonts.ui_size * 2, self.fonts.ui_size * 2}
+      size = {self.fonts.ui_size * 3, self.fonts.ui_size}
     }
   then
-    if love.system.vibrate then love.system.vibrate(0.2) end
-    self.game.locale = (self.game.locale == "ja") and "en" or "ja"
+    self.game:setLocale()
     self:resize()
+  end
+
+  if gui.Button{
+    text = self.game:getLocalizedString(self.keys.exit),
+    pos = {margin, margin * 2 + self.fonts.ui_size},
+    size = {self.fonts.ui_size * 3, self.fonts.ui_size}
+  }
+  then
+    self.game:quit()
   end
 
   gui.group{
@@ -93,7 +100,7 @@ function Menu:update(dt)
     spacing = self.spacing,
     function()
       self.fonts.normal:apply()
-      for _,data in pairs(self.scenarios) do addScenario(self, data, locale) end
+      for _,data in pairs(self.scenarios) do addScenario(self, data) end
     end
   }
 end
@@ -134,8 +141,8 @@ function Menu:resize(w, h)
   fonts.title_size = title_size
   fonts.title = summon.AssetLoader.load("font", "ipamp.ttf@"..title_size)
   fonts.ui_size = title_size / 3
-  fonts.ui = summon.AssetLoader.load("font", "ipamp.ttf@"..fonts.ui_size)
-  fonts.small_size = fonts.ui_size / 3
+  fonts.ui = summon.AssetLoader.load("font", "ipamp.ttf@"..(fonts.ui_size * 0.8))
+  fonts.small_size = fonts.ui_size / 4
   fonts.small = summon.AssetLoader.load("font", "ipamp.ttf@"..fonts.small_size)
   self.fonts = fonts
 end

@@ -8,28 +8,35 @@ local Phase = summon.class("state.Phase")
 
 function Phase:initialize(data)
   self.stages = {}
+  self.stages_data = data.stages
   self.activeStage = nil
   self.title = data.title
   self.description = data.description
   self.text = {
     next = {
       en = "Next",
-      ja = "次へ"
+      ja = "次へ",
+      it = "Continua"
+    },
+    finish = {
+      en = "End",
+      ja = "終了",
+      it = "Fine"
     }
   }
-
-  for _,stage_data in pairs(data.stages) do
-    local stage = Stage(stage_data)
-    table.insert(self.stages, {instance = stage, mouse = {}, vp = {}})
-  end
-
-  self:resize()
-  self.activeStage = self.stages[1]
 end
 
 function Phase:onPush(game, prev)
-  local locale = game.locale
-  self.next_w = self.font.description:getWidth(self.text.next[locale]) * 1.5
+  for _,stage_data in pairs(self.stages_data) do
+    local stage = Stage(game, stage_data)
+    table.insert(self.stages, {instance = stage, mouse = {}, vp = {}})
+  end
+  self.stage_data = nil
+  self.activeStage = self.stages[1]
+
+  self:resize()
+  self.next_w = 1.5 * self.font.description:getWidth(
+    game:getLocalizedString(self.text.next))
 end
 
 function Phase:resize(w, h)
@@ -52,12 +59,8 @@ function Phase:resize(w, h)
   local x = self.padding
   local y = header
 
-  local locale
-
-  if self.game then locale = self.game.locale
-  else locale = "en" end
-
-  self.next_w = self.font.description:getWidth(self.text.next[locale]) * 1.5
+  self.next_w = 1.5 * self.font.description:getWidth(
+    self.game:getLocalizedString(self.text.next))
 
   for _,stage in pairs(self.stages) do
     stage.instance:resize(sw, sh)
@@ -78,14 +81,12 @@ function Phase:drawStageBorder(stage, color)
 end
 
 function Phase:draw()
-  local locale = self.game.locale
-
   sg.setColor(200, 200, 200)
   self.font.title:apply()
-  sg.print(self.title[locale] or "", self.padding, self.padding)
+  sg.print(self.game:getLocalizedString(self.title), self.padding, self.padding)
 
   self.font.description:apply()
-  sg.print(self.description[locale] or "",
+  sg.print(self.game:getLocalizedString(self.description),
     self.padding, self.title_size + self.padding * 2)
 
   for _,stage in pairs(self.stages) do
@@ -124,11 +125,13 @@ local function isInStage(stage, x, y)
 end
 
 function Phase:update(dt)
-  local locale = self.game.locale
-
   self.font.description:apply()
+  local caption
+  if self.next_phase then caption = self.text.next
+  else caption = self.text.finish end
+
   if gui.Button{
-      text = self.text.next[locale],
+      text = self.game:getLocalizedString(caption),
       pos = {self.vp.x - self.padding - self.next_w, self.padding},
       size = {self.next_w, self.title_size + self.description_size}} then
     self:pop()
@@ -149,11 +152,6 @@ function Phase:update(dt)
   for _,stage in pairs(self.stages) do
     stage.instance:update(dt)
   end
-end
-
-function Phase:onPush(game, prev)
-  self.game = game
-  for _,stage in pairs(self.stages) do stage.instance:setLocale(game.locale) end
 end
 
 function Phase:keypressed(key)
