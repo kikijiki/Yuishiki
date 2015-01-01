@@ -137,18 +137,6 @@ function Phase:update(dt)
     self:pop()
   end
 
-  local size = (self.title_size + self.description_size) / 3
-  if gui.Button{
-      text = "",
-      pos = {self.vp.x - self.padding - self.next_w -size * 2, self.padding + size },
-      size = {size, size}}
-    then
-    console:flip()
-    if console.visible then
-      if self.activeStage then self.activeStage.instance:dumpActiveCharacter() end
-    end
-  end
-
   for _,stage in pairs(self.stages) do
     stage.instance:update(dt)
   end
