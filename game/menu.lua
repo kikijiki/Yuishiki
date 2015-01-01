@@ -51,10 +51,12 @@ function Menu:draw()
   sg.setColor(0, 200, 255)
   sg.printf("YS", 0, self.title_spacing, self.w, "center")
 
-  self.fonts.small:apply()
-  local margin = (self.title_offset - self.fonts.ui_size * 2) / 3
-  margin = (margin - self.fonts.small_size) / 2
-  sg.print(self.game:getLocalizedString(self.keys.fullscreen), margin, margin)
+  if not love.phone then
+    self.fonts.small:apply()
+    local margin = (self.title_offset - self.fonts.ui_size * 2) / 3
+    margin = (margin - self.fonts.small_size) / 2
+    sg.print(self.game:getLocalizedString(self.keys.fullscreen), margin, margin)
+  end
 
   self:drawLogo()
   gui.core.draw()
