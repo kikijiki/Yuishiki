@@ -205,7 +205,7 @@ return function(loader)
   end
 
   function BeliefBase:restore(data)
-    for _, belief in pairs(data) do self.log.i("restoring", belief.path.full)
+    for _, belief in pairs(data) do
       belief:reset()
       raw_set(self, belief)
     end

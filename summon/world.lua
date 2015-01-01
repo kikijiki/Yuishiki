@@ -12,11 +12,12 @@ return function(loader)
   function World:initialize(map) assert(map)
     EventObservable.initialize(self)
 
-    self.characters     = {}
-    self.map            = map
-    self.events_enabled = false
-    self.event_queue    = {}
-    self.log            = log.tag("world")
+    self.characters          = {}
+    self.inactive_characters = {}
+    self.map                 = map
+    self.events_enabled      = false
+    self.event_queue         = {}
+    self.log                 = log.tag("world")
   end
 
   function World:addCharacter(character, id) assert(character)
@@ -33,8 +34,12 @@ return function(loader)
 
   function World:removeCharacter(character)
     if type(character) == "table" then
-      if character.id then self.characters[character.id] = nil end
+      if character.id then
+        self.inactive_characters[character.id] = self.characters[character.id]
+        self.characters[character.id] = nil
+      end
     else
+      self.inactive_characters[character] = self.characters[character]
       self.characters[character] = nil
     end
     self:propagateEvent(character, {"character", "removed"})
@@ -96,6 +101,27 @@ return function(loader)
       self:notify(source, event, ...)
     else
       table.insert(self.event_queue, {source, event, ...})
+    end
+  end
+
+  function World:exportAgentData()
+    local data = {}
+    for id, char in pairs(self.characters) do
+      data[id] = char.agent:save()
+    end
+    for id, char in pairs(self.inactive_characters) do
+      data[id] = char.agent:save()
+    end
+    return data
+  end
+
+  function World:importAgentData(data)
+    for id, agent_data in pairs(data) do
+      if self.characters[id] then
+        self.characters[id].agent:restore(agent_data)
+      elseif self.inactive_characters[id] then
+        self.inactive_characters[id].agent:restore(agent_data)
+      end
     end
   end
 
