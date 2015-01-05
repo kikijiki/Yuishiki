@@ -15,7 +15,7 @@ return function(loader)
     self.buffer        = {length = 0}
     self.font_size     = 20
     self.font          = AssetLoader.load("font", "msmincho.ttc@"..self.font_size)
-    self.current_line  = 1
+    self.current_line  = 0
     self.padding       = 5
     self.margin        = 10
     self.colors        = {}
@@ -62,6 +62,8 @@ return function(loader)
     if key == "pageup"   then self:scroll( self.page) consumed = true end
     if key == "pagedown" then self:scroll(-self.page) consumed = true end
     if key == "end"      then self:scroll(0)          consumed = true end
+
+    if key == "delete"   then self:clear()            consumed = true end
 
     return consumed
   end
@@ -134,7 +136,7 @@ return function(loader)
     if #l > 1 then
       for i = 2, #l do insert(self.buffer, level, l[i]) end
     end
-    if self.current_line > 1 then self.current_line = self.current_line + 1 end
+    if self.current_line > 1 then self.current_line = self.current_line + #l end
   end
 
   function Console:i(msg) log(self, "INF", msg) end
