@@ -22,6 +22,9 @@ end
 
 local ys = require "yuishiki"()
 local summon = require "summon"()
+local sg = summon.graphics
+
+local signature_font = sg.newFont(20)
 
 -- Setup logging and console
 console = summon.Console(1, 1)
@@ -119,6 +122,8 @@ end
 function love.resize(w, h)
   console:resize(w, h)
   game.on.resize(w, h)
+  local size = math.min(w, h)
+  signature_font = sg.newFont(size / 50)
 end
 
 function love.keypressed(key)
@@ -148,13 +153,15 @@ end
 
 function love.keyreleased(key)
   game.on.keyreleased(key)
-
-  if key == "delete" then
-    console:clear()
-  end
 end
 
 function love.draw()
   game.on.draw()
   console:draw()
+
+  local w, h = sg.getDimensions()
+  sg.setColor(0, 200, 200)
+  sg.setFont(signature_font)
+  local fh = signature_font:getHeight()
+  summon.graphics.print("Bernacchia Matteo - 2015", fh/2, h - fh)
 end
