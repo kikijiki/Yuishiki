@@ -1,25 +1,3 @@
-if os.time() > os.time({year = 2015, month = 2, day = 1}) then
-  local x, y = 0, 0
-  local w = love.graphics.getWidth()
-  local c = love.graphics.newCanvas()
-  local fs = 30
-  local font = love.graphics.newFont(fs)
-  love.graphics.setFont(font)
-  local text = "EXPIRED "
-  local tw = font:getWidth(text)
-  love.draw = function()
-    love.graphics.setCanvas(c)
-    love.graphics.print(text, x, y)
-    x = x + tw
-    if x > w then
-      x, y = 0, y + fs
-    end
-    love.graphics.setCanvas()
-    love.graphics.draw(c)
-  end
-  return
-end
-
 local ys = require "yuishiki"()
 local summon = require "summon"()
 local sg = summon.graphics
