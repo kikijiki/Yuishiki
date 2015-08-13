@@ -134,7 +134,7 @@ return function(loader)
     local border = self.border
     local padding = self.padding
     local p2 = padding / 2
-    local stats = {}-- "str", "dex", "cos", "int", "spd", "mov"}--, "atk", "def", "arm", "matk", "mdef", "marm" }
+    local stats = {}-- "str", "dex", "con", "int", "spd", "mov"}--, "atk", "def", "arm", "matk", "mdef", "marm" }
     local spacing = self.fonts.normal:getHeight() + padding
     local h = #stats * spacing + (spacing + 4) * 3 + spacing + padding
     y = scrh - y - h
