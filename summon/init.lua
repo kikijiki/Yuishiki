@@ -86,8 +86,8 @@ return function (base_path)
 
   summon._VERSION     = "0.4.0"
   summon._DESCRIPTION = "Support game engine."
-  summon._AUTHOR      = "Matteo Bernacchia <makikijiki@gmail.com>"
-  summon._COPYRIGHT   = "Copyright (c) 2013-2014 Matteo Bernacchia"
+  summon._AUTHOR      = "Matteo Bernacchia <dev@kikijiki.com>"
+  summon._COPYRIGHT   = "Copyright (c) 2013 Matteo Bernacchia"
 
   return summon
 end

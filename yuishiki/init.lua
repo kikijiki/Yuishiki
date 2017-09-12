@@ -28,8 +28,8 @@ return function (base_path)
 
   ys._VERSION = "0.4.0"
   ys._DESCRIPTION = "A game-oriented BDI multi agent system."
-  ys._AUTHOR = "Matteo Bernacchia <makikijiki@gmail.com>"
-  ys._COPYRIGHT = "Copyright (c) 2013-2014 Matteo Bernacchia"
+  ys._AUTHOR = "Matteo Bernacchia <dev@kikijiki.com>"
+  ys._COPYRIGHT = "Copyright (c) 2013 Matteo Bernacchia"
 
   return ys
 end
